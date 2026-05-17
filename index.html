@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no,interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Moodfilm</title>
+<title>Moodfilm - Find Movies by Mood</title>
 <link rel="manifest" href="manifest.json">
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{})</script>
-<meta property="og:title" content="Moodfilm — Find Your Film by Mood">
+<meta property="og:title" content="Moodfilm - Find Movies by Mood">
+<meta property="og:description" content="Tell us how you feel and we find your perfect film. Free, always.">
 <meta property="og:image" content="https://aaronkankipati.github.io/moodfilm-app/og-image.png">
 <meta property="og:url" content="https://aaronkankipati.github.io/moodfilm-app/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,180 +18,332 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  /* Richer gold — more saturated, deeper shadows */
-  --gold:#D4922A;--gold-l:#F0B84A;--gold-d:#8A5E1A;--gold-glow:rgba(212,146,42,.18);
-  /* Deeper, more distinct background layers */
-  --ink:#070709;--ink2:#0F0F14;--ink3:#171720;--ink4:#1E1E2A;--ink5:#26263A;
-  /* Warmer paper — more cream, less grey */
-  --paper:#F0EAD8;--paper2:#C9BFA8;--muted:#6B6478;
+  /* Terracotta-gold — organic, warm, human. Not metallic. */
+  --gold:#C8895A;--gold-l:#E8A87C;--gold-d:#96583A;--gold-glow:rgba(200,137,90,.18);
+  /* Warm dark navy backgrounds — safety, depth, not void */
+  --ink:#0B0B0F;--ink2:#11111A;--ink3:#181824;--ink4:#1F1F2E;--ink5:#272738;
+  /* Warm off-white text — readable, soft, never clinical */
+  --paper:#EDE8E2;--paper2:#C4BAB0;--muted:#7A7088;
   --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
 }
 html,body{width:100%;height:100%;overflow:hidden;position:fixed;inset:0;background:var(--ink);color:var(--paper);font-family:'DM Sans',sans-serif}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");background-size:160px;pointer-events:none;z-index:9998;mix-blend-mode:overlay;opacity:.5}
 
-/* ══════════════════════════════════════════
-   WELCOME / SPLASH SCREEN
-   ══════════════════════════════════════════ */
+/* ══ SPLASH ══════════════════════════════════════════════
+   A cinema before the curtain rises.
+   Warm light blooms from centre, mark breathes into existence,
+   title draws itself, tagline whispers, then stillness.
+   ══════════════════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9000;
-  background:#080809;
+  /* Warm vignette — projector light before curtain */
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 48%,
+      rgba(32,24,18,.0) 0%,
+      rgba(18,14,10,.6) 55%,
+      rgba(11,11,15,1) 100%),
+    #0B0B0F;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   padding:40px 32px;
-  /* fades out when .fade-out is added */
-  transition:opacity 1.2s cubic-bezier(.4,0,.2,1);
+  transition:opacity 1.4s cubic-bezier(.4,0,.2,1);
 }
-#splash.fade-out{
-  opacity:0;
-  pointer-events:none;
-}
+#splash.fade-out{opacity:0;pointer-events:none}
 
-/* Horizontal rule that draws itself left→right */
+/* Thin horizontal rule draws left to right */
 .splash-rule{
   width:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);
-  margin-bottom:40px;
-  transition:width 1.1s cubic-bezier(.76,0,.24,1);
+  background:linear-gradient(90deg,transparent,rgba(200,137,90,.5),transparent);
+  margin-bottom:44px;
+  transition:width 1.2s cubic-bezier(.76,0,.24,1);
 }
-.splash-rule.drawn{width:120px;}
+.splash-rule.drawn{width:100px}
 
-/* Logo mark — film frame SVG, scales in */
+/* Film mark — larger, more present, subtle entry */
 .splash-mark{
   opacity:0;
-  transform:scale(.7);
-  transition:opacity .8s ease .4s, transform .8s cubic-bezier(.34,1.56,.64,1) .4s;
-  margin-bottom:28px;
+  transform:scale(.82) translateY(4px);
+  transition:opacity 1.1s ease .35s,
+             transform 1.1s cubic-bezier(.25,.46,.45,.94) .35s;
+  margin-bottom:36px;
 }
-.splash-mark.show{opacity:1;transform:scale(1);}
+.splash-mark.show{opacity:1;transform:scale(1) translateY(0)}
 
-/* Title — letters fade in staggered via clip-path reveal */
+/* Subtle breath on the mark after it appears */
+@keyframes markBreathe{
+  0%,100%{opacity:.92;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.018)}
+}
+.splash-mark.show{animation:markBreathe 4s ease-in-out 1.5s infinite}
+
+/* Title — wider spacing, slower, more weight */
 .splash-title{
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(38px,10vw,52px);
+  font-size:clamp(36px,9.5vw,50px);
   font-weight:300;
-  letter-spacing:.18em;
+  letter-spacing:.28em;
   text-transform:uppercase;
   color:var(--paper);
   overflow:hidden;
   white-space:nowrap;
-  /* clip reveal from left */
   clip-path:inset(0 100% 0 0);
-  transition:clip-path 1.0s cubic-bezier(.76,0,.24,1) .7s;
+  transition:clip-path 1.2s cubic-bezier(.76,0,.24,1) .8s;
   margin-bottom:14px;
 }
-.splash-title.reveal{clip-path:inset(0 0% 0 0);}
+.splash-title.reveal{clip-path:inset(0 0% 0 0)}
 
-/* Tagline — fades in last */
+/* Tagline — italic, lowercase, terracotta whisper */
 .splash-tagline{
   font-family:'Cormorant Garamond',serif;
-  font-size:13px;
+  font-size:15px;
   font-weight:300;
   font-style:italic;
-  letter-spacing:.22em;
-  color:rgba(201,168,76,.85);
-  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:rgba(200,137,90,.7);
+  /* No uppercase — whisper not shout */
   opacity:0;
-  transition:opacity .9s ease 1.5s;
+  transform:translateY(6px);
+  transition:opacity 1s ease 2.1s, transform 1s ease 2.1s;
 }
-.splash-tagline.show{opacity:1;}
+.splash-tagline.show{opacity:1;transform:translateY(0)}
 
-/* Bottom rule */
+/* Bottom rule — wider, more presence */
 .splash-rule-bottom{
   position:absolute;
-  bottom:52px;left:50%;transform:translateX(-50%);
+  bottom:56px;left:50%;transform:translateX(-50%);
   width:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(201,168,76,.3),transparent);
-  transition:width 1.0s cubic-bezier(.76,0,.24,1) 1.0s;
+  background:linear-gradient(90deg,transparent,rgba(200,137,90,.25),transparent);
+  transition:width 1.1s cubic-bezier(.76,0,.24,1) 1.2s;
 }
-.splash-rule-bottom.drawn{width:80px;}
+.splash-rule-bottom.drawn{width:100px}
 
-/* Enter prompt — pulses softly */
+/* Enter prompt — warmer, more personal */
 .splash-enter{
   position:absolute;
-  bottom:32px;left:50%;transform:translateX(-50%);
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;
-  letter-spacing:.25em;
-  text-transform:uppercase;
-  color:rgba(201,168,76,.55);
+  bottom:36px;left:50%;transform:translateX(-50%);
+  font-family:'Cormorant Garamond',serif;
+  font-size:12px;
+  font-style:italic;
+  letter-spacing:.18em;
+  color:rgba(200,137,90,.45);
   opacity:0;
-  transition:opacity .6s ease 2.4s;
+  transition:opacity .8s ease;
   white-space:nowrap;
 }
-.splash-enter.show{opacity:1;}
-@keyframes breathe{0%,100%{opacity:.4}50%{opacity:.8}}
-.splash-enter.breathing{animation:breathe 2s ease-in-out infinite;}
-/* ══════════════════════════════════════════ */
+.splash-enter.show{opacity:1}
+@keyframes breathe{0%,100%{opacity:.3}50%{opacity:.7}}
+.splash-enter.breathing{animation:breathe 2.5s ease-in-out infinite}
 
-
+/* ══ APP SHELL ════════════════════════════════════════════ */
 #app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--safe-t)}
-
-/* TOPBAR */
-#topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px 10px;border-bottom:1px solid rgba(212,146,42,.15);background:rgba(7,7,9,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:10}
+#topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px 10px;border-bottom:1px solid rgba(160,150,180,.12);background:rgba(11,11,15,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:10}
 .logo{display:flex;align-items:center;gap:8px}
 .logo-reel{width:22px;height:22px;flex-shrink:0}
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);-webkit-text-fill-color:var(--gold)}
-#usage-badge{font-size:11px;background:rgba(212,146,42,.12);border:1px solid rgba(212,146,42,.35);border-radius:50px;padding:5px 13px;color:var(--gold-l);cursor:pointer;font-weight:500}
+.topbar-tag{font-size:10px;color:var(--muted);letter-spacing:.08em}
 
-/* CHAT */
+/* ══ LISTENING STATE ════════════════════════════════════
+   Appears in the dead space when keyboard is open and
+   user hasn't typed yet. Warm, unhurried, human.
+   Fades in when keyboard opens, fades out on first keystroke.
+   ══════════════════════════════════════════════════════ */
+/* ══ LISTENING STATE — colour psychology ════════════════
+   Deep indigo wash — researched most effective colour for
+   emotional safety and trust. Used by therapy and journaling
+   apps. Feels like a quiet, dimmed room before a real talk.
+   Text stays warm cream. "I'm listening." shifts lavender-gold.
+   Breathing animation — 4s ease in/out like a resting heartbeat.
+   Fades out gently over 600ms when user starts typing.
+   ══════════════════════════════════════════════════════ */
+#listening-state{
+  position:fixed;
+  left:0;right:0;
+  top:56px;
+  bottom:130px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:28px 36px;
+  text-align:center;
+  /* Indigo-tinted wash — safety, trust, openness */
+  background:radial-gradient(
+    ellipse at 50% 40%,
+    rgba(52,48,96,.85) 0%,
+    rgba(28,24,52,.95) 45%,
+    rgba(7,7,9,1) 100%
+  );
+  opacity:0;
+  pointer-events:none;
+  z-index:5;
+  /* Show: fade in. Hide: fade out over 600ms */
+  transition:opacity .6s ease;
+}
+#listening-state.show{
+  opacity:1;
+}
+/* Fading out on type — class added by JS */
+#listening-state.fading{
+  opacity:0;
+  transition:opacity .6s ease;
+  pointer-events:none;
+}
+#listening-state.fading .listen-content{
+  animation-play-state:paused;
+}
+
+/* ── BREATHING ANIMATION ── */
+/* The whole content block breathes — 40% to 100% opacity, 4s loop */
+@keyframes breatheIn{
+  0%,100%{opacity:.5;transform:translateY(0px)}
+  50%{opacity:1;transform:translateY(-3px)}
+}
+.listen-content{
+  animation:breatheIn 4s ease-in-out infinite;
+}
+
+.listen-line-1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(22px,6vw,28px);
+  font-weight:300;
+  font-style:italic;
+  color:var(--paper);
+  line-height:1.2;
+  margin-bottom:20px;
+  letter-spacing:.02em;
+}
+.listen-line-2{
+  font-size:13px;
+  /* Slightly lavender — warm, soft, safe */
+  color:rgba(200,196,220,.7);
+  line-height:2;
+  letter-spacing:.03em;
+  font-weight:300;
+}
+.listen-line-2 span{
+  display:block;
+}
+.listen-final{
+  display:block;
+  margin-top:16px;
+  /* Lavender-gold — warm trust colour */
+  color:rgba(180,168,220,.75);
+  font-style:italic;
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;
+  font-weight:300;
+  letter-spacing:.06em;
+}
+.listen-em{
+  margin-top:10px;
+  display:block;
+  color:rgba(200,137,90,.65);
+  font-style:italic;
+  font-family:'Cormorant Garamond',serif;
+  font-size:16px;
+  font-weight:300;
+  letter-spacing:.03em;
+}
+.listen-im{
+  display:block;
+  margin-top:12px;
+  color:rgba(200,137,90,.7);
+  font-style:italic;
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;
+  font-weight:300;
+  letter-spacing:.04em;
+}
+/* ══ CHAT ════════════════════════════════════════════════ */
 #chat{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 18px 6px;display:flex;flex-direction:column;gap:10px}
 #chat::-webkit-scrollbar{display:none}
-
-/* APP BUBBLE */
 .msg-app{display:flex;gap:10px;align-items:flex-end;max-width:92%}
-.msg-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ink4),var(--ink3));border:1px solid rgba(212,146,42,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-bottom:2px}
-.bubble-app{background:linear-gradient(145deg,var(--ink3),var(--ink2));border:1px solid rgba(212,146,42,.22);border-radius:18px 18px 18px 4px;padding:13px 16px;font-size:14px;color:var(--paper2);line-height:1.55}
-.bubble-app .serif{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;color:var(--paper);font-style:italic;line-height:1.3}
-
-/* USER BUBBLE */
+.msg-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ink4),var(--ink3));border:1px solid rgba(200,137,90,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-bottom:2px}
+.bubble-app{background:linear-gradient(145deg,var(--ink3),var(--ink2));border:1px solid rgba(160,150,180,.14);border-radius:18px 18px 18px 4px;padding:14px 17px;font-size:14px;color:var(--paper2);line-height:1.65}
+.bubble-app .serif{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--paper);font-style:italic;line-height:1.25;letter-spacing:.01em}
 .msg-user{display:flex;justify-content:flex-end;align-self:flex-end;max-width:85%}
-.bubble-user{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--ink);border-radius:18px 18px 4px 18px;padding:11px 15px;font-size:14px;font-weight:500;line-height:1.5;word-break:break-word}
-
-/* TYPING */
+.bubble-user{background:linear-gradient(135deg,#D4906A,#A85E3A);color:#FFF8F4;border-radius:18px 18px 4px 18px;padding:11px 15px;font-size:14px;font-weight:500;line-height:1.5;word-break:break-word}
 .typing{display:flex;align-items:center;gap:5px;padding:4px 2px}
 .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingBounce 1.2s infinite}
 .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
 @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 
-/* MOOD PILLS in chat */
-.mood-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;margin-left:38px}
-.mood-pill{background:rgba(212,146,42,.09);border:1px solid rgba(212,146,42,.28);border-radius:50px;color:var(--paper);font-size:12px;padding:7px 15px;cursor:pointer;white-space:nowrap;user-select:none;-webkit-user-select:none;transition:background .15s,border-color .15s}
-/* FIX B1: use :active for visual feedback, not JS */
-.mood-pill:active{background:rgba(212,146,42,.22);border-color:var(--gold);color:var(--gold-l)}
+/* ══ COMPOSER PILLS — text-first, tags as secondary ═════
+   Sit below the input box, clearly labelled "or pick a feeling"
+   Horizontal scroll, single row, visually subordinate to text
+   ══════════════════════════════════════════════════════ */
+#composer-pills{
+  padding:4px 14px 10px;
+  overflow:hidden;
+}
+#composer-pills-label{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.15em;
+  color:var(--muted);
+  margin-bottom:7px;
+  opacity:.7;
+}
+#composer-pills-inner{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding-bottom:2px;
+}
+#composer-pills-inner::-webkit-scrollbar{display:none}
+.composer-pill{
+  flex-shrink:0;
+  background:rgba(200,137,90,.06);
+  border:1px solid rgba(200,137,90,.22);
+  border-radius:50px;
+  color:var(--paper2);
+  font-size:12px;
+  padding:6px 13px;
+  cursor:pointer;
+  white-space:nowrap;
+  user-select:none;-webkit-user-select:none;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.composer-pill:active{
+  background:rgba(200,137,90,.18);
+  border-color:var(--gold);
+  color:var(--gold-l);
+}
 
-/* INTENT CARDS */
+/* ══ INTENT CARDS ════════════════════════════════════════ */
 .intent-choices{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;margin-left:38px}
-.intent-choice{flex:1;min-width:calc(50% - 4px);background:linear-gradient(145deg,var(--ink4),var(--ink3));border:1px solid rgba(212,146,42,.2);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .18s,background .18s,box-shadow .18s;user-select:none;-webkit-user-select:none}
-.intent-choice:active{background:rgba(201,168,76,.06)}
-.intent-choice.selected{border-color:var(--gold);background:rgba(212,146,42,.14);box-shadow:0 0 18px rgba(212,146,42,.15)}
+.intent-choice{flex:1;min-width:calc(50% - 4px);background:linear-gradient(145deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.18);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .18s,background .18s,box-shadow .18s;user-select:none;-webkit-user-select:none}
+.intent-choice:active{background:rgba(200,137,90,.06)}
+.intent-choice.selected{border-color:var(--gold);background:rgba(200,137,90,.14);box-shadow:0 0 18px rgba(200,137,90,.15)}
 .ic-icon{font-size:20px;margin-bottom:5px;display:block}
 .ic-title{font-size:13px;font-weight:500;color:var(--paper);display:block;margin-bottom:2px}
-.ic-desc{font-size:11px;color:var(--muted)}
+.ic-desc{font-size:12px;color:var(--muted);margin-top:1px}
 
-/* LANG CHIPS */
+/* ══ LANG CHIPS ══════════════════════════════════════════ */
 .lang-choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
 .lang-choice{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 14px;font-size:13px;color:var(--paper2);cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;user-select:none;-webkit-user-select:none}
-.lang-choice:active{background:rgba(201,168,76,.08)}
-.lang-choice.selected{border-color:var(--gold);color:var(--gold-l);background:rgba(201,168,76,.1)}
+.lang-choice:active{background:rgba(200,137,90,.08)}
+.lang-choice.selected{border-color:var(--gold);color:var(--gold-l);background:rgba(200,137,90,.1)}
 .lang-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-
-/* LOCKED */
 .locked{pointer-events:none;opacity:.55}
 
-/* RESULTS */
+/* ══ RESULTS ══════════════════════════════════════════════ */
 .results-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:4px}
-.mood-summary-text{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--paper2);line-height:1.35;margin-bottom:6px}
+.mood-summary-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.4;margin-bottom:8px}
 .mood-tags{display:flex;flex-wrap:wrap;gap:4px}
-.mood-tag{border:1px solid rgba(201,168,76,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
+.mood-tag{border:1px solid rgba(200,137,90,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
 .cards-swipe{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:10px;padding-bottom:6px;margin:8px -18px 0;padding-left:18px;padding-right:18px}
 .cards-swipe::-webkit-scrollbar{display:none}
 .result-card{flex-shrink:0;width:calc(100vw - 56px);scroll-snap-align:start}
-.rc-inner{background:linear-gradient(160deg,var(--ink4),var(--ink3));border:1px solid rgba(212,146,42,.22);border-radius:16px;overflow:hidden}
-.result-card.top-pick .rc-inner{border-color:var(--gold);box-shadow:0 0 28px rgba(212,146,42,.2),0 0 0 1px rgba(212,146,42,.1)}
+.rc-inner{background:linear-gradient(160deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.15);border-radius:16px;overflow:hidden}
+.result-card.top-pick .rc-inner{border-color:var(--gold);box-shadow:0 0 28px rgba(200,137,90,.2),0 0 0 1px rgba(200,137,90,.1)}
 .card-poster{width:100%;height:120px;object-fit:cover;display:block}
 .card-poster-ph{width:100%;height:120px;background:var(--ink4);display:flex;align-items:center;justify-content:center;font-size:32px}
 .card-body{padding:11px 13px}
-.top-badge{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--ink);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:4px}
+.top-badge{background:linear-gradient(135deg,#C8895A,#96583A);color:#FFF8F4;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:4px}
 .card-header-row{display:flex;align-items:baseline;gap:6px;margin-bottom:3px;flex-wrap:wrap}
 .card-genre{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
 .card-title{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4vw,20px);font-weight:500;line-height:1.15}
@@ -199,86 +352,228 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .match-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px}
 .match-row .pct{color:var(--gold)}
 .match-track{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px}
-.match-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.match-fill{height:100%;background:linear-gradient(90deg,#96583A,#C8895A);border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
 .card-tagline{font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--gold-l);font-style:italic;margin-bottom:5px;line-height:1.3}
-.card-explanation{font-size:12px;color:var(--paper2);line-height:1.5;margin-bottom:7px}
+.card-explanation{font-size:13px;color:var(--paper2);line-height:1.55;margin-bottom:7px}
 .ott-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
-.ott-badge{display:inline-flex;align-items:center;gap:3px;background:var(--ink5);border:1px solid rgba(255,255,255,.12);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--paper);text-decoration:none;white-space:nowrap}
+.ott-badge{display:inline-flex;align-items:center;gap:3px;background:var(--ink5);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--paper);text-decoration:none;white-space:nowrap}
 .ott-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
 .ott-none{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:7px;display:block}
 .card-actions{display:flex;gap:7px;align-items:center}
 .btn-tmdb{flex:1;text-align:center;font-size:12px;font-weight:500;color:var(--ink);background:linear-gradient(135deg,var(--gold),var(--gold-d));border-radius:9px;padding:8px 12px;text-decoration:none;display:block}
-.btn-share-card{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid rgba(201,168,76,.2);background:none;cursor:pointer;color:var(--muted)}
+.btn-share-card{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid rgba(200,137,90,.2);background:none;cursor:pointer;color:var(--muted)}
 .btn-share-card:active{border-color:var(--gold);color:var(--gold)}
 .card-dots{display:flex;align-items:center;gap:4px;margin-top:8px}
 .card-dot{width:4px;height:4px;border-radius:50%;background:var(--ink4);cursor:pointer;transition:all .25s}
 .card-dot.active{background:var(--gold);width:12px;border-radius:2px}
-
-/* ACTION CHIPS */
 .action-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
-.action-chip{background:rgba(212,146,42,.09);border:1px solid rgba(212,146,42,.28);border-radius:50px;color:var(--paper);font-size:12px;padding:7px 16px;cursor:pointer;user-select:none;-webkit-user-select:none}
-.action-chip:active{background:rgba(201,168,76,.14)}
-.action-chip.gold{color:var(--gold-l);border-color:rgba(212,146,42,.45);background:rgba(212,146,42,.13)}
-
-/* IN-CHAT LOADING */
+.action-chip{background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-size:12px;padding:7px 16px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.action-chip:active{background:rgba(200,137,90,.16)}
+.action-chip.gold{color:var(--gold-l);border-color:rgba(200,137,90,.45);background:rgba(200,137,90,.13)}
 .rl-wrap{margin-left:38px;margin-top:4px}
 .rl-bar{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px;width:180px}
 .rl-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
 .rl-text{font-size:12px;color:var(--muted);font-style:italic}
 
-/* COMPOSER */
-#composer{flex-shrink:0;border-top:1px solid rgba(212,146,42,.18);padding-bottom:var(--safe-b);background:var(--ink2)}
+/* ══ COMPOSER ════════════════════════════════════════════ */
+#composer{flex-shrink:0;border-top:1px solid rgba(160,150,180,.12);padding-bottom:var(--safe-b);background:var(--ink2)}
 
-/* FIX B2: chip tray — no onBlur dependency at all */
-#chip-tray{max-height:0;overflow:hidden;opacity:0;transition:max-height .28s cubic-bezier(.4,0,.2,1),opacity .22s ease;pointer-events:none;touch-action:none}
-#chip-tray.open{max-height:52px;opacity:1;pointer-events:auto}
-#chip-tray-inner{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 14px 0}
-#chip-tray-inner::-webkit-scrollbar{display:none}
 
-/* FIX B1: tray chips — NO preventDefault, use pointer events cleanly */
-.tray-chip{flex-shrink:0;background:rgba(212,146,42,.09);border:1px solid rgba(212,146,42,.28);border-radius:50px;color:var(--paper);font-size:12px;padding:6px 13px;cursor:pointer;white-space:nowrap;user-select:none;-webkit-user-select:none;transition:background .15s,border-color .15s}
-.tray-chip:active{background:rgba(212,146,42,.2)}
-.tray-chip.active{background:rgba(212,146,42,.2);border-color:var(--gold);color:var(--gold-l)}
+#input-row{display:flex;align-items:flex-end;gap:10px;padding:10px 14px 12px}#input-glow-wrap{flex:1}
 
-#input-row{display:flex;align-items:flex-end;gap:10px;padding:10px 14px 12px}
-#mood-input{flex:1;background:rgba(212,146,42,.07);border:1.5px solid rgba(212,146,42,.3);border-radius:22px;color:var(--paper);font-family:'DM Sans',sans-serif;font-size:max(16px,14px);line-height:1.55;padding:12px 18px;resize:none;outline:none;min-height:48px;max-height:120px;overflow-y:auto;scrollbar-width:none;transition:border-color .25s,box-shadow .25s}
+/* ══ TEXTAREA — SERIAL LIGHT BORDER ════════════════════
+   A single point of gold light travels continuously
+   around the entire border perimeter — clockwise, calm,
+   hypnotic. Like a lit fuse or a luxury bezel catching light.
+   
+   Technique: the textarea sits inside #input-glow-wrap.
+   A ::before pseudo-element uses a rotating conic-gradient
+   clipped to just the border area via overflow+padding trick.
+   ══════════════════════════════════════════════════════ */
+
+/* Wrapper — provides the rotating light canvas */
+#input-glow-wrap{
+  flex:1;
+  position:relative;
+  border-radius:23px; /* 1px more than textarea for border */
+  padding:1.5px;      /* this IS the border — gradient shows here */
+  background:rgba(200,137,90,.22); /* resting base border colour */
+  transition:background .3s;
+}
+
+/* The rotating light — a conic-gradient that spins */
+@keyframes serialLight{
+  from{--light-angle:0deg}
+  to{--light-angle:360deg}
+}
+@property --light-angle{
+  syntax:'<angle>';
+  inherits:false;
+  initial-value:0deg;
+}
+
+#input-glow-wrap::before{
+  content:'';
+  position:absolute;
+  inset:-1px;
+  border-radius:24px;
+  background:conic-gradient(
+    from var(--light-angle),
+    transparent 0deg,
+    transparent 280deg,
+    rgba(200,137,90,.15) 300deg,
+    rgba(232,168,124,.7)  340deg,
+    rgba(255,200,160,1)  360deg,
+    transparent 360deg
+  );
+  animation:serialLight 4s linear infinite;
+  z-index:0;
+}
+
+/* Outer glow that follows the light — soft ambient */
+#input-glow-wrap::after{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:26px;
+  background:conic-gradient(
+    from var(--light-angle),
+    transparent 0deg,
+    transparent 300deg,
+    rgba(200,137,90,.04) 330deg,
+    rgba(200,137,90,.12) 355deg,
+    transparent 360deg
+  );
+  animation:serialLight 4s linear infinite;
+  z-index:0;
+  filter:blur(4px);
+}
+
+/* Textarea itself — sits ON TOP of the gradient border */
+#mood-input{
+  position:relative;
+  z-index:1;
+  width:100%;
+  background:var(--ink2);
+  border:none;
+  border-radius:22px;
+  color:var(--paper);
+  font-family:'DM Sans',sans-serif;
+  font-size:max(16px,14px);
+  line-height:1.55;
+  padding:12px 18px;
+  resize:none;outline:none;
+  min-height:48px;max-height:120px;
+  overflow-y:auto;scrollbar-width:none;
+  display:block;
+}
 #mood-input::-webkit-scrollbar{display:none}
-#mood-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,146,42,.1)}
-#mood-input::placeholder{color:rgba(107,100,120,.7)}
-#send-btn{width:44px;height:44px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold-l),var(--gold));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.25;pointer-events:none;transition:opacity .2s,transform .18s,box-shadow .2s}
-#send-btn.ready{opacity:1;pointer-events:auto;box-shadow:0 4px 16px rgba(212,146,42,.4)}
+#mood-input::placeholder{color:rgba(107,100,120,.65)}
+
+/* Nudge — speed up the light, brighten it */
+#input-glow-wrap.nudge::before{
+  animation-duration:2.2s;
+  background:conic-gradient(
+    from var(--light-angle),
+    transparent 0deg,
+    transparent 260deg,
+    rgba(200,137,90,.25) 290deg,
+    rgba(232,168,124,.9)  335deg,
+    rgba(255,210,170,1)  355deg,
+    transparent 360deg
+  );
+}
+#input-glow-wrap.nudge::after{
+  animation-duration:2.2s;
+}
+#input-glow-wrap.nudge{
+  background:rgba(200,137,90,.35);
+}
+
+/* Focus — steady full glow, light pauses */
+#input-glow-wrap.focused{
+  background:rgba(200,137,90,.5);
+  box-shadow:0 0 0 3px rgba(200,137,90,.1),0 0 20px rgba(200,137,90,.18);
+}
+#input-glow-wrap.focused::before{
+  animation-play-state:paused;
+  background:conic-gradient(
+    from var(--light-angle),
+    rgba(200,137,90,.3) 0deg,
+    rgba(232,168,124,.6) 180deg,
+    rgba(200,137,90,.3) 360deg
+  );
+}
+#input-glow-wrap.focused::after{
+  animation-play-state:paused;
+}
+
+/* Fallback for browsers without @property support */
+@supports not (background:conic-gradient(from 0deg, red, blue)){
+  #input-glow-wrap::before{
+    background:rgba(200,137,90,.3);
+    animation:none;
+  }
+  @keyframes fallbackBreathe{0%,100%{opacity:.4}50%{opacity:.9}}
+  #input-glow-wrap::before{animation:fallbackBreathe 3s ease-in-out infinite}
+}
+
+#send-btn{width:44px;height:44px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#D4906A,#96583A);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.25;pointer-events:none;transition:opacity .2s,transform .18s,box-shadow .2s}
+#send-btn.ready{opacity:1;pointer-events:auto;box-shadow:0 4px 20px rgba(200,137,90,.3)}
 #send-btn:active{transform:scale(.92)}
 
-/* PREFETCH BAR */
+/* ══ PREFETCH BAR ════════════════════════════════════════ */
 #prefetch-bar{height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold),var(--gold-l));background-size:200% auto;animation:shimmer 1.5s linear infinite;width:0;position:fixed;top:0;left:0;z-index:600;opacity:0;transition:width .4s ease,opacity .3s}
 
-/* PAYWALL */
-#paywall{position:fixed;inset:0;z-index:500;background:rgba(12,12,14,.9);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease}
-#paywall.show{opacity:1;pointer-events:auto}
-#paywall-sheet{background:var(--ink2);border-radius:22px 22px 0 0;border-top:1px solid rgba(201,168,76,.2);padding:20px 22px calc(22px + var(--safe-b));transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
-#paywall.show #paywall-sheet{transform:translateY(0)}
-.pw-handle{width:36px;height:3px;background:var(--ink4);border-radius:3px;margin:0 auto 16px}
-.pw-icon{font-size:28px;text-align:center;margin-bottom:8px}
-.pw-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;text-align:center;line-height:1.2;margin-bottom:4px}
-.pw-title em{font-style:italic;color:var(--gold)}
-.pw-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:16px}
-.pw-premium-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;background:var(--ink3);border:1px solid rgba(201,168,76,.15);border-radius:12px;padding:10px 14px}
-.pw-plan-name{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:2px}
-.pw-price{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--paper);line-height:1}
-.pw-price span{font-size:12px;font-family:'DM Sans',sans-serif;color:var(--muted)}
-.pw-features-mini{text-align:right}
-.pw-feat-mini{font-size:11px;color:var(--paper2);margin-bottom:2px}
-.pw-feat-mini.dim{color:var(--muted);font-style:italic}
-.pw-cta-stack{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
-.btn-ad{background:var(--ink3);border:1px solid rgba(201,168,76,.3);border-radius:13px;padding:13px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--paper)}
-.btn-ad:active{background:rgba(201,168,76,.08)}
-.btn-premium{background:linear-gradient(135deg,var(--gold),var(--gold-d));border:none;border-radius:13px;padding:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--ink)}
-.btn-premium:active{opacity:.9}
-.pw-upi{font-size:10px;color:var(--muted);text-align:center;margin-bottom:8px}
-.pw-dismiss{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;width:100%;text-align:center;padding:4px 0;cursor:pointer}
+/* ══ AD GATE — bottom sheet ══════════════════════════════
+   Slides up after language is picked
+   API fires simultaneously at 5 seconds into countdown
+   ══════════════════════════════════════════════════════ */
+#ad-gate{position:fixed;inset:0;z-index:500;background:rgba(7,7,9,.88);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(4px)}
+#ad-gate.show{opacity:1;pointer-events:auto}
+#ad-sheet{background:var(--ink2);border-radius:24px 24px 0 0;border-top:1px solid rgba(200,137,90,.22);padding:22px 22px calc(22px + var(--safe-b));transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1)}
+#ad-gate.show #ad-sheet{transform:translateY(0)}
+.ad-handle{width:36px;height:3px;background:var(--ink4);border-radius:3px;margin:0 auto 20px}
 
-/* TOAST */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink3);border:1px solid rgba(201,168,76,.3);border-radius:50px;padding:9px 20px;font-size:12px;color:var(--gold-l);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;z-index:700}
+/* Film icon + text */
+.ad-icon{font-size:32px;text-align:center;margin-bottom:10px}
+.ad-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;text-align:center;color:var(--paper);line-height:1.2;margin-bottom:6px}
+.ad-title em{font-style:italic;color:var(--gold)}
+.ad-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:22px;max-width:280px;margin-left:auto;margin-right:auto}
+
+/* The big watch ad button — premium gold */
+#btn-watch-ad{
+  width:100%;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold));
+  border:none;border-radius:16px;
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  color:var(--ink);
+  transition:transform .18s,box-shadow .18s;
+  box-shadow:0 4px 24px rgba(200,137,90,.3);
+  margin-bottom:12px;
+}
+#btn-watch-ad:active{transform:scale(.98)}
+
+/* Ad countdown timer ring */
+.ad-timer-wrap{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.ad-timer-ring{position:relative;width:52px;height:52px;flex-shrink:0}
+.ad-timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ad-timer-ring circle{fill:none;stroke:var(--ink4);stroke-width:3}
+.ad-timer-ring .progress{stroke:var(--gold);stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:138;transition:stroke-dashoffset .9s linear}
+.ad-timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold)}
+.ad-timer-label{font-size:13px;color:var(--paper2);line-height:1.5}
+
+/* Simulated ad view (pre-Play Store) */
+#ad-simulated{display:none;background:var(--ink3);border:1px solid rgba(200,137,90,.18);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px}
+#ad-simulated.show{display:block}
+.ad-sim-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+.ad-sim-content{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.5}
+
+/* ══ TOAST ════════════════════════════════════════════════ */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink3);border:1px solid rgba(200,137,90,.3);border-radius:50px;padding:9px 20px;font-size:12px;color:var(--gold-l);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;z-index:700}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -291,89 +586,134 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <div id="prefetch-bar"></div>
 <div class="toast" id="toast"></div>
 
-<!-- PAYWALL -->
-<div id="paywall">
-  <div id="paywall-sheet">
-    <div class="pw-handle"></div>
-    <div class="pw-icon">🎬</div>
-    <h2 class="pw-title">You've used your<br>free pick <em>today</em></h2>
-    <p class="pw-sub">Watch a short ad for one more, or go Premium.</p>
-    <div class="pw-premium-row">
-      <div><div class="pw-plan-name">✦ Premium</div><div class="pw-price">₹99<span>/mo</span></div></div>
-      <div class="pw-features-mini">
-        <div class="pw-feat-mini">Unlimited searches</div>
-        <div class="pw-feat-mini">Netflix · Prime · Hotstar</div>
-        <div class="pw-feat-mini dim">Hindi & Tamil — Soon</div>
-      </div>
-    </div>
-    <div class="pw-cta-stack">
-      <button class="btn-ad" onclick="watchAd()"><span>▶️</span> Watch a short ad for 1 more pick</button>
-      <button class="btn-premium" onclick="handleUpgrade()">Upgrade to Premium ₹99/month →</button>
-    </div>
-    <p class="pw-upi">UPI · GPay · PhonePe · Cancel anytime</p>
-    <button class="pw-dismiss" onclick="hidePaywall()">Come back tomorrow ↓</button>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     SPLASH SCREEN
-     ═══════════════════════════════════════ -->
+<!-- ══ SPLASH ══════════════════════════════════════════════ -->
 <div id="splash">
-  <!-- Top rule draws in -->
   <div class="splash-rule" id="splash-rule-top"></div>
 
-  <!-- Film frame mark -->
+  <!-- Film mark — 80px, more commanding presence -->
   <div class="splash-mark" id="splash-mark">
-    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
       <!-- Outer frame -->
-      <rect x="1.5" y="1.5" width="53" height="53" rx="8" stroke="#C9A84C" stroke-width="1.2" opacity="0.6"/>
+      <rect x="2" y="2" width="76" height="76" rx="12"
+            stroke="#C8895A" stroke-width="1.4" opacity="0.55"/>
       <!-- Inner frame -->
-      <rect x="8" y="8" width="40" height="40" rx="4" stroke="#C9A84C" stroke-width="1" opacity="0.35"/>
-      <!-- Center lens -->
-      <circle cx="28" cy="28" r="9" stroke="#C9A84C" stroke-width="1.2" opacity="0.8"/>
-      <circle cx="28" cy="28" r="3.5" fill="#C9A84C" opacity="0.9"/>
+      <rect x="11" y="11" width="58" height="58" rx="7"
+            stroke="#C8895A" stroke-width="1" opacity="0.25"/>
+      <!-- Centre lens -->
+      <circle cx="40" cy="40" r="14"
+              stroke="#C8895A" stroke-width="1.4" opacity="0.75"/>
+      <!-- Aperture dot -->
+      <circle cx="40" cy="40" r="5" fill="#C8895A" opacity="0.85"/>
       <!-- Corner sprockets -->
-      <rect x="3.5" y="3.5" width="6" height="6" rx="1.5" fill="#C9A84C" opacity="0.5"/>
-      <rect x="46.5" y="3.5" width="6" height="6" rx="1.5" fill="#C9A84C" opacity="0.5"/>
-      <rect x="3.5" y="46.5" width="6" height="6" rx="1.5" fill="#C9A84C" opacity="0.5"/>
-      <rect x="46.5" y="46.5" width="6" height="6" rx="1.5" fill="#C9A84C" opacity="0.5"/>
-      <!-- Side sprockets -->
-      <rect x="3.5" y="24.5" width="4" height="7" rx="1.2" fill="#C9A84C" opacity="0.25"/>
-      <rect x="48.5" y="24.5" width="4" height="7" rx="1.2" fill="#C9A84C" opacity="0.25"/>
-      <rect x="24.5" y="3.5" width="7" height="4" rx="1.2" fill="#C9A84C" opacity="0.25"/>
-      <rect x="24.5" y="48.5" width="7" height="4" rx="1.2" fill="#C9A84C" opacity="0.25"/>
+      <rect x="5"  y="5"  width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
+      <rect x="66" y="5"  width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
+      <rect x="5"  y="66" width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
+      <rect x="66" y="66" width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
+      <!-- Side film perforations -->
+      <rect x="5"  y="34" width="6" height="12" rx="2" fill="#C8895A" opacity="0.2"/>
+      <rect x="69" y="34" width="6" height="12" rx="2" fill="#C8895A" opacity="0.2"/>
+      <rect x="34" y="5"  width="12" height="6" rx="2" fill="#C8895A" opacity="0.2"/>
+      <rect x="34" y="69" width="12" height="6" rx="2" fill="#C8895A" opacity="0.2"/>
+      <!-- Subtle glow ring -->
+      <circle cx="40" cy="40" r="22"
+              stroke="#C8895A" stroke-width=".5" opacity="0.15"/>
     </svg>
   </div>
 
-  <!-- Title reveals letter by letter via clip -->
   <h1 class="splash-title" id="splash-title">Moodfilm</h1>
+  <!-- Tagline: italic whisper, not uppercase shout -->
+  <p class="splash-tagline" id="splash-tagline">find movies by mood</p>
 
-  <!-- Tagline fades in -->
-  <p class="splash-tagline" id="splash-tagline">Your mood. Your film.</p>
-
-  <!-- Bottom rule -->
   <div class="splash-rule-bottom" id="splash-rule-bottom"></div>
-
-  <!-- Tap to enter -->
-  <p class="splash-enter" id="splash-enter">Tap anywhere to begin</p>
+  <!-- Warmer, more personal prompt -->
+  <p class="splash-enter" id="splash-enter">touch to begin</p>
 </div>
 
+<!-- ══ AD GATE ════════════════════════════════════════════ -->
+<div id="ad-gate">
+  <div id="ad-sheet">
+    <div class="ad-handle"></div>
+    <div class="ad-icon">🎬</div>
+    <h2 class="ad-title">Your picks are <em>ready</em></h2>
+    <p class="ad-sub">Watch a short ad and your films appear the moment it ends. Completely free, always.</p>
+
+    <!-- Simulated ad (shown during countdown) -->
+    <div id="ad-simulated">
+      <div class="ad-sim-label">Advertisement</div>
+      <div class="ad-sim-content">Your ad will appear here after Play Store approval</div>
+    </div>
+
+    <!-- Timer + label (shown after tap) -->
+    <div class="ad-timer-wrap" id="ad-timer-wrap" style="display:none">
+      <div class="ad-timer-ring">
+        <svg viewBox="0 0 52 52" width="52" height="52">
+          <circle cx="26" cy="26" r="22"/>
+          <circle cx="26" cy="26" r="22" class="progress" id="ad-ring-progress"/>
+        </svg>
+        <div class="ad-timer-num" id="ad-timer-num">30</div>
+      </div>
+      <div class="ad-timer-label">Your films are being<br>curated right now</div>
+    </div>
+
+    <!-- Main CTA button -->
+    <button id="btn-watch-ad" onclick="startAdFlow()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+      Watch a short ad, it's free
+    </button>
+
+    <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
+      Your picks load while the ad plays. Zero wait after it ends.
+    </p>
+  </div>
+</div>
+
+<!-- ══ LISTENING STATE — fixed overlay, keyboard-triggered ══ -->
+<div id="listening-state">
+  <div class="listen-content">
+    <p class="listen-line-1">Take your time.</p>
+    <p class="listen-line-2">
+      <span>Talk about your day, your week,</span>
+      <span>what&#39;s been sitting with you.</span>
+      <span class="listen-final">I&#39;m listening.</span>
+    </p>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ════════════════════════════════════════════ -->
 <div id="app">
   <div id="topbar">
-    <div class="logo"><svg class="logo-reel" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="20" height="20" rx="4" stroke="#C9A84C" stroke-width="1.4"/><circle cx="11" cy="11" r="4" stroke="#C9A84C" stroke-width="1.4"/><circle cx="11" cy="11" r="1.4" fill="#C9A84C"/><rect x="3.5" y="3.5" width="3" height="3" rx="0.8" fill="#C9A84C" opacity="0.5"/><rect x="15.5" y="3.5" width="3" height="3" rx="0.8" fill="#C9A84C" opacity="0.5"/><rect x="3.5" y="15.5" width="3" height="3" rx="0.8" fill="#C9A84C" opacity="0.5"/><rect x="15.5" y="15.5" width="3" height="3" rx="0.8" fill="#C9A84C" opacity="0.5"/></svg><span class="logo-text">Moodfilm</span></div>
-    <div id="usage-badge" onclick="showPaywall()">1 free</div>
+    <div class="logo">
+      <svg class="logo-reel" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="20" height="20" rx="4" stroke="#C8895A" stroke-width="1.4"/>
+        <circle cx="11" cy="11" r="4" stroke="#C8895A" stroke-width="1.4"/>
+        <circle cx="11" cy="11" r="1.4" fill="#C8895A"/>
+        <rect x="3.5" y="3.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
+        <rect x="15.5" y="3.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
+        <rect x="3.5" y="15.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
+        <rect x="15.5" y="15.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
+      </svg>
+      <span class="logo-text">Moodfilm</span>
+    </div>
+    <span class="topbar-tag">Find Movies by Mood</span>
   </div>
   <div id="chat"></div>
+
   <div id="composer">
-    <div id="chip-tray"><div id="chip-tray-inner"></div></div>
     <div id="input-row">
-      <textarea id="mood-input" rows="1" placeholder="How are you feeling…" oninput="onInput()"></textarea>
+      <div id="input-glow-wrap">
+        <textarea id="mood-input" rows="1" placeholder="I'm feeling..." oninput="onInput()"></textarea>
+      </div>
       <button id="send-btn" type="button" onclick="onSend()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <path d="M12 19V5M5 12l7-7 7 7" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
+  <!-- Pills below input — secondary, horizontal scroll -->
+  <div id="composer-pills">
+    <div id="composer-pills-label">or pick a feeling</div>
+    <div id="composer-pills-inner"></div>
+  </div>
   </div>
 </div>
 
@@ -382,60 +722,31 @@ const WORKER_URL="https://moodfilm-api.kankipati-aaron.workers.dev";
 const COUNTRY=(()=>{try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";if(tz.includes("Kolkata")||tz.includes("Calcutta"))return"IN";return(navigator.language||"").split("-")[1]?.toUpperCase()||"IN"}catch{return"IN"}})();
 
 const LANGS=[
-  {value:"any", dot:"#C9A84C", label:"🌍 Any"},
+  {value:"any", dot:"#C8895A", label:"🌍 Any"},
   {value:"en",  dot:"#4A90D9", label:"🇬🇧 English"},
   {value:"hi",  dot:"#FF8C2A", label:"🇮🇳 Hindi"},
   {value:"te",  dot:"#00B89F", label:"తె Telugu"},
   {value:"ta",  dot:"#E040FB", label:"த Tamil"},
 ];
 const INTENTS=[
-  {value:"Feel better",  icon:"🌤", title:"Feel Better",  desc:"Something to lift me"},
-  {value:"Escape",       icon:"🚀", title:"Escape",       desc:"Take me somewhere else"},
-  {value:"Relate",       icon:"🤝", title:"Relate",       desc:"Something that gets me"},
-  {value:"Get motivated",icon:"⚡", title:"Motivate Me",  desc:"Fire me up"},
+  {value:"Feel better",  icon:"🌤", title:"Feel Better",   desc:"Something to lift me up"},
+  {value:"Escape",       icon:"🚀", title:"Escape",        desc:"Take me somewhere else"},
+  {value:"Relate",       icon:"🤝", title:"Relate",        desc:"A film that gets me"},
+  {value:"Get motivated",icon:"⚡", title:"Get Motivated", desc:"Something to fire me up"},
 ];
 const MOOD_CHIPS=["😰 Anxious","🌙 Nostalgic","😢 Sad","✨ Excited","🤝 Lonely","😴 Tired","💪 Hopeful","😤 Angry","🛋 Cozy","💡 Inspired","💔 Heartbroken","😐 Bored"];
 const GENRE_ICONS={Drama:"🎭",Comedy:"😄",Romance:"💕",Thriller:"😰",Action:"⚡",Horror:"👻",Animation:"✨",Fantasy:"🔮","Sci-Fi":"🚀",Documentary:"📽️"};
-const STAGES=["Curating your films…","Writing your explanations…","Almost there…"];
-const FACTS=["Parasite is the first non-English film to win the Oscar for Best Picture.","The Inception hallway fight took 3 weeks on a custom rotating set.","Schindler's List was shot almost entirely in black and white — intentionally.","Interstellar's black hole led to a published Nature Physics paper.","Mad Max: Fury Road was 90% practical effects, shot over 80 days in Namibia.","The Godfather was the first film to gross $100M domestically.","Spirited Away is the only non-English animated film to win an Oscar.","Hiding the Jaws shark accidentally made the film scarier.","Jurassic Park's roar blended elephant, tiger, alligator, and penguin sounds."];
+const STAGES=["Curating your films...","Writing your explanations...","Almost there..."];
+const FACTS=["Parasite is the first non-English film to win the Oscar for Best Picture.","The Inception hallway fight took 3 weeks on a custom rotating set.","Schindler's List was shot almost entirely in black and white, intentionally.","Interstellar's black hole led to a published Nature Physics paper.","Mad Max: Fury Road was 90% practical effects, shot over 80 days in Namibia.","The Godfather was the first film to gross $100M domestically.","Spirited Away is the only non-English animated film to win an Oscar.","Hiding the Jaws shark accidentally made the film scarier.","Jurassic Park's roar blended elephant, tiger, alligator, and penguin sounds."];
+const AD_DURATION = 30; // seconds — replace with real AdMob duration after Play Store
 
-/* STATE */
-let mood="",selectedChips=[],selectedIntent="",selectedLang="any";
-let chatStep="idle"; // idle | awaiting_intent | awaiting_lang | loading | done
-let prefetchData=null,prefetchPromise=null,prefetchProgress=0;
+/* ── STATE ── */
+let mood="", selectedChips=[], selectedIntent="", selectedLang="any";
+let chatStep="idle"; // idle | awaiting_intent | awaiting_lang | ad_gate | loading | done
+let prefetchData=null, prefetchPromise=null, prefetchProgress=0;
 let lastRecs=null;
-// FIX B7: trayOpen tracked purely in JS, not tied to blur events
-let trayOpen=false;
-
-/* ── USAGE ── */
-const FREE_DAILY=1;
-function getTodayStr(){return new Date().toISOString().slice(0,10)}
-function getUsage(){try{const d=JSON.parse(localStorage.getItem("mf_usage")||"{}");return d.date===getTodayStr()?d:{date:getTodayStr(),count:0,adUsed:false}}catch{return{date:getTodayStr(),count:0,adUsed:false}}}
-function saveUsage(u){try{localStorage.setItem("mf_usage",JSON.stringify(u))}catch{}}
-function isLimitReached(){const u=getUsage();return u.count>=FREE_DAILY&&!u.adUsed}
-function incrementUsage(){const u=getUsage();u.count++;saveUsage(u)}
-function markAdUsed(){const u=getUsage();u.adUsed=true;saveUsage(u)}
-function updateBadge(){
-  const u=getUsage();const b=document.getElementById("usage-badge");
-  b.textContent=u.count===0?"1 free":u.adUsed?"Used ✦":"Upgrade ✦";
-  b.style.borderColor=u.count>0&&!u.adUsed?"rgba(201,168,76,.5)":"rgba(201,168,76,.2)";
-}
-function showPaywall(){document.getElementById("paywall").classList.add("show")}
-function hidePaywall(){document.getElementById("paywall").classList.remove("show")}
-function handleUpgrade(){window.open("https://play.google.com/store/apps/details?id=com.moodfilm.app","_blank","noopener,noreferrer")}
-function watchAd(){
-  hidePaywall();markAdUsed();updateBadge();
-  // FIX 9: reset flow so user can start a new search after watching ad
-  document.getElementById("chat").innerHTML="";
-  mood="";selectedChips=[];selectedIntent="";selectedLang="any";
-  chatStep="idle";prefetchData=null;prefetchPromise=null;lastRecs=null;
-  trayOpen=false;
-  document.getElementById("chip-tray").classList.remove("open");
-  document.getElementById("mood-input").value="";
-  document.getElementById("mood-input").style.height="auto";
-  init(); // rebuild chat with greeting
-  scrollChat();
-}
+let adCountdownInterval=null, adApiPromise=null;
+let _keyboardInited=false;
 
 /* ── CHAT HELPERS ── */
 function appendApp(html){
@@ -461,161 +772,175 @@ function appendTyping(){
 function removeTyping(){const t=document.getElementById("typing-ind");if(t)t.remove()}
 function scrollChat(){setTimeout(()=>{const c=document.getElementById("chat");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})},80)}
 
-/* ── TRAY CONTROL ──
-  B10 FINAL FIX:
-  - Tray opens when textarea is focused
-  - Tray closes ONLY when:
-      a) User blurs textarea AND chipJustTapped is false
-      b) User taps completely outside composer (mousedown on desktop)
-  - chipJustTapped flag prevents close when a chip is being tapped
-  - NO document touchend listener (it races with chip touchend on mobile)
-  - Chip tray container gets touchstart+preventDefault to block focus steal
-    at the container level without suppressing individual chip clicks
-*/
-let chipJustTapped = false;
 
-function openTray(){
-  if(trayOpen)return;
-  trayOpen=true;
-  document.getElementById("chip-tray").classList.add("open");
-}
-function closeTray(){
-  if(!trayOpen)return;
-  trayOpen=false;
-  document.getElementById("chip-tray").classList.remove("open");
-}
-
-// Container-level touchstart preventDefault — stops focus steal without killing chip clicks
-// This is set once in init() on the chip-tray element itself
-
-// Desktop: close when clicking outside composer
-document.addEventListener("mousedown",function(e){
-  const composer=document.getElementById("composer");
-  if(!composer.contains(e.target)){closeTray();}
-},{passive:true});
 
 /* ── INPUT ── */
 function onInput(){
   const ta=document.getElementById("mood-input");
   ta.style.height="auto";
-  ta.style.height=Math.min(ta.scrollHeight,80)+"px";
+  ta.style.height=Math.min(ta.scrollHeight,120)+"px";
+  // Nudge glow on wrapper when user has typed something
+  const wrap=document.getElementById("input-glow-wrap");
+  if(wrap)wrap.classList.toggle("nudge", ta.value.trim().length > 0);
+  // Listening state stays while typing — hides on send
   updateSendBtn();
 }
 function updateSendBtn(){
   const hasText=document.getElementById("mood-input").value.trim().length>0;
-  const btn=document.getElementById("send-btn");
-  // FIX B2: only ready when step is idle
-  btn.classList.toggle("ready",(hasText||selectedChips.length>0)&&chatStep==="idle");
+  document.getElementById("send-btn").classList.toggle("ready",(hasText||selectedChips.length>0)&&chatStep==="idle");
 }
 
-/* ── TRAY CHIPS ──
-  B10 FINAL FIX:
-  Use touchstart+preventDefault on each chip to:
-    1. Prevent the textarea from losing focus (no keyboard drop)
-    2. Set chipJustTapped=true so the textarea blur handler ignores this event
-  Use touchend for the actual toggle action.
-  onclick handles desktop clicks normally.
-*/
-function buildTrayChips(){
-  const inner=document.getElementById("chip-tray-inner");
-  inner.innerHTML="";
+/* ── COMPOSER PILLS — below input, text-first secondary ── */
+function buildComposerPills(){
+  const container=document.getElementById("composer-pills-inner");
+  if(!container)return;
+  container.innerHTML="";
   MOOD_CHIPS.forEach(chip=>{
     const b=document.createElement("button");
-    b.className="tray-chip"+(selectedChips.includes(chip)?" active":"");
+    b.className="composer-pill";b.type="button";
     b.textContent=chip;
-    b.type="button";
-    // touchstart: prevent blur (keyboard stays up), mark flag
-    b.addEventListener("touchstart",function(e){
-      e.preventDefault();           // stops focus moving away from textarea
-      chipJustTapped=true;
-      clearTimeout(chipJustTappedTimer);
-    },{passive:false});
-    // touchend: do the actual toggle
-    b.addEventListener("touchend",function(e){
-      e.preventDefault();           // stop ghost click
-      toggleTrayChip(chip,b);
-      chipJustTappedTimer=setTimeout(()=>{chipJustTapped=false;},300);
-    },{passive:false});
-    // onclick: desktop fallback
-    b.addEventListener("click",function(){
-      if(!('ontouchstart' in window))toggleTrayChip(chip,b);
-    });
-    inner.appendChild(b);
+    b.onclick=function(){
+      if(chatStep!=="idle")return;
+      // If user already has text, append chip as text enhancement
+      const ta=document.getElementById("mood-input");
+      if(ta.value.trim().length>0){
+        // Append to existing text
+        const current=ta.value.trim();
+        const chipText=chip.replace(/^\S+\s/,"").toLowerCase();
+        ta.value=current+(current.endsWith(",")?" ":", ")+chipText;
+      } else {
+        // No text — use chip as starter but nudge them to add more
+        const chipText=chip.replace(/^\S+\s/,"");
+        ta.value="I'm feeling "+chipText.toLowerCase();
+        // Place cursor at end and focus so they can elaborate
+        setTimeout(()=>{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)},50);
+      }
+      onInput();
+    };
+    container.appendChild(b);
   });
 }
-let chipJustTappedTimer;
-function toggleTrayChip(chip,el){
-  if(selectedChips.includes(chip)){
-    selectedChips=selectedChips.filter(x=>x!==chip);
-    el.classList.remove("active");
-  }else{
-    selectedChips.push(chip);
-    el.classList.add("active");
-  }
-  updateSendBtn();
-}
+
+
 
 /* ── SEND ── */
 function onSend(){
-  // FIX B5: hard guard — only runs if idle
   if(chatStep!=="idle")return;
   const ta=document.getElementById("mood-input");
   const text=ta.value.trim();
   const chipText=selectedChips.map(c=>c.replace(/^\S+\s/,"")).join(", ");
-  mood=text||(chipText)||"";
-  if(!mood)return;
-  // Clear input state
+  mood=text||chipText||"";
+  if(!mood)return; // truly empty — nothing typed, no chip
   ta.value="";ta.style.height="auto";
-  selectedChips=[];
-  buildTrayChips(); // reset visuals — FIX B6: only call once here
-  updateSendBtn();
-  closeTray();
-  ta.blur();
+  const gw=document.getElementById("input-glow-wrap");if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
+  selectedChips=[];buildComposerPills();updateSendBtn();ta.blur();
   submitMood();
 }
-
-/* FIX B1+B4: Pill taps in chat — plain onclick, no preventDefault, no touchstart */
 function pillTap(rawChip){
-  if(chatStep!=="idle")return; // FIX B3: hard guard
-  mood=rawChip.replace(/^\S+\s/,""); // strip emoji prefix
+  if(chatStep!=="idle")return;
+  hideListeningState(true);
+  mood=rawChip.replace(/^\S+\s/,"");
   selectedChips=[];
-  // Lock pill row immediately to prevent double-tap
   const mp=document.getElementById("mood-pills-row");
   if(mp){mp.style.pointerEvents="none";mp.style.opacity=".55";}
   submitMood();
 }
+/* ── ACKNOWLEDGEMENT ──────────────────────────────────────
+   After user submits mood, app reflects back what it heard.
+   Text comes from Haiku's prefetch response.
+   While prefetch runs, we show a warm contextual fallback.
+   ─────────────────────────────────────────────────────── */
+async function getAcknowledgement(){
+  // If prefetch already done and has acknowledgement — use it
+  if(prefetchData&&prefetchData.acknowledgement){
+    return prefetchData.acknowledgement;
+  }
+  // Wait up to 3s for prefetch to return acknowledgement
+  if(prefetchPromise){
+    try{
+      await Promise.race([
+        prefetchPromise,
+        new Promise((_,r)=>setTimeout(()=>r("timeout"),3000))
+      ]);
+      if(prefetchData&&prefetchData.acknowledgement){
+        return prefetchData.acknowledgement;
+      }
+    }catch(e){}
+  }
+  // Fallback — warm, human, works for any mood
+  return pickFallbackAck(mood);
+}
+
+function pickFallbackAck(moodText){
+  // Read the mood text for emotional cues
+  const m=(moodText||"").toLowerCase();
+  if(/anxi|stress|worried|nervous|panic/.test(m))
+    return "That kind of anxious energy is exhausting to carry. I've got you.";
+  if(/sad|cry|tear|depress|down|low/.test(m))
+    return "I hear you. Some days just feel heavier than others.";
+  if(/angry|frustrat|annoyed|rage|mad/.test(m))
+    return "That frustration makes sense. Let's find something that helps.";
+  if(/lonely|alone|miss|empty/.test(m))
+    return "Loneliness at night hits differently. I'm here.";
+  if(/happy|excit|joy|great|amazing/.test(m))
+    return "That energy is everything. Let's find something worthy of it.";
+  if(/tired|exhaust|sleep|rest|drain/.test(m))
+    return "You've clearly been running on empty. Let's find something easy on the soul.";
+  if(/bored|nothing|meh|whatever/.test(m))
+    return "Sometimes nothing feels right. Let's change that.";
+  if(/nostalgic|memory|memories|past|miss/.test(m))
+    return "There's something beautiful about that kind of feeling.";
+  if(/lost|confus|don.t know|unsure/.test(m))
+    return "Not knowing how you feel is a feeling too. I've got you.";
+  // Gibberish, single chars, anything unmapped — most human response
+  return "I can feel something in that. Let's find your film.";
+}
+
+function appendAck(text){
+  const w=document.createElement("div");
+  w.className="msg-app slide-up";
+  w.innerHTML=`<div class="msg-avatar">🎬</div>
+    <div class="bubble-app">
+      <span class="serif" style="font-size:16px">${esc(text)}</span>
+    </div>`;
+  document.getElementById("chat").appendChild(w);
+  scrollChat();
+}
 
 function submitMood(){
-  if(isLimitReached()){showPaywall();return}
-  chatStep="awaiting_intent"; // set BEFORE typing delay to block double submit
+  hideListeningState(true);
+  chatStep="awaiting_intent";
   appendUser(mood);
-  startPrefetch(); // background — starts immediately
+  startPrefetch();
   setTimeout(()=>{
     appendTyping();
-    setTimeout(()=>{removeTyping();showIntentQuestion();},900);
+    // Wait for prefetch — it may already be done by now
+    // Use acknowledgement from Haiku if available, fallback otherwise
+    setTimeout(async()=>{
+      removeTyping();
+      // Get acknowledgement — from prefetch if ready, else warm fallback
+      let ack = await getAcknowledgement();
+      appendAck(ack);
+      // Breath — let the acknowledgement land before asking
+      setTimeout(showIntentQuestion, 1200);
+    },900);
   },300);
 }
 
-/* ── PREFETCH ── */
+/* ── PREFETCH (fires immediately on mood submit) ── */
 function startPrefetch(){
   prefetchData=null;prefetchProgress=0;
   const bar=document.getElementById("prefetch-bar");
   bar.style.opacity="1";bar.style.width="0%";
-  let pInt=setInterval(()=>{
-    prefetchProgress=Math.min(prefetchProgress+Math.random()*3,82);
-    bar.style.width=prefetchProgress+"%";
-  },350);
+  let pInt=setInterval(()=>{prefetchProgress=Math.min(prefetchProgress+Math.random()*3,82);bar.style.width=prefetchProgress+"%"},350);
   prefetchPromise=fetch(WORKER_URL,{
     method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({mood,moodChips:selectedChips,prefetch:true,country:COUNTRY})
-  })
-  .then(r=>r.json())
-  .then(data=>{
+  }).then(r=>r.json()).then(data=>{
     prefetchData=data;clearInterval(pInt);
     bar.style.width="100%";
     setTimeout(()=>{bar.style.opacity="0";setTimeout(()=>bar.style.width="0%",300)},500);
-  })
-  .catch(()=>{prefetchData=null;clearInterval(pInt);bar.style.opacity="0"});
+  }).catch(()=>{prefetchData=null;clearInterval(pInt);bar.style.opacity="0"});
 }
 
 /* ── STEP 2: INTENT ── */
@@ -623,141 +948,168 @@ function showIntentQuestion(){
   appendApp(`<span class="serif">What do you need from a film right now?</span>`);
   const grid=document.createElement("div");
   grid.className="intent-choices slide-up";
-  // FIX B6: no id collision — use closure reference
   INTENTS.forEach(intent=>{
-    const card=document.createElement("div");
-    card.className="intent-choice";
+    const card=document.createElement("div");card.className="intent-choice";
     card.innerHTML=`<span class="ic-icon">${intent.icon}</span><span class="ic-title">${intent.title}</span><span class="ic-desc">${intent.desc}</span>`;
-    // FIX B1: plain onclick — no touchstart preventDefault
-    card.onclick=function(){
-      if(chatStep!=="awaiting_intent")return; // FIX B5: guard
-      selectIntent(intent,card,grid);
-    };
+    card.onclick=function(){if(chatStep!=="awaiting_intent")return;selectIntent(intent,card,grid)};
     grid.appendChild(card);
   });
-  document.getElementById("chat").appendChild(grid);
-  scrollChat();
+  document.getElementById("chat").appendChild(grid);scrollChat();
 }
 function selectIntent(intent,card,grid){
   selectedIntent=intent.value;
   grid.querySelectorAll(".intent-choice").forEach(c=>c.classList.remove("selected"));
-  card.classList.add("selected");
-  grid.classList.add("locked");
+  card.classList.add("selected");grid.classList.add("locked");
   chatStep="awaiting_lang";
   appendUser(intent.icon+" "+intent.title);
-  setTimeout(()=>{appendTyping();setTimeout(()=>{removeTyping();showLangQuestion();},700);},400);
+  setTimeout(()=>{appendTyping();setTimeout(()=>{removeTyping();showLangQuestion()},700)},400);
 }
 
 /* ── STEP 3: LANGUAGE ── */
 function showLangQuestion(){
   appendApp(`<span class="serif">Any language preference?</span>`);
-  const row=document.createElement("div");
-  row.className="lang-choices slide-up";
+  const row=document.createElement("div");row.className="lang-choices slide-up";
   LANGS.forEach(lang=>{
     const b=document.createElement("button");
-    b.className="lang-choice";
-    b.type="button";
-    b.dataset.value=lang.value; // FIX B4: use data attribute for reliable matching
+    b.className="lang-choice";b.type="button";b.dataset.value=lang.value;
     b.innerHTML=`<span class="lang-dot" style="background:${lang.dot}"></span>${lang.label}`;
-    // FIX B1: plain onclick
-    b.onclick=function(){
-      if(chatStep!=="awaiting_lang")return; // FIX B5: guard
-      selectLang(lang,row);
-    };
+    b.onclick=function(){if(chatStep!=="awaiting_lang")return;selectLang(lang,row)};
     row.appendChild(b);
   });
-  document.getElementById("chat").appendChild(row);
-  scrollChat();
+  document.getElementById("chat").appendChild(row);scrollChat();
 }
 function selectLang(lang,row){
   selectedLang=lang.value;
-  // FIX B4: match by data attribute, not text content
-  row.querySelectorAll(".lang-choice").forEach(b=>{
-    b.classList.toggle("selected",b.dataset.value===lang.value);
-  });
+  row.querySelectorAll(".lang-choice").forEach(b=>b.classList.toggle("selected",b.dataset.value===lang.value));
   row.classList.add("locked");
-  chatStep="loading";
+  chatStep="ad_gate";
   appendUser(lang.label);
-  fireFinalAPI();
+  // Show ad gate after short delay
+  setTimeout(showAdGate, 400);
 }
 
-/* ── STEP 4: API ── */
-async function fireFinalAPI(){
-  incrementUsage();updateBadge();
-  // In-chat loading bar
+/* ══ AD GATE LOGIC ════════════════════════════════════════
+   Strategy:
+   - Show the gate with "Watch a short ad" button
+   - User taps button
+   - Simulated ad plays (countdown from 30)
+   - At 5 seconds in: API fires silently in background
+   - At 0 seconds: ad done, wait for API if needed, show results
+   ══════════════════════════════════════════════════════ */
+function showAdGate(){
+  document.getElementById("ad-gate").classList.add("show");
+}
+function hideAdGate(){
+  document.getElementById("ad-gate").classList.remove("show");
+}
+
+function startAdFlow(){
+  // Switch button to timer
+  document.getElementById("btn-watch-ad").style.display="none";
+  document.getElementById("ad-timer-wrap").style.display="flex";
+  document.getElementById("ad-simulated").classList.add("show");
+
+  let secondsLeft=AD_DURATION;
+  const ring=document.getElementById("ad-ring-progress");
+  const numEl=document.getElementById("ad-timer-num");
+  const circumference=138; // 2π × 22
+
+  // Update ring every second
+  adCountdownInterval=setInterval(()=>{
+    secondsLeft--;
+    numEl.textContent=secondsLeft;
+    // Animate ring
+    const offset=circumference-(circumference*((AD_DURATION-secondsLeft)/AD_DURATION));
+    ring.style.strokeDashoffset=offset;
+
+    // At 5 seconds remaining — fire API silently (revenue locked by AdMob by now)
+    if(secondsLeft===AD_DURATION-5){
+      adApiPromise=fireFinalAPI();
+    }
+
+    if(secondsLeft<=0){
+      clearInterval(adCountdownInterval);
+      onAdComplete();
+    }
+  },1000);
+
+  // Safety: also fire API at 5s in case timer is slow
+  setTimeout(()=>{if(!adApiPromise)adApiPromise=fireFinalAPI()},5000);
+}
+
+async function onAdComplete(){
+  // Hide ad gate
+  hideAdGate();
+  chatStep="loading";
+
+  // Show in-chat loading state
   const rlWrap=document.createElement("div");
   rlWrap.className="rl-wrap slide-up";rlWrap.id="rl-wrap";
-  rlWrap.innerHTML=`<div class="rl-bar"><div class="rl-fill" id="rl-fill"></div></div><div class="rl-text" id="rl-text">Pulling your picks together…</div>`;
+  rlWrap.innerHTML=`<div class="rl-bar"><div class="rl-fill" id="rl-fill"></div></div><div class="rl-text" id="rl-text">Putting your picks together...</div>`;
   document.getElementById("chat").appendChild(rlWrap);scrollChat();
-  let rlProg=0,si=0;
-  const rlInt=setInterval(()=>{
-    rlProg=Math.min(rlProg+5,90);
-    const f=document.getElementById("rl-fill");if(f)f.style.width=rlProg+"%";
-  },220);
-  const stageInt=setInterval(()=>{
-    si=Math.min(si+1,STAGES.length-1);
-    const t=document.getElementById("rl-text");if(t)t.textContent=STAGES[si];
-  },3000);
+
+  // Animate bar while waiting for API
+  let rlProg=0;
+  const rlInt=setInterval(()=>{rlProg=Math.min(rlProg+6,95);const f=document.getElementById("rl-fill");if(f)f.style.width=rlProg+"%"},200);
+
   try{
-    // Wait for prefetch to finish if still in flight
-    if(prefetchPromise)await prefetchPromise;
-    let data;
-    if(prefetchData&&!prefetchData.error){
-      // Fast path: send cached candidates, only need final Sonnet pick
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,prefetchResult:prefetchData,finalPickOnly:true})});
-      data=await res.json();
-    }else{
-      // Fallback: full pipeline
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})});
-      data=await res.json();
-    }
-    clearInterval(rlInt);clearInterval(stageInt);
+    // Wait for API (should already be done or nearly done)
+    const data=await(adApiPromise||fireFinalAPI());
+    clearInterval(rlInt);
     const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-    if(data.code==="RATE_LIMITED"){showPaywall();return}
     if(data.error)throw new Error(data.error);
     lastRecs=data.recommendations;
     renderResults(data.recommendations,data.moodAnalysis);
     chatStep="done";
   }catch(e){
-    clearInterval(rlInt);clearInterval(stageInt);
+    clearInterval(rlInt);
     const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-    appendApp(`<span style="color:#ff9999">⚠ ${esc(e.message||"Something went wrong.")} <span style="cursor:pointer;text-decoration:underline" onclick="chatStep='loading';fireFinalAPI()">Retry?</span></span>`);
-    chatStep="awaiting_lang"; // allow retry
+    appendApp(`<span style="color:#ff9999">Something went wrong. <span style="cursor:pointer;text-decoration:underline" onclick="adApiPromise=null;onAdComplete()">Try again?</span></span>`);
+    chatStep="awaiting_lang";
+  }
+}
+
+/* ── FINAL API CALL ── */
+async function fireFinalAPI(){
+  try{
+    if(prefetchPromise)await prefetchPromise;
+    let data;
+    if(prefetchData&&!prefetchData.error){
+      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,prefetchResult:prefetchData,finalPickOnly:true})});
+      data=await res.json();
+    }else{
+      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})});
+      data=await res.json();
+    }
+    return data;
+  }catch(e){
+    return {error:e.message||"Request failed"};
   }
 }
 
 /* ── RESULTS ── */
-function renderResults(recs,mood){
+function renderResults(recs,moodData){
   const chat=document.getElementById("chat");
-  // Summary bubble
-  const sumWrap=document.createElement("div");
-  sumWrap.className="msg-app slide-up";
+  const sumWrap=document.createElement("div");sumWrap.className="msg-app slide-up";
   let sumHtml=`<div class="msg-avatar">🎬</div><div class="bubble-app">`;
   sumHtml+=`<div class="results-eyebrow">Your picks</div>`;
-  if(mood?.moodSummary)sumHtml+=`<div class="mood-summary-text">"${esc(mood.moodSummary)}"</div>`;
-  if(mood?.emotions?.length)sumHtml+=`<div class="mood-tags">${mood.emotions.slice(0,4).map(e=>'<span class="mood-tag">'+esc(e)+'</span>').join("")}</div>`;
+  if(moodData?.moodSummary)sumHtml+=`<div class="mood-summary-text">"${esc(moodData.moodSummary)}"</div>`;
+  if(moodData?.emotions?.length)sumHtml+=`<div class="mood-tags">${moodData.emotions.slice(0,4).map(e=>'<span class="mood-tag">'+esc(e)+'</span>').join("")}</div>`;
   sumHtml+=`</div>`;
-  sumWrap.innerHTML=sumHtml;
-  chat.appendChild(sumWrap);
+  sumWrap.innerHTML=sumHtml;chat.appendChild(sumWrap);
 
-  // Cards
-  const cardsWrap=document.createElement("div");
-  cardsWrap.style.marginLeft="38px";
+  const cardsWrap=document.createElement("div");cardsWrap.style.marginLeft="38px";
   const swipeId="swipe-"+Date.now();
-  const swipe=document.createElement("div");
-  swipe.className="cards-swipe slide-up";swipe.id=swipeId;
-
+  const swipe=document.createElement("div");swipe.className="cards-swipe slide-up";swipe.id=swipeId;
   const sorted=[...recs].sort((a,b)=>b.isTopPick-a.isTopPick);
+
   sorted.forEach(rec=>{
     const pct=Math.round((rec.matchScore||.75)*100);
     const icon=GENRE_ICONS[rec.genre]||"🎬";
-    const poster=rec.poster
-      ?`<img src="${esc(rec.poster)}" class="card-poster" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='<div class=card-poster-ph>${icon}</div>'">`
-      :`<div class="card-poster-ph">${icon}</div>`;
-    const card=document.createElement("div");
-    card.className="result-card"+(rec.isTopPick?" top-pick":"");
+    const poster=rec.poster?`<img src="${esc(rec.poster)}" class="card-poster" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='<div class=card-poster-ph>${icon}</div>'">`:`<div class="card-poster-ph">${icon}</div>`;
+    const card=document.createElement("div");card.className="result-card"+(rec.isTopPick?" top-pick":"");
     card.innerHTML=`<div class="rc-inner">${poster}<div class="card-body">
-      ${rec.isTopPick?'<span class="top-badge">★ Top Pick</span><br>':''}
+      ${rec.isTopPick?'<span class="top-badge">Top Pick</span><br>':''}
       <div class="card-header-row"><span class="card-genre">${icon} ${esc(rec.genre||'')}</span><h3 class="card-title">${esc(rec.title)}</h3></div>
       <div class="card-meta">${rec.releaseYear?`<span>${rec.releaseYear}</span>`:''} ${rec.rating?`<span class="rating">★ ${rec.rating}</span>`:''}</div>
       <div class="match-row"><span>Mood match</span><span class="pct">${pct}%</span></div>
@@ -766,86 +1118,97 @@ function renderResults(recs,mood){
       <p class="card-explanation">${esc(rec.explanation)}</p>
       ${renderOTT(rec.streaming)}
       <div class="card-actions">
-        ${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="btn-tmdb">More Info →</a>`:''}
+        ${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="btn-tmdb">More Info</a>`:''}
         <button class="btn-share-card" data-title="${esc(rec.title)}" onclick="shareFilm(this.dataset.title)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
       </div>
     </div></div>`;
     swipe.appendChild(card);
   });
 
-  // Dots
   const dotsRow=document.createElement("div");dotsRow.className="card-dots";
   sorted.forEach((_,i)=>{
-    const d=document.createElement("div");
-    d.className="card-dot"+(i===0?" active":"");
+    const d=document.createElement("div");d.className="card-dot"+(i===0?" active":"");
     d.onclick=()=>{const s=document.getElementById(swipeId);if(s)s.scrollTo({left:i*s.offsetWidth,behavior:"smooth"})};
     dotsRow.appendChild(d);
   });
-  swipe.addEventListener("scroll",()=>{
-    const idx=Math.round(swipe.scrollLeft/swipe.offsetWidth);
-    dotsRow.querySelectorAll(".card-dot").forEach((d,i)=>d.classList.toggle("active",i===idx));
-  },{passive:true});
+  swipe.addEventListener("scroll",()=>{const idx=Math.round(swipe.scrollLeft/swipe.offsetWidth);dotsRow.querySelectorAll(".card-dot").forEach((d,i)=>d.classList.toggle("active",i===idx))},{passive:true});
 
-  cardsWrap.appendChild(swipe);cardsWrap.appendChild(dotsRow);
-  chat.appendChild(cardsWrap);
+  cardsWrap.appendChild(swipe);cardsWrap.appendChild(dotsRow);chat.appendChild(cardsWrap);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{cardsWrap.querySelectorAll(".match-fill[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%")}));
 
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    cardsWrap.querySelectorAll(".match-fill[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%");
-  }));
-
-  appendActionChips();
-  scrollChat();
-}
-
-function appendActionChips(){
-  const row=document.createElement("div");
-  row.className="action-chips slide-up";
+  // Action chips
+  const row=document.createElement("div");row.className="action-chips slide-up";
   row.innerHTML=`
-    <button class="action-chip" onclick="restartAll()">↺ New mood</button>
-    <button class="action-chip" onclick="changeIntent()">↩ Different vibe</button>
-    <button class="action-chip gold" onclick="shareAll()">↑ Share</button>`;
-  document.getElementById("chat").appendChild(row);
+    <button class="action-chip" onclick="restartAll()">New mood</button>
+    <button class="action-chip" onclick="changeIntent()">Different vibe</button>
+    <button class="action-chip gold" onclick="shareAll()">Share picks</button>`;
+  chat.appendChild(row);
   scrollChat();
 }
 
-/* FIX B6: restartAll — clean reset, buildTrayChips only called once inside init */
+/* ── RESET ── */
 function restartAll(){
   document.getElementById("chat").innerHTML="";
   mood="";selectedChips=[];selectedIntent="";selectedLang="any";
   chatStep="idle";prefetchData=null;prefetchPromise=null;lastRecs=null;
-  trayOpen=false;
-  document.getElementById("chip-tray").classList.remove("open");
+  adApiPromise=null;
+  clearInterval(adCountdownInterval);
+  hideAdGate();
+  document.getElementById("btn-watch-ad").style.display="flex";
+  document.getElementById("ad-timer-wrap").style.display="none";
+  document.getElementById("ad-simulated").classList.remove("show");
   document.getElementById("mood-input").value="";
   document.getElementById("mood-input").style.height="auto";
+  const gw=document.getElementById("input-glow-wrap");
+  if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
+  // listenTimer cleaned up via ta.onfocus reassignment
+  hideListeningState(true);
   updateSendBtn();
-  init(); // init rebuilds tray chips — no double build
+  init();
 }
-
-/* FIX B5+B6: changeIntent — track by first .msg-user, reliable */
 function changeIntent(){
-  selectedIntent="";selectedLang="any";
-  const chat=document.getElementById("chat");
-  const children=Array.from(chat.children);
-  // Find index AFTER first user bubble (mood bubble)
-  let keepUntil=children.length; // default: keep all if not found
-  for(let i=0;i<children.length;i++){
-    if(children[i].classList.contains("msg-user")){
-      keepUntil=i+1; // keep greeting, pill row, and user mood bubble
-      break;
-    }
-  }
+  selectedIntent="";selectedLang="any";adApiPromise=null;
+  const chat=document.getElementById("chat");const children=Array.from(chat.children);
+  let keepUntil=children.length;
+  for(let i=0;i<children.length;i++){if(children[i].classList.contains("msg-user")){keepUntil=i+1;break}}
   while(chat.children.length>keepUntil)chat.lastChild.remove();
-  chatStep="awaiting_intent";
-  prefetchData=null;
-  startPrefetch();
+  chatStep="awaiting_intent";prefetchData=null;startPrefetch();
   setTimeout(showIntentQuestion,100);
 }
 
-/* ── KEYBOARD FIX ── */
-let _keyboardInited = false;
+/* ── KEYBOARD ── */
+let _listenTimer=null;
+function showListeningState(){
+  const ls=document.getElementById("listening-state");
+  if(!ls||chatStep!=="idle")return;
+  // Calculate position from actual DOM heights
+  const topbarH=document.getElementById("topbar").offsetHeight||56;
+  const comp=document.getElementById("composer");
+  const compH=comp.offsetHeight||72;
+  // With no interactive-widget, vv gives keyboard height correctly
+  const kbH=window.visualViewport
+    ?Math.max(0,window.innerHeight-window.visualViewport.height)
+    :0;
+  ls.style.top=topbarH+"px";
+  ls.style.bottom=(compH+kbH)+"px";
+  ls.classList.add("show");
+}
+function hideListeningState(instant){
+  const ls=document.getElementById("listening-state");
+  if(!ls)return;
+  if(instant){
+    ls.classList.remove("show","fading");
+    return;
+  }
+  // Graceful 600ms fade out
+  ls.classList.add("fading");
+  setTimeout(function(){
+    ls.classList.remove("show","fading");
+  },620);
+}
+
 function initKeyboard(){
-  if(!window.visualViewport)return;
-  if(_keyboardInited)return; // FIX 8: prevent duplicate listeners on restartAll
+  if(!window.visualViewport||_keyboardInited)return;
   _keyboardInited=true;
   function update(){
     const kbH=Math.max(0,window.innerHeight-window.visualViewport.height);
@@ -853,163 +1216,122 @@ function initKeyboard(){
     comp.style.transform=kbH>50?`translateY(-${kbH}px)`:"translateY(0)";
     document.getElementById("chat").style.paddingBottom=kbH>50?(kbH+comp.offsetHeight+8)+"px":"8px";
     if(kbH>50)scrollChat();
+    clearTimeout(_listenTimer);
+    if(kbH>50){
+      _listenTimer=setTimeout(showListeningState,350);
+    }else{
+      hideListeningState();
+    }
   }
   window.visualViewport.addEventListener("resize",update,{passive:true});
   window.visualViewport.addEventListener("scroll",update,{passive:true});
 }
 
 /* ── HELPERS ── */
-function renderOTT(s){if(!s||!s.length)return'<span class="ott-none">Not on major streaming</span>';return'<div class="ott-row">'+s.map(p=>`<a class="ott-badge" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("")+'</div>'}
+function renderOTT(s){if(!s||!s.length)return'<span class="ott-none">Not on major streaming platforms</span>';return'<div class="ott-row">'+s.map(p=>`<a class="ott-badge" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("")+'</div>'}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function shareFilm(title){const text=`Moodfilm picked "${title}" for my mood 🎬\nhttps://aaronkankipati.github.io/moodfilm-app/`;if(navigator.share)navigator.share({title:"Moodfilm Pick",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("✓ Copied!")).catch(()=>showToast("✓ Copied!"))}
-function shareAll(){if(!lastRecs)return;const text="My Moodfilm picks 🎬\n"+lastRecs.map(r=>r.title).join(" · ")+"\nhttps://aaronkankipati.github.io/moodfilm-app/";if(navigator.share)navigator.share({title:"My Moodfilm Picks",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("✓ Copied!")).catch(()=>showToast("✓ Copied!"))}
+function shareFilm(title){const text=`Moodfilm picked "${title}" for my mood.\nhttps://aaronkankipati.github.io/moodfilm-app/`;if(navigator.share)navigator.share({title:"Moodfilm Pick",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareAll(){if(!lastRecs)return;const text="My Moodfilm picks\n"+lastRecs.map(r=>r.title).join(", ")+"\nhttps://aaronkankipati.github.io/moodfilm-app/";if(navigator.share)navigator.share({title:"My Moodfilm Picks",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
-/* ── INIT ── FIX B6+B7: single init, single buildTrayChips call */
+/* ── INIT ── */
 function init(){
   const h=new Date().getHours();
   const tw=h>=5&&h<12?"today":h>=12&&h<17?"this afternoon":h>=17&&h<22?"tonight":"right now";
-  // Rich greeting hero — fills the screen purposefully
-  const greetingWrap = document.createElement("div");
-  greetingWrap.className = "msg-app slide-up";
-  greetingWrap.style.maxWidth = "100%";
-  greetingWrap.innerHTML = `
+  const greetingWrap=document.createElement("div");
+  greetingWrap.className="msg-app slide-up";greetingWrap.style.maxWidth="100%";
+  greetingWrap.innerHTML=`
     <div class="msg-avatar">🎬</div>
     <div class="bubble-app" style="flex:1">
       <div style="margin-bottom:12px">
-        <span class="serif" style="font-size:clamp(20px,5.5vw,26px);display:block;margin-bottom:4px">What are you feeling<br>${tw}?</span>
-        <span style="font-size:12px;color:var(--muted);line-height:1.5;display:block">Tell me how you feel — I'll find the perfect film for this exact moment.</span>
+        <span class="serif" style="font-size:clamp(22px,5.5vw,28px);display:block;margin-bottom:6px">How are you feeling ${tw}?</span>
+        <span style="font-size:13px;color:var(--muted);line-height:1.65;display:block">Tell me what's going on and I'll find the perfect film for this moment.</span>
       </div>
-      <div style="height:1px;background:linear-gradient(90deg,rgba(212,146,42,.3),transparent);margin:12px 0"></div>
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">
-          <span style="width:20px;height:20px;border-radius:50%;background:rgba(212,146,42,.12);border:1px solid rgba(212,146,42,.25);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">1</span>
-          <span>Describe your mood — type or tap a feeling</span>
+      <div style="height:1px;background:linear-gradient(90deg,rgba(200,137,90,.3),transparent);margin:12px 0"></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="width:22px;height:22px;border-radius:50%;background:rgba(200,137,90,.12);border:1px solid rgba(200,137,90,.25);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">1</span>
+          <span>Tell me how you're feeling and what you need</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">
-          <span style="width:20px;height:20px;border-radius:50%;background:rgba(212,146,42,.12);border:1px solid rgba(212,146,42,.25);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">2</span>
-          <span>Tell me what you need from a film</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)">
-          <span style="width:20px;height:20px;border-radius:50%;background:rgba(212,146,42,.12);border:1px solid rgba(212,146,42,.25);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">3</span>
-          <span>AI picks your perfect films — in seconds</span>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
+          <span style="width:22px;height:22px;border-radius:50%;background:rgba(200,137,90,.12);border:1px solid rgba(200,137,90,.25);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">2</span>
+          <span>Your film picks are completely free, always</span>
         </div>
       </div>
     </div>`;
   document.getElementById("chat").appendChild(greetingWrap);
 
-  // Mood pills with label
-  const pillsLabel=document.createElement("div");
-  pillsLabel.style.cssText="margin-left:38px;margin-top:10px;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:rgba(212,146,42,.6);";
-  pillsLabel.textContent="Quick feelings";
-  document.getElementById("chat").appendChild(pillsLabel);
+  buildComposerPills();
 
-  const pillRow=document.createElement("div");
-  pillRow.className="mood-pills slide-up";
-  pillRow.id="mood-pills-row";
-  MOOD_CHIPS.forEach(chip=>{
-    const b=document.createElement("button");
-    b.className="mood-pill";b.type="button";b.textContent=chip;
-    b.onclick=function(){pillTap(chip);}; // plain onclick — no freezing
-    pillRow.appendChild(b);
-  });
-  document.getElementById("chat").appendChild(pillRow);
-
-  // FIX B6: only build tray chips once here
-  buildTrayChips();
-
-  // Textarea focus/blur — keyboard management
   const ta=document.getElementById("mood-input");
-  ta.onfocus=function(){openTray();};
-  // Blur: only close tray if a chip wasn't just tapped
-  ta.onblur=function(){
-    if(!chipJustTapped){closeTray();}
-  };
-  // Container touchstart preventDefault — blocks focus steal at tray level
-  const tray=document.getElementById("chip-tray");
-  tray.ontouchstart=null; // clear any old handler
-  tray.addEventListener("touchstart",function(e){
-    // Only prevent default if the touch is on a chip button (not scroll)
-    if(e.target.classList.contains("tray-chip")){
-      e.preventDefault();
-    }
-  },{passive:false});
+  const wrap=document.getElementById("input-glow-wrap");
+  ta.addEventListener("focus",function(){
+    if(wrap)wrap.classList.add("focused");
+    // Primary trigger for listening state on Android
+    clearTimeout(_listenTimer);
+    _listenTimer=setTimeout(function(){
+      showListeningState();
+    },300);
+  },{passive:true});
 
-  updateBadge();
+  ta.addEventListener("blur",function(){
+    if(wrap)wrap.classList.remove("focused");
+    // Small delay — prevents hiding when tapping composer pills
+    setTimeout(function(){
+      const focused=document.activeElement;
+      const composer=document.getElementById("composer");
+      if(composer&&!composer.contains(focused)){
+        hideListeningState();
+      }
+    },200);
+  },{passive:true});
+
   initKeyboard();
   scrollChat();
 }
 
-
-/* ══════════════════════════════════════════
-   SPLASH SCREEN LOGIC
-   ══════════════════════════════════════════ */
+/* ══ SPLASH ══════════════════════════════════════════════ */
 (function(){
-  // Sequence:
-  // 0ms   — rule draws
-  // 400ms — mark scales in
-  // 700ms — title reveals
-  // 1500ms — tagline fades
-  // 1000ms — bottom rule draws
-  // 2400ms — enter prompt appears + breathes
-  // Auto-dismiss at 3800ms OR on tap
-
-  let dismissed = false;
-
+  let dismissed=false;
   function dismissSplash(){
-    if(dismissed)return;
-    dismissed=true;
-    const s=document.getElementById("splash");
-    s.classList.add("fade-out");
-    // Remove from DOM after transition completes
-    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s);},1300);
+    if(dismissed)return;dismissed=true;
+    const s=document.getElementById("splash");s.classList.add("fade-out");
+    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s)},1300);
   }
-
   function runSplashSequence(){
-    const rule      = document.getElementById("splash-rule-top");
-    const mark      = document.getElementById("splash-mark");
-    const title     = document.getElementById("splash-title");
-    const tagline   = document.getElementById("splash-tagline");
-    const ruleBot   = document.getElementById("splash-rule-bottom");
-    const enterEl   = document.getElementById("splash-enter");
-
-    // Staggered reveals — each triggered by adding a class
+    const rule=document.getElementById("splash-rule-top");
+    const mark=document.getElementById("splash-mark");
+    const title=document.getElementById("splash-title");
+    const tagline=document.getElementById("splash-tagline");
+    const ruleBot=document.getElementById("splash-rule-bottom");
+    const enterEl=document.getElementById("splash-enter");
     requestAnimationFrame(()=>{
-      setTimeout(()=> rule.classList.add("drawn"),    30);
-      setTimeout(()=> mark.classList.add("show"),    300);
-      setTimeout(()=> title.classList.add("reveal"),  800);
-      setTimeout(()=> ruleBot.classList.add("drawn"),1200);
-      setTimeout(()=> tagline.classList.add("show"), 2000);
+      // Rule draws first — sets the stage
+      setTimeout(()=>rule.classList.add("drawn"),80);
+      // Mark blooms in — slower, more presence
+      setTimeout(()=>mark.classList.add("show"),350);
+      // Title reveals — waits for mark to settle
+      setTimeout(()=>title.classList.add("reveal"),900);
+      // Bottom rule draws
+      setTimeout(()=>ruleBot.classList.add("drawn"),1300);
+      // Tagline whispers in
+      setTimeout(()=>tagline.classList.add("show"),2200);
+      // Enter prompt — appears last, breathes
       setTimeout(()=>{
         enterEl.classList.add("show");
-        setTimeout(()=>enterEl.classList.add("breathing"),600);
-      },3200);
-      // Auto dismiss — user needs time to read everything
-      setTimeout(dismissSplash, 6500);
+        setTimeout(()=>enterEl.classList.add("breathing"),800);
+      },3400);
+      // Auto-dismiss — enough time to read everything
+      setTimeout(dismissSplash,7000);
     });
   }
-
-  // Tap to dismiss — but only after title is fully visible (1800ms)
-  // Prevents accidental tap dismissing before user can read anything
-  let splashReady = false;
-  setTimeout(()=>{ splashReady = true; }, 1900);
-
-  document.getElementById("splash").addEventListener("touchend", function(e){
-    e.preventDefault();
-    if(splashReady) dismissSplash();
-  },{passive:false});
-  document.getElementById("splash").addEventListener("click", function(){
-    if(splashReady) dismissSplash();
-  });
-
-  // Start sequence when DOM ready
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded", runSplashSequence);
-  } else {
-    runSplashSequence();
-  }
+  let splashReady=false;
+  setTimeout(()=>splashReady=true,1900);
+  document.getElementById("splash").addEventListener("touchend",e=>{e.preventDefault();if(splashReady)dismissSplash()},{passive:false});
+  document.getElementById("splash").addEventListener("click",()=>{if(splashReady)dismissSplash()});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",runSplashSequence);
+  else runSplashSequence();
 })();
-/* ══════════════════════════════════════════ */
 
 init();
 </script>

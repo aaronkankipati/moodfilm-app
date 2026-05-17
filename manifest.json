@@ -1,7 +1,7 @@
 {
-  "name": "Moodfilm \u2014 Find Your Film by Mood",
+  "name": "Moodfilm - Find Movies by Mood",
   "short_name": "Moodfilm",
-  "description": "Describe your mood. AI picks the perfect film for this exact moment. Free, no sign-up.",
+  "description": "Tell us how you feel and we find your perfect film. Free, always.",
   "start_url": "/moodfilm-app/",
   "scope": "/moodfilm-app/",
   "display": "standalone",
