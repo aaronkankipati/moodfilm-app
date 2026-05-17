@@ -143,54 +143,39 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);-webkit-text-fill-color:var(--gold)}
 .topbar-tag{font-size:10px;color:var(--muted);letter-spacing:.08em}
 
-/* ══ LISTENING STATE ════════════════════════════════════
-   Appears in the dead space when keyboard is open and
-   user hasn't typed yet. Warm, unhurried, human.
-   Fades in when keyboard opens, fades out on first keystroke.
-   ══════════════════════════════════════════════════════ */
-/* ══ LISTENING STATE — colour psychology ════════════════
-   Deep indigo wash — researched most effective colour for
-   emotional safety and trust. Used by therapy and journaling
-   apps. Feels like a quiet, dimmed room before a real talk.
-   Text stays warm cream. "I'm listening." shifts lavender-gold.
-   Breathing animation — 4s ease in/out like a resting heartbeat.
-   Fades out gently over 600ms when user starts typing.
+/* ══ LISTENING STATE — inside #chat, no keyboard math ═══
+   Lives as position:absolute inside #chat.
+   #chat shrinks naturally when keyboard opens (no interactive-widget).
+   The listening state fills exactly the visible space.
+   Pure focus/blur trigger — no visualViewport dependency.
    ══════════════════════════════════════════════════════ */
 #listening-state{
-  position:fixed;
-  left:0;right:0;
-  top:56px;
-  bottom:130px;
-  will-change:opacity;
-  -webkit-backface-visibility:hidden;
-  backface-visibility:hidden;
+  position:absolute;
+  inset:0;                    /* fills entire #chat area */
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   padding:28px 36px;
   text-align:center;
-  /* Indigo-tinted wash — safety, trust, openness */
   background:radial-gradient(
     ellipse at 50% 40%,
-    rgba(52,48,96,.85) 0%,
-    rgba(28,24,52,.95) 45%,
-    rgba(7,7,9,1) 100%
+    rgba(52,48,96,.92) 0%,
+    rgba(28,24,52,.97) 45%,
+    rgba(11,11,15,1) 100%
   );
   opacity:0;
   pointer-events:none;
-  z-index:5;
-  /* Show: fade in. Hide: fade out over 600ms */
-  transition:opacity .6s ease;
+  z-index:20;                 /* above chat content */
+  transition:opacity .5s ease;
+  will-change:opacity;
 }
 #listening-state.show{
   opacity:1;
 }
-/* Fading out on type — class added by JS */
 #listening-state.fading{
   opacity:0;
-  transition:opacity .6s ease;
-  pointer-events:none;
+  transition:opacity .5s ease;
 }
 #listening-state.fading .listen-content{
   animation-play-state:paused;
@@ -259,7 +244,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   letter-spacing:.04em;
 }
 /* ══ CHAT ════════════════════════════════════════════════ */
-#chat{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 18px 6px;display:flex;flex-direction:column;gap:10px}
+#chat{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 18px 6px;display:flex;flex-direction:column;gap:10px;overscroll-behavior-y:contain;position:relative}
 #chat::-webkit-scrollbar{display:none}
 .msg-app{display:flex;gap:10px;align-items:flex-end;max-width:92%}
 .msg-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ink4),var(--ink3));border:1px solid rgba(200,137,90,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-bottom:2px}
@@ -334,46 +319,99 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .lang-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .locked{pointer-events:none;opacity:.55}
 
-/* ══ RESULTS ══════════════════════════════════════════════ */
+/* ══ RESULTS — FULL EXPERIENCE ════════════════════════════
+   Inspired by reference design:
+   - Top pick: hero card with full-width poster + all details
+   - Other picks: split-layout cards (poster left, details right)
+   - Everything visible immediately, no tap-to-expand needed
+   - Vertical scroll through picks
+   ══════════════════════════════════════════════════════ */
 .results-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:4px}
 .mood-summary-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.4;margin-bottom:8px}
 .mood-tags{display:flex;flex-wrap:wrap;gap:4px}
 .mood-tag{border:1px solid rgba(200,137,90,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
-.cards-swipe{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:10px;padding-bottom:6px;margin:8px -18px 0;padding-left:18px;padding-right:18px;overscroll-behavior-x:contain;-webkit-scroll-snap-type:x mandatory}
-.cards-swipe::-webkit-scrollbar{display:none}
-.result-card{flex-shrink:0;width:calc(100vw - 56px);scroll-snap-align:start}
-.rc-inner{background:linear-gradient(160deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.15);border-radius:16px;overflow:hidden}
-.result-card.top-pick .rc-inner{border-color:var(--gold);box-shadow:0 0 28px rgba(200,137,90,.2),0 0 0 1px rgba(200,137,90,.1)}
-.card-poster{width:100%;height:120px;object-fit:cover;display:block}
-.card-poster-ph{width:100%;height:120px;background:var(--ink4);display:flex;align-items:center;justify-content:center;font-size:32px}
-.card-body{padding:11px 13px}
-.top-badge{background:linear-gradient(135deg,#C8895A,#96583A);color:#FFF8F4;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:4px}
-.card-header-row{display:flex;align-items:baseline;gap:6px;margin-bottom:3px;flex-wrap:wrap}
-.card-genre{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.card-title{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4vw,20px);font-weight:500;line-height:1.15}
-.card-meta{display:flex;gap:8px;margin-bottom:4px}
-.card-meta span{font-size:11px;color:var(--muted)}.card-meta .rating{color:var(--gold)}
-.card-meta-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap}
-.card-runtime{font-size:10px;color:var(--muted)}
-.card-langs{font-size:10px;color:var(--muted)}
-.meta-dot{font-size:10px;color:var(--muted);opacity:.4}
-.match-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px}
-.match-row .pct{color:var(--gold)}
-.match-track{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px}
-.match-fill{height:100%;background:linear-gradient(90deg,#96583A,#C8895A);border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.card-tagline{font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--gold-l);font-style:italic;margin-bottom:5px;line-height:1.3}
-.card-explanation{font-size:13px;color:var(--paper2);line-height:1.55;margin-bottom:7px}
-.ott-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+
+/* Results scroll container — vertical, full width */
+.results-list{display:flex;flex-direction:column;gap:12px;margin:10px 0}
+
+/* ── TOP PICK CARD — hero, full width poster ── */
+.top-pick-card{
+  background:linear-gradient(160deg,var(--ink4),var(--ink3));
+  border:1px solid var(--gold);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 0 24px rgba(200,137,90,.15);
+}
+.top-pick-section-label{
+  font-size:9px;text-transform:uppercase;letter-spacing:.18em;
+  color:var(--gold);padding:10px 14px 0;margin-bottom:-4px;
+}
+.top-pick-poster{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.top-pick-poster-ph{width:100%;aspect-ratio:16/9;background:var(--ink4);display:flex;align-items:center;justify-content:center}
+.top-pick-body{padding:14px 14px 10px}
+.top-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#C8895A,#96583A);color:#FFF8F4;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:5px;margin-bottom:8px}
+.tp-genre-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.tp-genre{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.tp-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5.5vw,28px);font-weight:400;line-height:1.1;margin-bottom:6px;color:var(--paper)}
+.tp-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tp-meta span{font-size:12px;color:var(--muted)}.tp-meta .tp-rating{color:var(--gold)}
+.tp-match-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.tp-match-pct{color:var(--gold);font-weight:500}
+.tp-match-track{height:2px;background:var(--ink5);border-radius:2px;overflow:hidden;margin-bottom:10px}
+.tp-match-fill{height:100%;background:linear-gradient(90deg,#96583A,#C8895A);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.tp-tagline{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--gold-l);font-style:italic;margin-bottom:8px;line-height:1.4}
+.tp-explanation{font-size:13px;color:var(--paper2);line-height:1.65;margin-bottom:12px}
+.tp-ott-label{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:6px}
+.tp-actions{display:flex;gap:8px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
+.tp-btn-tmdb{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--ink);background:linear-gradient(135deg,var(--gold),var(--gold-d));border-radius:10px;padding:11px;text-decoration:none;display:block;touch-action:manipulation}
+.tp-btn-share{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid rgba(200,137,90,.25);background:none;cursor:pointer;color:var(--muted);touch-action:manipulation}
+.tp-btn-share:active{border-color:var(--gold);color:var(--gold)}
+
+/* ── OTHER PICKS SECTION ── */
+.more-picks-label{font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);padding:4px 0 8px;text-align:center}
+
+/* ── SPLIT CARD — poster left 42%, details right 58% ── */
+.split-card{
+  background:linear-gradient(160deg,var(--ink4),var(--ink3));
+  border:1px solid rgba(160,150,180,.14);
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  min-height:160px;
+}
+.split-card:active{border-color:rgba(200,137,90,.3)}
+.split-poster-wrap{width:42%;flex-shrink:0;position:relative}
+.split-poster{width:100%;height:100%;object-fit:cover;display:block}
+.split-poster-ph{width:100%;height:100%;background:var(--ink4);display:flex;align-items:center;justify-content:center;min-height:160px}
+.split-genre-badge{
+  position:absolute;top:8px;left:8px;
+  background:rgba(11,11,15,.7);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(200,137,90,.25);
+  border-radius:20px;padding:2px 8px;
+  font-size:9px;color:var(--paper2);
+  white-space:nowrap;
+}
+.split-body{flex:1;padding:12px 12px 10px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.split-title{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,3.8vw,18px);font-weight:400;line-height:1.2;margin-bottom:4px;color:var(--paper);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.split-meta{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.split-meta span{font-size:10px;color:var(--muted)}.split-meta .split-rating{color:var(--gold)}
+.split-match-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px}
+.split-match-pct{color:var(--gold)}
+.split-match-track{height:2px;background:var(--ink5);border-radius:2px;overflow:hidden;margin-bottom:7px}
+.split-match-fill{height:100%;background:linear-gradient(90deg,#96583A,#C8895A);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.split-explanation{font-size:11px;color:var(--paper2);line-height:1.55;margin-bottom:7px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;flex:1}
+.split-ott{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.split-ott-badge{display:inline-flex;align-items:center;gap:2px;background:var(--ink5);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 6px;font-size:9px;color:var(--paper2);text-decoration:none;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.split-ott-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.split-more-btn{font-size:11px;font-weight:500;color:var(--gold-l);text-decoration:none;display:inline-flex;align-items:center;gap:3px;touch-action:manipulation}
+.split-more-btn:active{opacity:.7}
+
+/* Shared */
+.ott-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
 .ott-badge{display:inline-flex;align-items:center;gap:3px;background:var(--ink5);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--paper);text-decoration:none;white-space:nowrap}
 .ott-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-.ott-none{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:7px;display:block}
-.card-actions{display:flex;gap:7px;align-items:center}
-.btn-tmdb{flex:1;text-align:center;font-size:12px;font-weight:500;color:var(--ink);background:linear-gradient(135deg,var(--gold),var(--gold-d));border-radius:9px;padding:8px 12px;text-decoration:none;display:block}
-.btn-share-card{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid rgba(200,137,90,.2);background:none;cursor:pointer;color:var(--muted)}
-.btn-share-card:active{border-color:var(--gold);color:var(--gold)}
-.card-dots{display:flex;align-items:center;gap:4px;margin-top:8px}
-.card-dot{width:4px;height:4px;border-radius:50%;background:var(--ink4);cursor:pointer;transition:all .25s}
-.card-dot.active{background:var(--gold);width:12px;border-radius:2px}
+.ott-none{font-size:10px;color:var(--muted);font-style:italic;display:block}
 .action-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
 .action-chip{background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-size:12px;padding:7px 16px;cursor:pointer;user-select:none;-webkit-user-select:none}
 .action-chip:active{background:rgba(200,137,90,.16)}
@@ -411,8 +449,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   padding-bottom:calc(var(--safe-b) + 20px);
 }
 #card-overlay-inner::-webkit-scrollbar{display:none}
-.co-poster{width:100%;max-height:52vw;object-fit:cover;display:block;flex-shrink:0}
-.co-poster-ph{width:100%;height:52vw;background:var(--ink4);display:flex;align-items:center;justify-content:center;font-size:52px}
+.co-poster{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;flex-shrink:0}
+.co-poster-ph{width:100%;height:56vw;background:linear-gradient(160deg,var(--ink4),var(--ink3));display:flex;align-items:center;justify-content:center}
 .co-body{padding:20px 20px 8px}
 .co-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
 .co-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--muted);touch-action:manipulation}
@@ -768,17 +806,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   </div>
 </div>
 
-<!-- ══ LISTENING STATE — fixed overlay, keyboard-triggered ══ -->
-<div id="listening-state">
-  <div class="listen-content">
-    <p class="listen-line-1">Take your time.</p>
-    <p class="listen-line-2">
-      <span>Talk about your day, your week,</span>
-      <span>what&#39;s been sitting with you.</span>
-      <span class="listen-final">I&#39;m listening.</span>
-    </p>
-  </div>
-</div>
+
 
 <!-- ══ MAIN APP ════════════════════════════════════════════ -->
 <div id="app">
@@ -797,7 +825,19 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     </div>
     <span class="topbar-tag">Find Movies by Mood</span>
   </div>
-  <div id="chat"></div>
+  <div id="chat">
+    <!-- Listening state — absolute inside chat, fills visible space naturally -->
+    <div id="listening-state">
+      <div class="listen-content">
+        <p class="listen-line-1">Take your time.</p>
+        <p class="listen-line-2">
+          <span>Talk about your day, your week,</span>
+          <span>what&#39;s been sitting with you.</span>
+          <span class="listen-final">I&#39;m listening.</span>
+        </p>
+      </div>
+    </div>
+  </div>
 
   <div id="composer">
     <div id="input-row">
@@ -1253,61 +1293,113 @@ function showError(type, retryFn){
 function renderResults(recs,moodData){
   // Empty results guard
   if(!recs||recs.length===0){
-    showError("EMPTY_RESULTS",function(){
-      adApiPromise=null;chatStep="awaiting_lang";
-      changeIntent();
-    });
+    showError("EMPTY_RESULTS",function(){adApiPromise=null;chatStep="awaiting_lang";changeIntent();});
     return;
   }
   const chat=document.getElementById("chat");
+
+  // ── Summary bubble ──
   const sumWrap=document.createElement("div");sumWrap.className="msg-app slide-up";
   let sumHtml=`<div class="msg-avatar">🎬</div><div class="bubble-app">`;
   sumHtml+=`<div class="results-eyebrow">Your picks</div>`;
   if(moodData?.moodSummary)sumHtml+=`<div class="mood-summary-text">"${esc(moodData.moodSummary)}"</div>`;
   if(moodData?.emotions?.length)sumHtml+=`<div class="mood-tags">${moodData.emotions.slice(0,4).map(e=>'<span class="mood-tag">'+esc(e)+'</span>').join("")}</div>`;
   sumHtml+=`</div>`;
-  sumWrap.innerHTML=sumHtml;chat.appendChild(sumWrap);
+  sumWrap.innerHTML=sumHtml;
+  chat.appendChild(sumWrap);
 
-  const cardsWrap=document.createElement("div");cardsWrap.style.marginLeft="38px";
-  const swipeId="swipe-"+Date.now();
-  const swipe=document.createElement("div");swipe.className="cards-swipe slide-up";swipe.id=swipeId;
+  // Sort: top pick first
   const sorted=[...recs].sort((a,b)=>b.isTopPick-a.isTopPick);
+  const topPick=sorted[0];
+  const others=sorted.slice(1);
+  const FILM_PH='<div class="top-pick-poster-ph"><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="opacity:.25"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/><rect x="4" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="4" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/></svg></div>';
+  const SPLIT_PH='<div class="split-poster-ph"><svg width="36" height="36" viewBox="0 0 52 52" fill="none" style="opacity:.2"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/></svg></div>';
 
-  sorted.forEach(rec=>{
-    const pct=Math.round((rec.matchScore||.75)*100);
-    const icon=GENRE_ICONS[rec.genre]||"🎬";
-    const poster=rec.poster?`<img src="${esc(rec.poster)}" class="card-poster" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='<div class=card-poster-ph>${icon}</div>'">`:`<div class="card-poster-ph">${icon}</div>`;
-    const card=document.createElement("div");card.className="result-card"+(rec.isTopPick?" top-pick":"");
-    card.onclick=function(e){if(!e.target.closest('a')&&!e.target.closest('.btn-share-card'))openCardOverlay(rec);};
-    card.style.cursor="pointer";
-    card.innerHTML=`<div class="rc-inner">${poster}<div class="card-body">
-      ${rec.isTopPick?'<span class="top-badge">Top Pick</span><br>':''}
-      <div class="card-header-row"><span class="card-genre">${icon} ${esc(rec.genre||'')}</span><h3 class="card-title">${esc(rec.title)}</h3></div>
-      <div class="card-meta">${rec.releaseYear?`<span>${rec.releaseYear}</span>`:''} ${rec.rating?`<span class="rating">★ ${rec.rating}</span>`:''}</div>
-      <div class="match-row"><span>Mood match</span><span class="pct">${pct}%</span></div>
-      <div class="match-track"><div class="match-fill" style="width:0" data-pct="${pct}"></div></div>
-      ${rec.tagline?`<p class="card-tagline">"${esc(rec.tagline)}"</p>`:''}
-      <p class="card-explanation">${esc(rec.explanation)}</p>
-      ${renderSpokenLangs(rec.spokenLanguages,rec.runtime)}
-      ${renderOTT(rec.streaming)}
-      <div class="card-actions">
-        ${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="btn-tmdb">More Info</a>`:''}
-        <button class="btn-share-card" data-title="${esc(rec.title)}" onclick="shareFilm(this.dataset.title)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
-      </div>
-    </div></div>`;
-    swipe.appendChild(card);
-  });
+  const listWrap=document.createElement("div");
+  listWrap.className="results-list slide-up";
 
-  const dotsRow=document.createElement("div");dotsRow.className="card-dots";
-  sorted.forEach((_,i)=>{
-    const d=document.createElement("div");d.className="card-dot"+(i===0?" active":"");
-    d.onclick=()=>{const s=document.getElementById(swipeId);if(s)s.scrollTo({left:i*s.offsetWidth,behavior:"smooth"})};
-    dotsRow.appendChild(d);
-  });
-  swipe.addEventListener("scroll",()=>{const idx=Math.round(swipe.scrollLeft/swipe.offsetWidth);dotsRow.querySelectorAll(".card-dot").forEach((d,i)=>d.classList.toggle("active",i===idx))},{passive:true});
+  // ── TOP PICK — hero card full width ──
+  if(topPick){
+    const pct=Math.round((topPick.matchScore||.75)*100);
+    const icon=GENRE_ICONS[topPick.genre]||"🎬";
+    const tpCard=document.createElement("div");
+    tpCard.className="top-pick-card";
+    const posterHtml=topPick.poster
+      ?`<img src="${esc(topPick.poster)}" class="top-pick-poster" alt="${esc(topPick.title)}" loading="lazy" onerror="this.outerHTML='${FILM_PH.replace(/'/g,"\'")}'">` : FILM_PH;
+    tpCard.innerHTML=`
+      <p class="top-pick-section-label">★ Your top pick</p>
+      ${posterHtml}
+      <div class="top-pick-body">
+        <span class="top-badge">Top Pick</span>
+        <div class="tp-genre-row"><span class="tp-genre">${esc(topPick.genre||'')}</span></div>
+        <h2 class="tp-title">${esc(topPick.title)}</h2>
+        <div class="tp-meta">
+          ${topPick.releaseYear?`<span>${topPick.releaseYear}</span>`:''}
+          ${topPick.rating?`<span class="tp-rating">★ ${topPick.rating}</span>`:''}
+          ${topPick.runtime?`<span>${Math.floor(topPick.runtime/60)}h ${topPick.runtime%60}m</span>`:''}
+        </div>
+        <div class="tp-match-row"><span>Mood match</span><span class="tp-match-pct">${pct}%</span></div>
+        <div class="tp-match-track"><div class="tp-match-fill" data-pct="${pct}" style="width:0"></div></div>
+        ${topPick.tagline?`<p class="tp-tagline">"${esc(topPick.tagline)}"</p>`:''}
+        <p class="tp-explanation">${esc(topPick.explanation||'')}</p>
+        ${topPick.spokenLanguages?.length?`<p class="tp-ott-label" style="margin-bottom:4px">Spoken in: ${esc(topPick.spokenLanguages.slice(0,3).join(' · '))}</p>`:''}
+        ${topPick.streaming?.length?`<p class="tp-ott-label">Available on</p><div class="ott-row">${topPick.streaming.filter(p=>p.name!=='Check JustWatch').map(p=>`<a class="ott-badge" href="${esc(p.link||'#')}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join('')}</div>`:`<p class="ott-none">Not on major streaming · <a href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="color:var(--gold-l);text-decoration:none">Check JustWatch</a></p>`}
+        <div class="tp-actions">
+          ${topPick.tmdbUrl?`<a href="${esc(topPick.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="tp-btn-tmdb">More Info →</a>`:''}
+          <button class="tp-btn-share" data-title="${esc(topPick.title)}" onclick="shareFilm(this.dataset.title)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+        </div>
+      </div>`;
+    listWrap.appendChild(tpCard);
+  }
 
-  cardsWrap.appendChild(swipe);cardsWrap.appendChild(dotsRow);chat.appendChild(cardsWrap);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{cardsWrap.querySelectorAll(".match-fill[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%")}));
+  // ── OTHER PICKS — split layout cards ──
+  if(others.length>0){
+    const moreLabel=document.createElement("p");
+    moreLabel.className="more-picks-label";
+    moreLabel.textContent="More for your mood";
+    listWrap.appendChild(moreLabel);
+
+    others.forEach(rec=>{
+      const pct=Math.round((rec.matchScore||.75)*100);
+      const icon=GENRE_ICONS[rec.genre]||"🎬";
+      const card=document.createElement("div");
+      card.className="split-card";
+      card.dataset.recJson=JSON.stringify(rec);
+      const ottBadges=(rec.streaming||[])
+        .filter(p=>p.name!=='Check JustWatch')
+        .slice(0,2)
+        .map(p=>`<a class="split-ott-badge" href="${esc(p.link||'#')}" target="_blank" rel="noopener noreferrer"><span class="split-ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`)
+        .join('');
+      const ottOrJW=ottBadges||`<span style="font-size:9px;color:var(--muted)">Check JustWatch</span>`;
+      const posterHtml=rec.poster
+        ?`<img src="${esc(rec.poster)}" class="split-poster" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='${SPLIT_PH.replace(/'/g,"\'")}'">` : SPLIT_PH;
+      card.innerHTML=`
+        <div class="split-poster-wrap">
+          ${posterHtml}
+          <span class="split-genre-badge">${esc(rec.genre||'')}</span>
+        </div>
+        <div class="split-body">
+          <h3 class="split-title">${esc(rec.title)}</h3>
+          <div class="split-meta">
+            ${rec.releaseYear?`<span>${rec.releaseYear}</span>`:''}
+            ${rec.rating?`<span class="split-rating">★ ${rec.rating}</span>`:''}
+          </div>
+          <div class="split-match-row"><span>Mood match</span><span class="split-match-pct">${pct}%</span></div>
+          <div class="split-match-track"><div class="split-match-fill" data-pct="${pct}" style="width:0"></div></div>
+          <p class="split-explanation">${esc(rec.explanation||'')}</p>
+          <div class="split-ott">${ottOrJW}</div>
+          ${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="split-more-btn">More Info →</a>`:''}
+        </div>`;
+      listWrap.appendChild(card);
+    });
+  }
+
+  chat.appendChild(listWrap);
+
+  // Animate match bars after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    listWrap.querySelectorAll('[data-pct]').forEach(el=>el.style.width=el.getAttribute('data-pct')+'%');
+  }));
 
   // Hide composer, show quick action bar
   const composer=document.getElementById("composer");
@@ -1372,17 +1464,11 @@ function changeIntent(){
 let _listenTimer=null;
 function showListeningState(){
   const ls=document.getElementById("listening-state");
+  // Only show on idle step, no text typed
   if(!ls||chatStep!=="idle")return;
-  // Calculate position from actual DOM heights
-  const topbarH=document.getElementById("topbar").offsetHeight||56;
-  const comp=document.getElementById("composer");
-  const compH=comp.offsetHeight||72;
-  // With no interactive-widget, vv gives keyboard height correctly
-  const kbH=window.visualViewport
-    ?Math.max(0,window.innerHeight-window.visualViewport.height)
-    :0;
-  ls.style.top=topbarH+"px";
-  ls.style.bottom=(compH+kbH)+"px";
+  const ta=document.getElementById("mood-input");
+  if(ta&&ta.value.trim().length>0)return;
+  // Simply add show — position is handled by CSS (absolute inside #chat)
   ls.classList.add("show");
 }
 function hideListeningState(instant){
@@ -1400,20 +1486,15 @@ function hideListeningState(instant){
 }
 
 function initKeyboard(){
+  // Only handle composer layout on keyboard open
+  // Listening state is now purely focus/blur — no visualViewport needed
   if(!window.visualViewport||_keyboardInited)return;
   _keyboardInited=true;
   function update(){
     const kbH=Math.max(0,window.innerHeight-window.visualViewport.height);
     const comp=document.getElementById("composer");
     comp.style.transform=kbH>50?`translateY(-${kbH}px)`:"translateY(0)";
-    document.getElementById("chat").style.paddingBottom=kbH>50?(kbH+comp.offsetHeight+8)+"px":"8px";
     if(kbH>50)scrollChat();
-    clearTimeout(_listenTimer);
-    if(kbH>50){
-      _listenTimer=setTimeout(showListeningState,350);
-    }else{
-      hideListeningState();
-    }
   }
   window.visualViewport.addEventListener("resize",update,{passive:true});
   window.visualViewport.addEventListener("scroll",update,{passive:true});
@@ -1429,7 +1510,8 @@ function openCardOverlay(rec){
   const pct=Math.round((rec.matchScore||.75)*100);
   // Poster
   const pw=document.getElementById("co-poster-wrap");
-  pw.innerHTML=rec.poster?`<img src="${esc(rec.poster)}" class="co-poster" alt="${esc(rec.title)}" onerror="this.outerHTML='<div class=co-poster-ph>${icon}</div>'">`:`<div class="co-poster-ph">${icon}</div>`;
+  const CO_PH='<div class="co-poster-ph"><svg width="64" height="64" viewBox="0 0 52 52" fill="none" style="opacity:.3"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/><rect x="4" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="4" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/></svg></div>';
+  pw.innerHTML=rec.poster?`<img src="${esc(rec.poster)}" class="co-poster" alt="${esc(rec.title)}" onerror="this.outerHTML='${CO_PH}'">`:(CO_PH);
   // Badges
   const badges=document.getElementById("co-badges");
   badges.innerHTML=(rec.isTopPick?'<span class="co-top-badge">Top Pick</span>':'')+`<span class="co-genre">${icon} ${esc(rec.genre||"")}</span>`;
@@ -1535,37 +1617,26 @@ function init(){
 
   const ta=document.getElementById("mood-input");
   const wrap=document.getElementById("input-glow-wrap");
+  // Focus: show listening state immediately — no delay needed
+  // because position is CSS-driven, not calculated
   ta.addEventListener("focus",function(){
     if(wrap)wrap.classList.add("focused");
-    // Show at 200ms and again at 600ms — catches both fast and slow Android keyboards
-    clearTimeout(_listenTimer);
-    _listenTimer=setTimeout(showListeningState, 200);
-    setTimeout(showListeningState, 600);
+    showListeningState();
   },{passive:true});
 
-  // Extra trigger: first touch after focus — catches Android keyboards that
-  // fire resize late. If keyboard is open and state not visible, show it.
-  document.addEventListener("touchstart", function(){
-    const ta2=document.getElementById("mood-input");
-    const ls=document.getElementById("listening-state");
-    if(!ls||!ta2)return;
-    const isFocused=(document.activeElement===ta2);
-    const isShowing=ls.classList.contains("show");
-    if(isFocused&&!isShowing&&chatStep==="idle"){
-      showListeningState();
-    }
-  },{passive:true});
-
+  // Blur: hide listening state, but wait briefly to
+  // avoid hiding when user taps a composer pill
   ta.addEventListener("blur",function(){
     if(wrap)wrap.classList.remove("focused");
-    // Small delay — prevents hiding when tapping composer pills
-    setTimeout(function(){
-      const focused=document.activeElement;
-      const composer=document.getElementById("composer");
-      if(composer&&!composer.contains(focused)){
+    clearTimeout(_listenTimer);
+    _listenTimer=setTimeout(function(){
+      // Only hide if focus moved outside composer
+      const active=document.activeElement;
+      const comp=document.getElementById("composer");
+      if(!comp||!comp.contains(active)){
         hideListeningState();
       }
-    },200);
+    },150);
   },{passive:true});
 
   initKeyboard();
