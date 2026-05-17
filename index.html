@@ -27,6 +27,7 @@
   --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
 }
 html,body{width:100%;height:100%;overflow:hidden;position:fixed;inset:0;background:var(--ink);color:var(--paper);font-family:'DM Sans',sans-serif}
+button,a,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");background-size:160px;pointer-events:none;z-index:9998;mix-blend-mode:overlay;opacity:.5}
 
 /* ══ SPLASH ══════════════════════════════════════════════
@@ -160,6 +161,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   left:0;right:0;
   top:56px;
   bottom:130px;
+  will-change:opacity;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -315,7 +319,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 /* ══ INTENT CARDS ════════════════════════════════════════ */
 .intent-choices{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;margin-left:38px}
-.intent-choice{flex:1;min-width:calc(50% - 4px);background:linear-gradient(145deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.18);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .18s,background .18s,box-shadow .18s;user-select:none;-webkit-user-select:none}
+.intent-choice{flex:1;min-width:calc(50% - 4px);background:linear-gradient(145deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.18);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .18s,background .18s,box-shadow .18s;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:80px}
 .intent-choice:active{background:rgba(200,137,90,.06)}
 .intent-choice.selected{border-color:var(--gold);background:rgba(200,137,90,.14);box-shadow:0 0 18px rgba(200,137,90,.15)}
 .ic-icon{font-size:20px;margin-bottom:5px;display:block}
@@ -324,7 +328,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 /* ══ LANG CHIPS ══════════════════════════════════════════ */
 .lang-choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
-.lang-choice{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 14px;font-size:13px;color:var(--paper2);cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;user-select:none;-webkit-user-select:none}
+.lang-choice{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 14px;font-size:13px;color:var(--paper2);cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:44px}
 .lang-choice:active{background:rgba(200,137,90,.08)}
 .lang-choice.selected{border-color:var(--gold);color:var(--gold-l);background:rgba(200,137,90,.1)}
 .lang-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -335,7 +339,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .mood-summary-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.4;margin-bottom:8px}
 .mood-tags{display:flex;flex-wrap:wrap;gap:4px}
 .mood-tag{border:1px solid rgba(200,137,90,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
-.cards-swipe{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:10px;padding-bottom:6px;margin:8px -18px 0;padding-left:18px;padding-right:18px}
+.cards-swipe{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:10px;padding-bottom:6px;margin:8px -18px 0;padding-left:18px;padding-right:18px;overscroll-behavior-x:contain;-webkit-scroll-snap-type:x mandatory}
 .cards-swipe::-webkit-scrollbar{display:none}
 .result-card{flex-shrink:0;width:calc(100vw - 56px);scroll-snap-align:start}
 .rc-inner{background:linear-gradient(160deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.15);border-radius:16px;overflow:hidden}
@@ -349,6 +353,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .card-title{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4vw,20px);font-weight:500;line-height:1.15}
 .card-meta{display:flex;gap:8px;margin-bottom:4px}
 .card-meta span{font-size:11px;color:var(--muted)}.card-meta .rating{color:var(--gold)}
+.card-meta-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap}
+.card-runtime{font-size:10px;color:var(--muted)}
+.card-langs{font-size:10px;color:var(--muted)}
+.meta-dot{font-size:10px;color:var(--muted);opacity:.4}
 .match-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px}
 .match-row .pct{color:var(--gold)}
 .match-track{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px}
@@ -374,9 +382,71 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .rl-bar{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px;width:180px}
 .rl-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
 .rl-text{font-size:12px;color:var(--muted);font-style:italic}
+/* Error bubble */
+.error-bubble{text-align:center;padding:16px!important}
+.error-icon{font-size:28px;margin-bottom:8px}
+.error-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--paper);margin-bottom:4px}
+.error-sub{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.error-retry{background:linear-gradient(135deg,var(--gold),var(--gold-d));border:none;border-radius:10px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;touch-action:manipulation}
+.error-retry:active{opacity:.85}
+
+/* ══ EXPANDED CARD OVERLAY ══════════════════════════════
+   Slides up from bottom when user taps a film card.
+   Full screen — large poster, full explanation, all details.
+   Swipe down or tap × to close. Chat stays underneath.
+   ══════════════════════════════════════════════════════ */
+#card-overlay{
+  position:fixed;inset:0;z-index:400;
+  display:flex;flex-direction:column;
+  background:var(--ink2);
+  transform:translateY(100%);
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+#card-overlay.open{transform:translateY(0)}
+#card-overlay-inner{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding-bottom:calc(var(--safe-b) + 20px);
+}
+#card-overlay-inner::-webkit-scrollbar{display:none}
+.co-poster{width:100%;max-height:52vw;object-fit:cover;display:block;flex-shrink:0}
+.co-poster-ph{width:100%;height:52vw;background:var(--ink4);display:flex;align-items:center;justify-content:center;font-size:52px}
+.co-body{padding:20px 20px 8px}
+.co-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.co-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--muted);touch-action:manipulation}
+.co-close:active{background:rgba(255,255,255,.12)}
+.co-badge-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.co-top-badge{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--ink);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.co-genre{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.co-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,6vw,32px);font-weight:400;line-height:1.15;margin-bottom:6px;color:var(--paper)}
+.co-meta{display:flex;gap:10px;margin-bottom:4px}
+.co-meta span{font-size:12px;color:var(--muted)}.co-meta .co-rating{color:var(--gold)}
+.co-langs{font-size:11px;color:var(--muted);margin-bottom:12px}
+.co-match-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.co-match-pct{color:var(--gold);font-weight:500}
+.co-match-track{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.co-match-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:2px}
+.co-tagline{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-l);font-style:italic;margin-bottom:10px;line-height:1.4}
+.co-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:6px}
+.co-explanation{font-size:14px;color:var(--paper2);line-height:1.7;margin-bottom:18px}
+.co-divider{height:1px;background:rgba(255,255,255,.06);margin:14px 0}
+.co-actions{display:flex;gap:10px;padding:14px 20px calc(14px + var(--safe-b));border-top:1px solid rgba(255,255,255,.06);background:var(--ink2);flex-shrink:0}
+.co-btn-tmdb{flex:1;text-align:center;font-size:14px;font-weight:600;color:var(--ink);background:linear-gradient(135deg,var(--gold),var(--gold-d));border-radius:12px;padding:13px;text-decoration:none;display:block;touch-action:manipulation}
+.co-btn-share{width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid rgba(200,137,90,.3);background:none;cursor:pointer;color:var(--muted);touch-action:manipulation}
+.co-btn-share:active{border-color:var(--gold);color:var(--gold)}
+/* Drag handle at top */
+.co-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:3px;margin:10px auto 0;flex-shrink:0}
 
 /* ══ COMPOSER ════════════════════════════════════════════ */
-#composer{flex-shrink:0;border-top:1px solid rgba(160,150,180,.12);padding-bottom:var(--safe-b);background:var(--ink2)}
+#composer{flex-shrink:0;border-top:1px solid rgba(160,150,180,.12);padding-bottom:var(--safe-b);background:var(--ink2);transition:opacity .3s ease}
+#quick-actions{display:none;flex-direction:row;gap:8px;padding:10px 14px calc(10px + var(--safe-b));border-top:1px solid rgba(200,137,90,.18);background:var(--ink2);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-shrink:0}
+#quick-actions::-webkit-scrollbar{display:none}
+#quick-actions.show{display:flex}
+.qa-chip{flex-shrink:0;background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;cursor:pointer;white-space:nowrap;touch-action:manipulation;min-height:44px;display:flex;align-items:center;gap:6px}
+.qa-chip:active{background:rgba(200,137,90,.18)}
+.qa-chip.gold{color:var(--gold-l);border-color:rgba(200,137,90,.45);background:rgba(200,137,90,.13)}
 
 
 #input-row{display:flex;align-items:flex-end;gap:10px;padding:10px 14px 12px}#input-glow-wrap{flex:1}
@@ -632,7 +702,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- ══ AD GATE ════════════════════════════════════════════ -->
 <div id="ad-gate">
   <div id="ad-sheet">
-    <div class="ad-handle"></div>
+    <div class="ad-handle" onclick="dismissAdEarly()" style="cursor:pointer;padding:8px 0"></div>
     <div class="ad-icon">🎬</div>
     <h2 class="ad-title">Your picks are <em>ready</em></h2>
     <p class="ad-sub">Watch a short ad and your films appear the moment it ends. Completely free, always.</p>
@@ -664,6 +734,37 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
       Your picks load while the ad plays. Zero wait after it ends.
     </p>
+  </div>
+</div>
+
+<!-- ══ CARD OVERLAY — full screen expanded card ══ -->
+<div id="card-overlay">
+  <div class="co-handle" id="co-handle"></div>
+  <div id="card-overlay-inner">
+    <div id="co-poster-wrap"></div>
+    <div class="co-body">
+      <div class="co-top-row">
+        <div id="co-badges" class="co-badge-row"></div>
+        <button class="co-close" onclick="closeCardOverlay()">✕</button>
+      </div>
+      <h2 class="co-title" id="co-title"></h2>
+      <div class="co-meta" id="co-meta"></div>
+      <div class="co-langs" id="co-langs"></div>
+      <div class="co-match-row"><span>Mood match</span><span class="co-match-pct" id="co-pct"></span></div>
+      <div class="co-match-track"><div class="co-match-fill" id="co-match-fill"></div></div>
+      <p class="co-tagline" id="co-tagline"></p>
+      <div class="co-section-label">Why this film</div>
+      <p class="co-explanation" id="co-explanation"></p>
+      <div class="co-divider"></div>
+      <div class="co-section-label">Where to watch</div>
+      <div id="co-ott" class="ott-row" style="margin-top:6px"></div>
+    </div>
+  </div>
+  <div class="co-actions">
+    <a id="co-tmdb-btn" href="#" target="_blank" rel="noopener noreferrer" class="co-btn-tmdb">Open on TMDb</a>
+    <button class="co-btn-share" id="co-share-btn" onclick="shareFilm(document.getElementById('co-title').textContent)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    </button>
   </div>
 </div>
 
@@ -715,6 +816,14 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <div id="composer-pills-inner"></div>
   </div>
   </div>
+
+<!-- ══ QUICK ACTIONS — shown after recommendations ══ -->
+<div id="quick-actions">
+  <button class="qa-chip" onclick="restartAll()">↺ New Mood</button>
+  <button class="qa-chip" onclick="quickChangeLang()">🌍 Language</button>
+  <button class="qa-chip" onclick="changeIntent()">🎯 Vibe</button>
+  <button class="qa-chip gold" onclick="shareAll()">↑ Share</button>
+</div>
 </div>
 
 <script>
@@ -1002,6 +1111,26 @@ function showAdGate(){
 function hideAdGate(){
   document.getElementById("ad-gate").classList.remove("show");
 }
+// User dismisses ad before completion — return to language step
+function dismissAdEarly(){
+  clearInterval(adCountdownInterval);
+  adApiPromise=null;
+  hideAdGate();
+  // Reset ad UI for next time
+  document.getElementById("btn-watch-ad").style.display="flex";
+  document.getElementById("ad-timer-wrap").style.display="none";
+  document.getElementById("ad-simulated").classList.remove("show");
+  // Go back to language question
+  chatStep="awaiting_lang";
+  const chat=document.getElementById("chat");
+  // Remove last user bubble (language choice) and lang chips
+  const children=Array.from(chat.children);
+  // Remove everything after intent user bubble
+  let intentUserIdx=-1;
+  children.forEach((c,i)=>{if(c.classList.contains("msg-user"))intentUserIdx=i;});
+  while(chat.children.length>intentUserIdx+1)chat.lastChild.remove();
+  setTimeout(showLangQuestion,200);
+}
 
 function startAdFlow(){
   // Switch button to timer
@@ -1064,31 +1193,72 @@ async function onAdComplete(){
   }catch(e){
     clearInterval(rlInt);
     const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-    appendApp(`<span style="color:#ff9999">Something went wrong. <span style="cursor:pointer;text-decoration:underline" onclick="adApiPromise=null;onAdComplete()">Try again?</span></span>`);
+    const errType=(e.message==="TIMEOUT")?"TIMEOUT":(!navigator.onLine)?"OFFLINE":"REQUEST_FAILED";
+    showError(errType,function(){adApiPromise=null;chatStep="loading";onAdComplete();});
     chatStep="awaiting_lang";
   }
 }
 
-/* ── FINAL API CALL ── */
+/* ── FINAL API CALL — with full error handling ── */
+function isOffline(){ return typeof navigator!=="undefined"&&!navigator.onLine; }
+
 async function fireFinalAPI(){
+  // Offline check
+  if(isOffline()) return {error:"OFFLINE"};
   try{
     if(prefetchPromise)await prefetchPromise;
     let data;
+    // Race with 45s timeout
+    const timeoutPromise=new Promise((_,r)=>setTimeout(()=>r(new Error("TIMEOUT")),45000));
     if(prefetchData&&!prefetchData.error){
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,prefetchResult:prefetchData,finalPickOnly:true})});
-      data=await res.json();
+      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,prefetchResult:prefetchData,finalPickOnly:true})}).then(r=>r.json());
+      data=await Promise.race([fetchPromise,timeoutPromise]);
     }else{
-      const res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})});
-      data=await res.json();
+      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})}).then(r=>r.json());
+      data=await Promise.race([fetchPromise,timeoutPromise]);
     }
     return data;
   }catch(e){
-    return {error:e.message||"Request failed"};
+    const msg=e.message||"";
+    if(msg==="TIMEOUT")return{error:"TIMEOUT"};
+    if(!navigator.onLine)return{error:"OFFLINE"};
+    return{error:msg||"REQUEST_FAILED"};
   }
+}
+
+/* ── ERROR DISPLAY — never leaves user stuck ── */
+function showError(type, retryFn){
+  const messages={
+    OFFLINE:        {icon:"📡", title:"You're offline", sub:"Check your connection and try again."},
+    TIMEOUT:        {icon:"⏱", title:"That took too long", sub:"The AI is busy. Try again in a moment."},
+    EMPTY_RESULTS:  {icon:"🎬", title:"No films found", sub:"Try describing your mood differently."},
+    REQUEST_FAILED: {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
+    DEFAULT:        {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
+  };
+  const m=messages[type]||messages.DEFAULT;
+  const w=document.createElement("div");
+  w.className="msg-app slide-up";
+  w.innerHTML=`<div class="msg-avatar">🎬</div>
+    <div class="bubble-app error-bubble">
+      <div class="error-icon">${m.icon}</div>
+      <div class="error-title">${m.title}</div>
+      <div class="error-sub">${m.sub}</div>
+      <button class="error-retry" onclick="this.closest('.error-bubble').parentElement.parentElement.remove();(${retryFn.toString()})()">Try again</button>
+    </div>`;
+  document.getElementById("chat").appendChild(w);
+  scrollChat();
 }
 
 /* ── RESULTS ── */
 function renderResults(recs,moodData){
+  // Empty results guard
+  if(!recs||recs.length===0){
+    showError("EMPTY_RESULTS",function(){
+      adApiPromise=null;chatStep="awaiting_lang";
+      changeIntent();
+    });
+    return;
+  }
   const chat=document.getElementById("chat");
   const sumWrap=document.createElement("div");sumWrap.className="msg-app slide-up";
   let sumHtml=`<div class="msg-avatar">🎬</div><div class="bubble-app">`;
@@ -1108,6 +1278,8 @@ function renderResults(recs,moodData){
     const icon=GENRE_ICONS[rec.genre]||"🎬";
     const poster=rec.poster?`<img src="${esc(rec.poster)}" class="card-poster" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='<div class=card-poster-ph>${icon}</div>'">`:`<div class="card-poster-ph">${icon}</div>`;
     const card=document.createElement("div");card.className="result-card"+(rec.isTopPick?" top-pick":"");
+    card.onclick=function(e){if(!e.target.closest('a')&&!e.target.closest('.btn-share-card'))openCardOverlay(rec);};
+    card.style.cursor="pointer";
     card.innerHTML=`<div class="rc-inner">${poster}<div class="card-body">
       ${rec.isTopPick?'<span class="top-badge">Top Pick</span><br>':''}
       <div class="card-header-row"><span class="card-genre">${icon} ${esc(rec.genre||'')}</span><h3 class="card-title">${esc(rec.title)}</h3></div>
@@ -1116,6 +1288,7 @@ function renderResults(recs,moodData){
       <div class="match-track"><div class="match-fill" style="width:0" data-pct="${pct}"></div></div>
       ${rec.tagline?`<p class="card-tagline">"${esc(rec.tagline)}"</p>`:''}
       <p class="card-explanation">${esc(rec.explanation)}</p>
+      ${renderSpokenLangs(rec.spokenLanguages,rec.runtime)}
       ${renderOTT(rec.streaming)}
       <div class="card-actions">
         ${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="btn-tmdb">More Info</a>`:''}
@@ -1136,13 +1309,11 @@ function renderResults(recs,moodData){
   cardsWrap.appendChild(swipe);cardsWrap.appendChild(dotsRow);chat.appendChild(cardsWrap);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{cardsWrap.querySelectorAll(".match-fill[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%")}));
 
-  // Action chips
-  const row=document.createElement("div");row.className="action-chips slide-up";
-  row.innerHTML=`
-    <button class="action-chip" onclick="restartAll()">New mood</button>
-    <button class="action-chip" onclick="changeIntent()">Different vibe</button>
-    <button class="action-chip gold" onclick="shareAll()">Share picks</button>`;
-  chat.appendChild(row);
+  // Hide composer, show quick action bar
+  const composer=document.getElementById("composer");
+  if(composer)composer.style.display="none";
+  const qa=document.getElementById("quick-actions");
+  if(qa)qa.classList.add("show");
   scrollChat();
 }
 
@@ -1154,6 +1325,7 @@ function restartAll(){
   adApiPromise=null;
   clearInterval(adCountdownInterval);
   hideAdGate();
+  closeCardOverlay();
   document.getElementById("btn-watch-ad").style.display="flex";
   document.getElementById("ad-timer-wrap").style.display="none";
   document.getElementById("ad-simulated").classList.remove("show");
@@ -1161,17 +1333,37 @@ function restartAll(){
   document.getElementById("mood-input").style.height="auto";
   const gw=document.getElementById("input-glow-wrap");
   if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
-  // listenTimer cleaned up via ta.onfocus reassignment
+  const rComp=document.getElementById("composer");if(rComp)rComp.style.display="";
+  const rQa=document.getElementById("quick-actions");if(rQa)rQa.classList.remove("show");
   hideListeningState(true);
   updateSendBtn();
   init();
 }
+function quickChangeLang(){
+  closeCardOverlay();selectedLang="any";adApiPromise=null;
+  const chat=document.getElementById("chat");const ch=Array.from(chat.children);
+  let ku=ch.length,ic=0;
+  for(let i=0;i<ch.length;i++){if(ch[i].classList.contains("msg-user"))ic++;if(ic===2){ku=i+1;break;}}
+  while(chat.children.length>ku)chat.lastChild.remove();
+  const comp=document.getElementById("composer");if(comp)comp.style.display="";
+  const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
+  chatStep="awaiting_lang";adApiPromise=null;
+  setTimeout(showLangQuestion,150);
+}
 function changeIntent(){
   selectedIntent="";selectedLang="any";adApiPromise=null;
+  closeCardOverlay();
   const chat=document.getElementById("chat");const children=Array.from(chat.children);
   let keepUntil=children.length;
   for(let i=0;i<children.length;i++){if(children[i].classList.contains("msg-user")){keepUntil=i+1;break}}
   while(chat.children.length>keepUntil)chat.lastChild.remove();
+  // Restore composer
+  const composer=document.getElementById("composer");
+  if(composer)composer.style.display="";
+  const qa=document.getElementById("quick-actions");
+  if(qa)qa.classList.remove("show");
+  const ciComp=document.getElementById("composer");if(ciComp)ciComp.style.display="";
+  const ciQa=document.getElementById("quick-actions");if(ciQa)ciQa.classList.remove("show");
   chatStep="awaiting_intent";prefetchData=null;startPrefetch();
   setTimeout(showIntentQuestion,100);
 }
@@ -1228,7 +1420,85 @@ function initKeyboard(){
 }
 
 /* ── HELPERS ── */
-function renderOTT(s){if(!s||!s.length)return'<span class="ott-none">Not on major streaming platforms</span>';return'<div class="ott-row">'+s.map(p=>`<a class="ott-badge" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("")+'</div>'}
+/* ── CARD OVERLAY ── */
+let _overlayRec=null;
+function openCardOverlay(rec){
+  _overlayRec=rec;
+  const ol=document.getElementById("card-overlay");
+  const icon=GENRE_ICONS[rec.genre]||"🎬";
+  const pct=Math.round((rec.matchScore||.75)*100);
+  // Poster
+  const pw=document.getElementById("co-poster-wrap");
+  pw.innerHTML=rec.poster?`<img src="${esc(rec.poster)}" class="co-poster" alt="${esc(rec.title)}" onerror="this.outerHTML='<div class=co-poster-ph>${icon}</div>'">`:`<div class="co-poster-ph">${icon}</div>`;
+  // Badges
+  const badges=document.getElementById("co-badges");
+  badges.innerHTML=(rec.isTopPick?'<span class="co-top-badge">Top Pick</span>':'')+`<span class="co-genre">${icon} ${esc(rec.genre||"")}</span>`;
+  // Title + meta
+  document.getElementById("co-title").textContent=rec.title||"";
+  const meta=document.getElementById("co-meta");
+  meta.innerHTML=(rec.releaseYear?`<span>${rec.releaseYear}</span>`:"")+
+    (rec.runtime?`<span>${Math.floor(rec.runtime/60)}h ${rec.runtime%60}m</span>`:"")+
+    (rec.rating?`<span class="co-rating">★ ${rec.rating}</span>`:"");
+  // Languages
+  const langs=document.getElementById("co-langs");
+  langs.textContent=(rec.spokenLanguages&&rec.spokenLanguages.length)?`🗣 ${rec.spokenLanguages.slice(0,3).join(" · ")}`:"";
+  // Match
+  document.getElementById("co-pct").textContent=pct+"%";
+  document.getElementById("co-match-fill").style.width=pct+"%";
+  // Tagline + explanation
+  document.getElementById("co-tagline").textContent=rec.tagline?`"${rec.tagline}"`:"";
+  document.getElementById("co-explanation").textContent=rec.explanation||"";
+  // OTT
+  document.getElementById("co-ott").innerHTML=renderOTT(rec.streaming);
+  // TMDB
+  const tmdbBtn=document.getElementById("co-tmdb-btn");
+  tmdbBtn.href=rec.tmdbUrl||"https://www.themoviedb.org";
+  // Open
+  ol.classList.add("open");
+  document.body.style.overflow="hidden";
+  // Swipe down to close
+  setupOverlaySwipe(ol);
+}
+function closeCardOverlay(){
+  const ol=document.getElementById("card-overlay");
+  ol.classList.remove("open");
+  document.body.style.overflow="";
+}
+function setupOverlaySwipe(el){
+  let startY=0;
+  el.ontouchstart=e=>startY=e.touches[0].clientY;
+  el.ontouchmove=e=>{
+    const dy=e.touches[0].clientY-startY;
+    if(dy>0){el.style.transform=`translateY(${dy}px)`;e.preventDefault();}
+  };
+  el.ontouchend=e=>{
+    const dy=e.changedTouches[0].clientY-startY;
+    el.style.transform="";
+    if(dy>80){closeCardOverlay();}
+  };
+}
+
+function renderSpokenLangs(langs, runtime){
+  const parts=[];
+  if(runtime&&runtime>0){
+    const h=Math.floor(runtime/60),m=runtime%60;
+    parts.push(`<span class="card-runtime">${h>0?h+"h ":""}${m}m</span>`);
+  }
+  if(langs&&langs.length>0){
+    const display=langs.slice(0,3).join(" · ");
+    parts.push(`<span class="card-langs">🗣 ${esc(display)}</span>`);
+  }
+  if(!parts.length)return"";
+  return`<div class="card-meta-row">${parts.join('<span class="meta-dot">·</span>')}</div>`;
+}
+function renderOTT(s){
+  if(!s||!s.length)return'<span class="ott-none">Not on major streaming · <a href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="color:var(--gold-l);text-decoration:none">Check JustWatch</a></span>';
+  const hasJW=s.some(p=>p.name==="Check JustWatch");
+  const regular=s.filter(p=>p.name!=="Check JustWatch");
+  let html='<div class="ott-row">'+regular.map(p=>`<a class="ott-badge" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("");
+  if(hasJW||regular.length===0)html+=`<a class="ott-badge" href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="border-color:rgba(232,125,13,.3)"><span class="ott-dot" style="background:#E87D0D"></span>JustWatch</a>`;
+  return html+'</div>';
+}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
 function shareFilm(title){const text=`Moodfilm picked "${title}" for my mood.\nhttps://aaronkankipati.github.io/moodfilm-app/`;if(navigator.share)navigator.share({title:"Moodfilm Pick",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function shareAll(){if(!lastRecs)return;const text="My Moodfilm picks\n"+lastRecs.map(r=>r.title).join(", ")+"\nhttps://aaronkankipati.github.io/moodfilm-app/";if(navigator.share)navigator.share({title:"My Moodfilm Picks",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
@@ -1267,11 +1537,23 @@ function init(){
   const wrap=document.getElementById("input-glow-wrap");
   ta.addEventListener("focus",function(){
     if(wrap)wrap.classList.add("focused");
-    // Primary trigger for listening state on Android
+    // Show at 200ms and again at 600ms — catches both fast and slow Android keyboards
     clearTimeout(_listenTimer);
-    _listenTimer=setTimeout(function(){
+    _listenTimer=setTimeout(showListeningState, 200);
+    setTimeout(showListeningState, 600);
+  },{passive:true});
+
+  // Extra trigger: first touch after focus — catches Android keyboards that
+  // fire resize late. If keyboard is open and state not visible, show it.
+  document.addEventListener("touchstart", function(){
+    const ta2=document.getElementById("mood-input");
+    const ls=document.getElementById("listening-state");
+    if(!ls||!ta2)return;
+    const isFocused=(document.activeElement===ta2);
+    const isShowing=ls.classList.contains("show");
+    if(isFocused&&!isShowing&&chatStep==="idle"){
       showListeningState();
-    },300);
+    }
   },{passive:true});
 
   ta.addEventListener("blur",function(){
