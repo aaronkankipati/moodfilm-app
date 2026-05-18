@@ -2005,7 +2005,8 @@ function renderSpokenLangs(langs, runtime){
   return`<div class="card-meta-row">${parts.join('<span class="meta-dot">·</span>')}</div>`;
 }
 function renderOTT(s){
-  if(!s||!s.length)return'<span class="ott-none">Not on major streaming · <a href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="color:var(--gold-l);text-decoration:none">Check JustWatch</a></span>';
+  // BUG-2 FIX: strict array validation — prevents type errors from crashing card renders before explanation is written
+  if(!Array.isArray(s)||!s.length)return'<span class="ott-none">Not on major streaming · <a href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="color:var(--gold-l);text-decoration:none">Check JustWatch</a></span>';
   const hasJW=s.some(p=>p.name==="Check JustWatch");
   const regular=s.filter(p=>p.name!=="Check JustWatch");
   let html='<div class="ott-row">'+regular.map(p=>`<a class="ott-badge" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("");
@@ -2161,7 +2162,9 @@ function renderResults(recs,moodData){
   // ══ HERO CARD ═══════════════════════════════════════════════
   if(topPick){
     const pct=Math.round((topPick.matchScore||.75)*100);
-    const rt=topPick.runtime?Math.floor(topPick.runtime/60)+"h "+topPick.runtime%60+"m":"";
+    const rt=(topPick.runtime&&topPick.runtime>0)?(()=>{const _h=Math.floor(topPick.runtime/60),_m=topPick.runtime%60;return _h>0?_h+"h "+_m+"m":_m+"m";})():
+      (topPick.releaseYear&&topPick.genre)?topPick.releaseYear+" • "+topPick.genre:
+      (topPick.releaseYear||topPick.genre||"");
     const heroCard=document.createElement("div");
     heroCard.className="hero-card";
 
@@ -2340,7 +2343,9 @@ function renderResults(recs,moodData){
 
     others.forEach((rec,i)=>{
       const pct=Math.round((rec.matchScore||.75)*100);
-      const rt=rec.runtime?Math.floor(rec.runtime/60)+"h "+rec.runtime%60+"m":"";
+      const rt=(rec.runtime&&rec.runtime>0)?(()=>{const _h=Math.floor(rec.runtime/60),_m=rec.runtime%60;return _h>0?_h+"h "+_m+"m":_m+"m";})():
+        (rec.releaseYear&&rec.genre)?rec.releaseYear+" • "+rec.genre:
+        (rec.releaseYear||rec.genre||"");
       const card=document.createElement("div");
       card.className="film-card";
       card.dataset.recJson=JSON.stringify(rec);
@@ -2472,8 +2477,11 @@ function renderResults(recs,moodData){
   chat.appendChild(listWrap);
 
   // Animate match bars
+  // BUG-3 FIX: force layout reflow before width assignment so Mobile Chromium
+  // transition triggers reliably on Android touch-points (1.4s fluid animation)
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     listWrap.querySelectorAll("[data-pct]").forEach(el=>{
+      void el.offsetWidth; // force reflow — paint engine must commit width:0 before animating
       el.style.width=el.dataset.pct+"%";
     });
   }));
