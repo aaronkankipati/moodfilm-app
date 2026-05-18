@@ -1225,7 +1225,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <div id="ad-gate">
   <div id="ad-sheet">
     <div class="ad-handle" onclick="dismissAdEarly()" style="cursor:pointer;padding:8px 0"></div>
-    <button onclick="dismissAdEarly()" style="position:absolute;top:16px;right:16px;background:none;border:1px solid rgba(255,255,255,.12);border-radius:50%;width:30px;height:30px;color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;z-index:10">×</button>
     <div class="ad-icon">🎬</div>
     <h2 class="ad-title">Your picks are <em>ready</em></h2>
     <p class="ad-sub">Watch a short ad and your films appear the moment it ends. Completely free, always.</p>
@@ -1826,43 +1825,70 @@ function restartAll(){
   init();
 }
 function quickChangeLang(){
+  // Full clean reset of all pending state
+  clearInterval(adCountdownInterval);
+  adApiPromise=null;
+  prefetchData=null;
+  prefetchPromise=null;
+  selectedLang="any";
   closeCardOverlay();
-  selectedLang="any";adApiPromise=null;prefetchData=null;
+  hideAdGate();
+  // Reset ad gate UI to clean state
+  document.getElementById("btn-watch-ad").style.display="flex";
+  document.getElementById("ad-timer-wrap").style.display="none";
+  document.getElementById("ad-simulated").classList.remove("show");
+
   const chat=document.getElementById("chat");
-  // Restore chat padding
   chat.style.padding="";
+  // Trim chat back to just after the 2nd user bubble (intent choice)
+  // Children: [#listening-state, greeting, userMood, ack, intentCards, userIntent, ...]
+  // We want to keep up to and including userIntent (2nd msg-user)
   const ch=Array.from(chat.children);
-  // Find 2nd user bubble (the intent choice) — trim everything after it
-  let ku=ch.length,ic=0;
+  let ku=ch.length, ic=0;
   for(let i=0;i<ch.length;i++){
-    if(ch[i].classList.contains("msg-user"))ic++;
+    if(ch[i].classList.contains("msg-user")) ic++;
     if(ic===2){ku=i+1;break;}
   }
-  while(chat.children.length>ku)chat.lastChild.remove();
+  while(chat.children.length>ku) chat.lastChild.remove();
+
   const comp=document.getElementById("composer");if(comp)comp.style.display="";
   const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
   chatStep="awaiting_lang";
   startPrefetch();
-  setTimeout(showLangQuestion,150);
+  setTimeout(showLangQuestion, 180);
 }
 function changeIntent(){
-  selectedIntent="";selectedLang="any";adApiPromise=null;
+  // Full clean reset of all pending state
+  clearInterval(adCountdownInterval);
+  adApiPromise=null;
+  prefetchData=null;
+  prefetchPromise=null;
+  selectedIntent="";
+  selectedLang="any";
   closeCardOverlay();
+  hideAdGate();
+  // Reset ad gate UI to clean state
+  document.getElementById("btn-watch-ad").style.display="flex";
+  document.getElementById("ad-timer-wrap").style.display="none";
+  document.getElementById("ad-simulated").classList.remove("show");
+
   const chat=document.getElementById("chat");
-  // Restore chat padding
   chat.style.padding="";
+  // Trim chat back to just after the 1st user bubble (mood input)
+  // Children: [#listening-state, greeting, userMood, ...]
+  // We want to keep up to and including userMood (1st msg-user)
   const children=Array.from(chat.children);
-  // Find 1st user bubble (mood input) — trim everything after it
   let keepUntil=children.length;
   for(let i=0;i<children.length;i++){
     if(children[i].classList.contains("msg-user")){keepUntil=i+1;break;}
   }
-  while(chat.children.length>keepUntil)chat.lastChild.remove();
+  while(chat.children.length>keepUntil) chat.lastChild.remove();
+
   const comp=document.getElementById("composer");if(comp)comp.style.display="";
   const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
-  chatStep="awaiting_intent";prefetchData=null;
+  chatStep="awaiting_intent";
   startPrefetch();
-  setTimeout(showIntentQuestion,100);
+  setTimeout(showIntentQuestion, 120);
 }
 
 /* ── KEYBOARD ── */
