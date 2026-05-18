@@ -332,7 +332,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .mood-tag{border:1px solid rgba(200,137,90,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
 
 /* Results scroll container — vertical, full width */
-.results-list{display:flex;flex-direction:column;gap:12px;margin:10px 0}
+.results-list{display:flex;flex-direction:column;gap:12px;margin:0;padding-bottom:20px}
 
 /* ══════════════════════════════════════════
    TOP PICK — IMMERSIVE HERO CARD
@@ -342,7 +342,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
    Mood match is a thin gold thread.
    ══════════════════════════════════════════ */
 .hero-card {
-  margin: 0 16px 6px;
+  margin: 0 0 6px;
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgba(212,160,86,0.25);
@@ -628,7 +628,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
    Card number floats as a typographic element.
    ══════════════════════════════════════════ */
 .picks-stack {
-  padding: 0 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -846,6 +846,20 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   gap: 3px;
 }
 .film-link::after { content: '→'; font-size: 11px; }
+
+/* ── Class aliases — JS uses these names ── */
+.hero-ott-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); margin-bottom: 8px; display: block; }
+.hero-ott-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+.hero-ott-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; padding: 5px 10px; font-size: 11px; color: rgba(242,237,230,0.75); text-decoration: none; }
+.hero-ott-pill:active { background: rgba(255,255,255,0.08); }
+.hero-ott-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.hero-btn-primary { flex: 1; background: linear-gradient(135deg, var(--gold), var(--gold-d)); border: none; border-radius: 11px; padding: 13px; font-family: 'Outfit',sans-serif; font-size: 13px; font-weight: 600; color: #060606; text-align: center; text-decoration: none; display: block; letter-spacing: 0.02em; cursor: pointer; touch-action: manipulation; }
+.hero-btn-icon { width: 46px; height: 46px; flex-shrink: 0; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); touch-action: manipulation; }
+.hero-btn-icon:active { background: rgba(255,255,255,0.08); color: var(--paper); }
+.hero-langs { font-size: 9.5px; color: rgba(237,232,226,0.3); margin-bottom: 12px; letter-spacing: 0.04em; }
+/* film card OTT aliases */
+.film-ott-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; color: rgba(242,237,230,0.5); max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.film-ott-microdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
 
 /* Shared OTT (used elsewhere) */
@@ -1756,13 +1770,13 @@ function renderResults(recs,moodData){
     return;
   }
   const chat=document.getElementById("chat");
+  // Mood summary — full width, not inside a bubble
   const sumWrap=document.createElement("div");
-  sumWrap.className="msg-app slide-up";
-  let sumHtml=`<div class="msg-avatar">🎬</div><div class="bubble-app results-lead">`;
-  sumHtml+=`<span class="results-eyebrow">Your Picks</span>`;
+  sumWrap.className="results-lead slide-up";
+  sumWrap.style.cssText="padding:12px 2px 10px";
+  let sumHtml=`<span class="results-eyebrow">Your Picks</span>`;
   if(moodData?.moodSummary)sumHtml+=`<div class="mood-summary-text">"${esc(moodData.moodSummary)}"</div>`;
   if(moodData?.emotions?.length)sumHtml+=`<div class="mood-tags">${moodData.emotions.slice(0,5).map(e=>'<span class="mood-tag">'+esc(e)+'</span>').join("")}</div>`;
-  sumHtml+=`</div>`;
   sumWrap.innerHTML=sumHtml;
   chat.appendChild(sumWrap);
   const sorted=[...recs].sort((a,b)=>b.isTopPick-a.isTopPick);
@@ -1811,10 +1825,20 @@ function renderResults(recs,moodData){
     listWrap.appendChild(stack);
   }
   chat.appendChild(listWrap);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{listWrap.querySelectorAll("[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%");}));
+  // Animate match bars
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    listWrap.querySelectorAll("[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%");
+  }));
+  // Hide composer, show quick actions
   const composer=document.getElementById("composer");if(composer)composer.style.display="none";
   const qa=document.getElementById("quick-actions");if(qa)qa.classList.add("show");
-  scrollChat();
+  // Reduce chat side padding for results — cards need more width
+  const chatEl=document.getElementById("chat");
+  if(chatEl)chatEl.style.padding="12px 10px 6px";
+  // Scroll to TOP of results — user should land on hero card, not bottom
+  setTimeout(()=>{
+    listWrap.scrollIntoView({behavior:"smooth",block:"start"});
+  },120);
 }
 
 
@@ -1834,6 +1858,8 @@ function restartAll(){
   document.getElementById("mood-input").style.height="auto";
   const gw=document.getElementById("input-glow-wrap");
   if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
+  const chatEl2=document.getElementById("chat");
+  if(chatEl2)chatEl2.style.padding="";
   const rComp=document.getElementById("composer");if(rComp)rComp.style.display="";
   const rQa=document.getElementById("quick-actions");if(rQa)rQa.classList.remove("show");
   hideListeningState(true);
