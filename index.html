@@ -151,22 +151,26 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
    ══════════════════════════════════════════════════════ */
 #listening-state{
   position:absolute;
-  inset:0;                    /* fills entire #chat area */
+  inset:0;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  padding:28px 36px;
+  /* Sit in top 60% — always above keyboard */
+  justify-content:flex-start;
+  padding-top:clamp(40px,12vh,80px);
+  padding-left:36px;
+  padding-right:36px;
+  padding-bottom:28px;
   text-align:center;
   background:radial-gradient(
-    ellipse at 50% 40%,
-    rgba(52,48,96,.92) 0%,
-    rgba(28,24,52,.97) 45%,
-    rgba(11,11,15,1) 100%
+    ellipse at 50% 30%,
+    rgba(52,48,96,.95) 0%,
+    rgba(28,24,52,.98) 40%,
+    rgba(11,11,15,1) 80%
   );
   opacity:0;
   pointer-events:none;
-  z-index:20;                 /* above chat content */
+  z-index:20;
   transition:opacity .5s ease;
   will-change:opacity;
 }
@@ -332,7 +336,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .mood-tag{border:1px solid rgba(200,137,90,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
 
 /* Results scroll container — vertical, full width */
-.results-list{display:flex;flex-direction:column;gap:12px;margin:0;padding-bottom:20px}
+.results-list{display:flex;flex-direction:column;gap:10px;margin:0;padding-bottom:24px}
 
 /* ══════════════════════════════════════════
    TOP PICK — IMMERSIVE HERO CARD
@@ -342,8 +346,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
    Mood match is a thin gold thread.
    ══════════════════════════════════════════ */
 .hero-card {
-  margin: 0 0 6px;
-  border-radius: 18px;
+  margin: 0;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(212,160,86,0.25);
   background: var(--ink2);
@@ -366,9 +370,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   height: 100%;
   object-fit: cover;
   display: block;
-  /* Slight desaturation — cinematic */
   filter: saturate(0.88) brightness(0.92);
   transition: filter 0.6s ease;
+  position: relative;
+  z-index: 1;
 }
 
 /* Layered gradient — lifts text from image */
@@ -376,17 +381,18 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 2;
   background:
     linear-gradient(to top,
       rgba(11,11,15,1) 0%,
-      rgba(11,11,15,0.85) 20%,
-      rgba(11,11,15,0.4) 42%,
-      rgba(11,11,15,0.08) 62%,
-      transparent 78%
+      rgba(11,11,15,0.88) 18%,
+      rgba(11,11,15,0.45) 40%,
+      rgba(11,11,15,0.1) 60%,
+      transparent 76%
     ),
     linear-gradient(to bottom,
-      rgba(11,11,15,0.35) 0%,
-      transparent 22%
+      rgba(11,11,15,0.4) 0%,
+      transparent 20%
     );
 }
 
@@ -549,16 +555,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 /* ── Hero card body — below poster ── */
 .hero-body {
-  padding: 18px 18px 16px;
+  padding: 16px 16px 14px;
   border-top: 1px solid rgba(255,255,255,0.05);
 }
 .hero-explanation {
-  font-size: 13.5px;
-  color: rgba(242,237,230,0.72);
-  line-height: 1.72;
-  margin-bottom: 16px;
   font-family: 'EB Garamond',serif;
   font-size: 15px;
+  color: rgba(242,237,230,0.78);
+  line-height: 1.7;
+  margin-bottom: 14px;
 }
 
 /* OTT row */
@@ -641,7 +646,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   border: 1px solid rgba(255,255,255,0.06);
   display: flex;
   position: relative;
-  min-height: 178px;
+  min-height: 160px;
   transition: border-color 0.2s;
 }
 .film-card:active { border-color: rgba(212,160,86,0.3); }
@@ -663,10 +668,11 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 /* Left: poster column */
 .film-poster-col {
-  width: 38%;
+  width: 36%;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
+  align-self: stretch;
 }
 .film-poster-col img {
   width: 100%;
@@ -793,15 +799,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* Explanation — Garamond, 2-3 lines max */
 .film-explanation {
   font-family: 'EB Garamond',serif;
-  font-size: 13.5px;
-  color: rgba(242,237,230,0.58);
-  line-height: 1.55;
-  flex: 1;
+  font-size: 14px;
+  color: rgba(242,237,230,0.65);
+  line-height: 1.6;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   margin-bottom: 9px;
+  flex-shrink: 0;
 }
 
 /* Bottom row: OTT + link */
@@ -846,6 +852,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   gap: 3px;
 }
 .film-link::after { content: '→'; font-size: 11px; }
+.film-langs { font-size: 10px; color: rgba(237,232,226,0.32); margin-bottom: 6px; letter-spacing: 0.03em; }
 
 /* ── Class aliases — JS uses these names ── */
 .hero-ott-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); margin-bottom: 8px; display: block; }
@@ -890,7 +897,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .film-card:nth-child(4){animation:rcSlideUp .5s .32s ease both}
 .film-card:nth-child(5){animation:rcSlideUp .5s .40s ease both}
 @keyframes fillIn{from{width:0}}
-.hero-match-fill,.film-match-fill{animation:fillIn 1.4s cubic-bezier(.16,1,.3,1) both}
+.hero-match-fill,.film-match-fill{transition:width 1.4s cubic-bezier(.16,1,.3,1) .1s}
 .rl-wrap{margin-left:38px;margin-top:4px}
 .rl-bar{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px;width:180px}
 .rl-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
@@ -1484,7 +1491,7 @@ async function getAcknowledgement(){
     try{
       await Promise.race([
         prefetchPromise,
-        new Promise((_,r)=>setTimeout(()=>r("timeout"),3000))
+        new Promise((_,r)=>setTimeout(()=>r("timeout"),4500))
       ]);
       if(prefetchData&&prefetchData.acknowledgement){
         return prefetchData.acknowledgement;
@@ -1496,28 +1503,47 @@ async function getAcknowledgement(){
 }
 
 function pickFallbackAck(moodText){
-  // Read the mood text for emotional cues
   const m=(moodText||"").toLowerCase();
-  if(/anxi|stress|worried|nervous|panic/.test(m))
-    return "That kind of anxious energy is exhausting to carry. I've got you.";
-  if(/sad|cry|tear|depress|down|low/.test(m))
-    return "I hear you. Some days just feel heavier than others.";
-  if(/angry|frustrat|annoyed|rage|mad/.test(m))
-    return "That frustration makes sense. Let's find something that helps.";
-  if(/lonely|alone|miss|empty/.test(m))
-    return "Loneliness at night hits differently. I'm here.";
-  if(/happy|excit|joy|great|amazing/.test(m))
-    return "That energy is everything. Let's find something worthy of it.";
-  if(/tired|exhaust|sleep|rest|drain/.test(m))
-    return "You've clearly been running on empty. Let's find something easy on the soul.";
-  if(/bored|nothing|meh|whatever/.test(m))
-    return "Sometimes nothing feels right. Let's change that.";
-  if(/nostalgic|memory|memories|past|miss/.test(m))
-    return "There's something beautiful about that kind of feeling.";
-  if(/lost|confus|don.t know|unsure/.test(m))
-    return "Not knowing how you feel is a feeling too. I've got you.";
-  // Gibberish, single chars, anything unmapped — most human response
-  return "I can feel something in that. Let's find your film.";
+  // Contradictory / mixed states
+  if(/sad.*happy|happy.*sad|laugh.*cry|cry.*laugh/.test(m))
+    return "Caught between two feelings at once. That’s its own kind of weight.";
+  if(/lonely.*busy|busy.*lonely|occupied.*empty|empty.*occupied/.test(m))
+    return "Occupied but still hollow inside. That silence is real.";
+  if(/angry.*love|love.*angry|hate.*care|care.*hate/.test(m))
+    return "When love and anger live in the same breath.";
+  // Single states — specific, not generic
+  if(/anxi|stress|overwhelm|panic|nervous|worried/.test(m))
+    return "That restless energy needs somewhere to go.";
+  if(/sad|depress|down|low|heartbreak|heartbroken|grief|griev/.test(m))
+    return "Carrying something heavy today. Let’s find something that holds you.";
+  if(/cry|tear|sob/.test(m))
+    return "Sometimes you need a film that cries with you.";
+  if(/angry|frustrat|annoy|rage|mad|furious/.test(m))
+    return "That fire deserves a worthy outlet.";
+  if(/lonely|alone|isolat/.test(m))
+    return "Lonely in a way that words barely touch.";
+  if(/miss|missing|nostalg|memory|memories|past/.test(m))
+    return "Something is pulling you back. That ache means it mattered.";
+  if(/empty|hollow|numb|void|nothing/.test(m))
+    return "That quiet emptiness. We’ll find something that fills it gently.";
+  if(/happy|excit|joy|great|amazing|wonderful|love|loved/.test(m))
+    return "That warmth is worth protecting. Let’s give it something worthy.";
+  if(/tired|exhaust|drain|fatigue|sleep|rest/.test(m))
+    return "Running on empty. Something gentle is waiting for you.";
+  if(/bored|boredom|meh|whatever|dull|nothing to do/.test(m))
+    return "The right film will change that. Promise.";
+  if(/confus|lost|unsure|don.t know|not sure|unclear/.test(m))
+    return "Not knowing is its own kind of feeling. We’ll find something anyway.";
+  if(/nervous|scared|fear|afraid|anxious/.test(m))
+    return "That feeling in your chest. Let’s find something that steadies it.";
+  if(/hopeful|hope|optimis/.test(m))
+    return "Hold that feeling. We’ll find something that grows it.";
+  if(/romantic|love|crush|partner|relationship/.test(m))
+    return "The heart has its own kind of hunger.";
+  // Short/vague inputs — warm not dismissive
+  if(m.length < 15)
+    return "Even a small feeling deserves the right film.";
+  return "Something in what you said points somewhere. Let’s find it.";
 }
 
 function appendAck(text){
@@ -1536,19 +1562,22 @@ function submitMood(){
   chatStep="awaiting_intent";
   appendUser(mood);
   startPrefetch();
+  // Short pause then show typing
   setTimeout(()=>{
     appendTyping();
-    // Wait for prefetch — it may already be done by now
-    // Use acknowledgement from Haiku if available, fallback otherwise
+    scrollChat();
+    // Wait for Haiku or use fallback — min 1.4s so typing feels real
     setTimeout(async()=>{
-      removeTyping();
-      // Get acknowledgement — from prefetch if ready, else warm fallback
       let ack = await getAcknowledgement();
-      appendAck(ack);
-      // Breath — let the acknowledgement land before asking
-      setTimeout(showIntentQuestion, 1200);
-    },900);
-  },300);
+      removeTyping();
+      // Small gap between removing typing and showing response
+      setTimeout(()=>{
+        appendAck(ack);
+        // Let the acknowledgement breathe before intent question
+        setTimeout(showIntentQuestion, 1400);
+      }, 120);
+    }, 1400);
+  }, 350);
 }
 
 /* ── PREFETCH (fires immediately on mood submit) ── */
@@ -1762,83 +1791,6 @@ function showError(type, retryFn){
     </div>`;
   document.getElementById("chat").appendChild(w);
   scrollChat();
-}
-
-function renderResults(recs,moodData){
-  if(!recs||recs.length===0){
-    showError("EMPTY_RESULTS",function(){adApiPromise=null;chatStep="awaiting_lang";changeIntent();});
-    return;
-  }
-  const chat=document.getElementById("chat");
-  // Mood summary — full width, not inside a bubble
-  const sumWrap=document.createElement("div");
-  sumWrap.className="results-lead slide-up";
-  sumWrap.style.cssText="padding:12px 2px 10px";
-  let sumHtml=`<span class="results-eyebrow">Your Picks</span>`;
-  if(moodData?.moodSummary)sumHtml+=`<div class="mood-summary-text">"${esc(moodData.moodSummary)}"</div>`;
-  if(moodData?.emotions?.length)sumHtml+=`<div class="mood-tags">${moodData.emotions.slice(0,5).map(e=>'<span class="mood-tag">'+esc(e)+'</span>').join("")}</div>`;
-  sumWrap.innerHTML=sumHtml;
-  chat.appendChild(sumWrap);
-  const sorted=[...recs].sort((a,b)=>b.isTopPick-a.isTopPick);
-  const topPick=sorted[0];
-  const others=sorted.slice(1);
-  const SVG_PH='<svg width="40" height="40" viewBox="0 0 52 52" fill="none" style="opacity:.2"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/><rect x="4" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".4"/><rect x="40" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".4"/><rect x="4" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".4"/><rect x="40" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".4"/></svg>';
-  const listWrap=document.createElement("div");
-  listWrap.className="results-list";
-  if(topPick){
-    const pct=Math.round((topPick.matchScore||.75)*100);
-    const rt=topPick.runtime?Math.floor(topPick.runtime/60)+"h "+topPick.runtime%60+"m":"";
-    const heroCard=document.createElement("div");
-    heroCard.className="hero-card";
-    const streaming=topPick.streaming||[];
-    const regularOTT=streaming.filter(p=>p.name!=="Check JustWatch");
-    const ottPills=regularOTT.length
-      ?regularOTT.map(p=>`<a class="hero-ott-pill" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="hero-ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("")
-      :`<a class="hero-ott-pill" href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer">Check JustWatch</a>`;
-    const langsHtml=topPick.spokenLanguages?.length?`<p class="hero-langs">Spoken: ${esc(topPick.spokenLanguages.slice(0,3).join(" / "))}</p>`:"";
-    const posterSec=topPick.poster
-      ?`<div class="hero-poster-wrap"><img src="${esc(topPick.poster)}" alt="${esc(topPick.title)}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=hero-poster-ph style=aspect-ratio:4/5>${SVG_PH}</div>'"><div class="hero-top-chrome"><span class="hero-top-badge">Top Pick</span><div class="hero-meta-float">${topPick.rating?`<span class="hero-rating">${topPick.rating}</span><span class="hero-rating-label">TMDb</span>`:""}</div></div><div class="hero-text-layer"><div class="hero-genre-year"><span class="hero-genre">${esc(topPick.genre||"")}</span>${topPick.releaseYear?`<span class="hero-sep">&middot;</span><span class="hero-year">${topPick.releaseYear}</span>`:""}${rt?`<span class="hero-sep">&middot;</span><span class="hero-runtime">${rt}</span>`:""}</div><h2 class="hero-title">${esc(topPick.title)}</h2><div class="hero-match"><div class="hero-match-track"><div class="hero-match-fill" data-pct="${pct}" style="width:0"></div></div><span class="hero-match-pct">${pct}%</span></div>${topPick.tagline?`<p class="hero-tagline">"${esc(topPick.tagline)}"</p>`:""}</div></div>`
-      :`<div class="hero-poster-ph" style="aspect-ratio:4/5;position:relative">${SVG_PH}<div style="position:absolute;top:14px;left:16px"><span class="hero-top-badge">Top Pick</span></div></div>`;
-    heroCard.innerHTML=posterSec+`<div class="hero-body"><p class="hero-explanation">${esc(topPick.explanation||"")}</p>${langsHtml}<span class="hero-ott-label">Available on</span><div class="hero-ott-row">${ottPills}</div><div class="hero-actions">${topPick.tmdbUrl?`<a href="${esc(topPick.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="hero-btn-primary">More Info &rarr;</a>`:""}<button class="hero-btn-icon" data-title="${esc(topPick.title)}" onclick="shareFilm(this.dataset.title)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button></div></div>`;
-    listWrap.appendChild(heroCard);
-  }
-  if(others.length>0){
-    const divider=document.createElement("div");
-    divider.className="section-divider";
-    divider.innerHTML="<span>More for your mood</span>";
-    listWrap.appendChild(divider);
-    const stack=document.createElement("div");
-    stack.className="picks-stack";
-    others.forEach((rec,i)=>{
-      const pct=Math.round((rec.matchScore||.75)*100);
-      const rt=rec.runtime?Math.floor(rec.runtime/60)+"h "+rec.runtime%60+"m":"";
-      const card=document.createElement("div");
-      card.className="film-card";
-      card.dataset.recJson=JSON.stringify(rec);
-      const recOTT=(rec.streaming||[]).filter(p=>p.name!=="Check JustWatch").slice(0,2);
-      const ottMini=recOTT.length?recOTT.map(p=>`<span class="film-ott-badge"><span class="film-ott-microdot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</span>`).join(""):`<span class="film-ott-badge">JustWatch</span>`;
-      const posterHtml=rec.poster?`<img src="${esc(rec.poster)}" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='<div class=film-poster-ph>${SVG_PH}</div>'">`:`<div class="film-poster-ph">${SVG_PH}</div>`;
-      const langsHtml=rec.spokenLanguages?.length?`<p class="film-langs">Spoken: ${esc(rec.spokenLanguages.slice(0,2).join(" / "))}</p>`:"";
-      card.innerHTML=`<div class="film-card-num">0${i+2}</div><div class="film-poster-col">${posterHtml}<div class="film-genre-badge">${esc(rec.genre||"")}</div></div><div class="film-divider"></div><div class="film-body"><h3 class="film-title">${esc(rec.title)}</h3><div class="film-meta-row">${rec.releaseYear?`<span class="film-year">${rec.releaseYear}</span>`:""}${rec.rating?`<span class="film-mid">&middot;</span><span class="film-rating">&#9733; ${rec.rating}</span>`:""}${rt?`<span class="film-mid">&middot;</span><span class="film-runtime">${rt}</span>`:""}</div><div class="film-match-row"><div class="film-match-track"><div class="film-match-fill" data-pct="${pct}" style="width:0"></div></div><span class="film-match-pct">${pct}%</span></div><p class="film-explanation">${esc(rec.explanation||"")}</p>${langsHtml}<div class="film-bottom"><div class="film-ott-mini">${ottMini}</div>${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="film-link">Info</a>`:""}</div></div>`;
-      stack.appendChild(card);
-    });
-    listWrap.appendChild(stack);
-  }
-  chat.appendChild(listWrap);
-  // Animate match bars
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    listWrap.querySelectorAll("[data-pct]").forEach(el=>el.style.width=el.getAttribute("data-pct")+"%");
-  }));
-  // Hide composer, show quick actions
-  const composer=document.getElementById("composer");if(composer)composer.style.display="none";
-  const qa=document.getElementById("quick-actions");if(qa)qa.classList.add("show");
-  // Reduce chat side padding for results — cards need more width
-  const chatEl=document.getElementById("chat");
-  if(chatEl)chatEl.style.padding="12px 10px 6px";
-  // Scroll to TOP of results — user should land on hero card, not bottom
-  setTimeout(()=>{
-    listWrap.scrollIntoView({behavior:"smooth",block:"start"});
-  },120);
 }
 
 
@@ -2120,6 +2072,372 @@ function init(){
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",runSplashSequence);
   else runSplashSequence();
 })();
+
+
+/* ── RESULTS ── */
+function renderResults(recs,moodData){
+  if(!recs||recs.length===0){
+    showError("EMPTY_RESULTS",function(){adApiPromise=null;chatStep="awaiting_lang";changeIntent();});
+    return;
+  }
+  const chat=document.getElementById("chat");
+
+  // ── Mood summary — full width above cards ──────────────────
+  const sumWrap=document.createElement("div");
+  sumWrap.className="results-lead slide-up";
+  const eyebrow=document.createElement("span");
+  eyebrow.className="results-eyebrow";
+  eyebrow.textContent="Your Picks";
+  sumWrap.appendChild(eyebrow);
+  if(moodData?.moodSummary){
+    const ms=document.createElement("div");
+    ms.className="mood-summary-text";
+    ms.textContent="\u201C"+moodData.moodSummary+"\u201D";
+    sumWrap.appendChild(ms);
+  }
+  if(moodData?.emotions?.length){
+    const mt=document.createElement("div");
+    mt.className="mood-tags";
+    moodData.emotions.slice(0,5).forEach(e=>{
+      const t=document.createElement("span");
+      t.className="mood-tag";
+      t.textContent=e;
+      mt.appendChild(t);
+    });
+    sumWrap.appendChild(mt);
+  }
+  chat.appendChild(sumWrap);
+
+  const sorted=[...recs].sort((a,b)=>b.isTopPick-a.isTopPick);
+  const topPick=sorted[0];
+  const others=sorted.slice(1);
+  const listWrap=document.createElement("div");
+  listWrap.className="results-list";
+
+  // ══ HERO CARD ═══════════════════════════════════════════════
+  if(topPick){
+    const pct=Math.round((topPick.matchScore||.75)*100);
+    const rt=topPick.runtime?Math.floor(topPick.runtime/60)+"h "+topPick.runtime%60+"m":"";
+    const heroCard=document.createElement("div");
+    heroCard.className="hero-card";
+
+    // Poster wrap
+    if(topPick.poster){
+      const pw=document.createElement("div");
+      pw.className="hero-poster-wrap";
+
+      const img=document.createElement("img");
+      img.src=topPick.poster;
+      img.alt=topPick.title;
+      img.loading="lazy";
+      img.onerror=function(){this.style.opacity="0"};
+      pw.appendChild(img);
+
+      // Top chrome — badge + rating
+      const chrome=document.createElement("div");
+      chrome.className="hero-top-chrome";
+      const badge=document.createElement("span");
+      badge.className="hero-top-badge";
+      badge.textContent="Top Pick";
+      chrome.appendChild(badge);
+      if(topPick.rating){
+        const mf=document.createElement("div");
+        mf.className="hero-meta-float";
+        const rat=document.createElement("span");
+        rat.className="hero-rating";
+        rat.textContent=topPick.rating;
+        const rl=document.createElement("span");
+        rl.className="hero-rating-label";
+        rl.textContent="TMDb";
+        mf.appendChild(rat);
+        mf.appendChild(rl);
+        chrome.appendChild(mf);
+      }
+      pw.appendChild(chrome);
+
+      // Text layer — floats over gradient
+      const tl=document.createElement("div");
+      tl.className="hero-text-layer";
+      const gy=document.createElement("div");
+      gy.className="hero-genre-year";
+      const genreEl=document.createElement("span");
+      genreEl.className="hero-genre";
+      genreEl.textContent=topPick.genre||"";
+      gy.appendChild(genreEl);
+      if(topPick.releaseYear){
+        const s1=document.createElement("span");s1.className="hero-sep";s1.textContent="·";
+        const yr=document.createElement("span");yr.className="hero-year";yr.textContent=topPick.releaseYear;
+        gy.appendChild(s1);gy.appendChild(yr);
+      }
+      if(rt){
+        const s2=document.createElement("span");s2.className="hero-sep";s2.textContent="·";
+        const rtel=document.createElement("span");rtel.className="hero-runtime";rtel.textContent=rt;
+        gy.appendChild(s2);gy.appendChild(rtel);
+      }
+      tl.appendChild(gy);
+
+      const titleEl=document.createElement("h2");
+      titleEl.className="hero-title";
+      titleEl.textContent=topPick.title;
+      tl.appendChild(titleEl);
+
+      // Match bar
+      const matchWrap=document.createElement("div");
+      matchWrap.className="hero-match";
+      const track=document.createElement("div");
+      track.className="hero-match-track";
+      const fill=document.createElement("div");
+      fill.className="hero-match-fill";
+      fill.dataset.pct=pct;
+      fill.style.width="0";
+      track.appendChild(fill);
+      matchWrap.appendChild(track);
+      const pctEl=document.createElement("span");
+      pctEl.className="hero-match-pct";
+      pctEl.textContent=pct+"%";
+      matchWrap.appendChild(pctEl);
+      tl.appendChild(matchWrap);
+
+      if(topPick.tagline){
+        const tg=document.createElement("p");
+        tg.className="hero-tagline";
+        tg.textContent="\u201C"+topPick.tagline+"\u201D";
+        tl.appendChild(tg);
+      }
+      pw.appendChild(tl);
+      heroCard.appendChild(pw);
+    } else {
+      // No poster — placeholder block with badge
+      const ph=document.createElement("div");
+      ph.className="hero-poster-ph";
+      ph.style.cssText="aspect-ratio:4/5;position:relative;display:flex;align-items:center;justify-content:center;background:#0f0f14";
+      const badge2=document.createElement("span");
+      badge2.className="hero-top-badge";
+      badge2.style.cssText="position:absolute;top:14px;left:16px";
+      badge2.textContent="Top Pick";
+      ph.appendChild(badge2);
+      heroCard.appendChild(ph);
+    }
+
+    // Hero body — explanation, langs, OTT, actions
+    const body=document.createElement("div");
+    body.className="hero-body";
+
+    const exp=document.createElement("p");
+    exp.className="hero-explanation";
+    exp.textContent=topPick.explanation||"";
+    body.appendChild(exp);
+
+    if(topPick.spokenLanguages?.length){
+      const lg=document.createElement("p");
+      lg.className="hero-langs";
+      lg.textContent="Spoken: "+topPick.spokenLanguages.slice(0,3).join(" / ");
+      body.appendChild(lg);
+    }
+
+    const ottLabel=document.createElement("span");
+    ottLabel.className="hero-ott-label";
+    ottLabel.textContent="Available on";
+    body.appendChild(ottLabel);
+
+    const ottRow=document.createElement("div");
+    ottRow.className="hero-ott-row";
+    const streaming=topPick.streaming||[];
+    const regularOTT=streaming.filter(p=>p.name!=="Check JustWatch");
+    const ottSources=regularOTT.length?regularOTT:[{name:"Check JustWatch",colour:"#E87D0D",link:"https://www.justwatch.com/in"}];
+    ottSources.forEach(p=>{
+      const pill=document.createElement("a");
+      pill.className="hero-ott-pill";
+      pill.href=p.link||"#";
+      pill.target="_blank";
+      pill.rel="noopener noreferrer";
+      const dot=document.createElement("span");
+      dot.className="hero-ott-dot";
+      dot.style.background=p.colour||"#666";
+      pill.appendChild(dot);
+      pill.appendChild(document.createTextNode(p.name));
+      ottRow.appendChild(pill);
+    });
+    body.appendChild(ottRow);
+
+    const actions=document.createElement("div");
+    actions.className="hero-actions";
+    if(topPick.tmdbUrl){
+      const btn=document.createElement("a");
+      btn.className="hero-btn-primary";
+      btn.href=topPick.tmdbUrl;
+      btn.target="_blank";
+      btn.rel="noopener noreferrer";
+      btn.textContent="More Info \u2192";
+      actions.appendChild(btn);
+    }
+    const shareBtn=document.createElement("button");
+    shareBtn.className="hero-btn-icon";
+    shareBtn.setAttribute("data-title",topPick.title);
+    shareBtn.onclick=function(){shareFilm(this.dataset.title)};
+    shareBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
+    actions.appendChild(shareBtn);
+    body.appendChild(actions);
+    heroCard.appendChild(body);
+    listWrap.appendChild(heroCard);
+  }
+
+  // ══ JOURNAL CARDS ═══════════════════════════════════════════
+  if(others.length>0){
+    const divider=document.createElement("div");
+    divider.className="section-divider";
+    const divSpan=document.createElement("span");
+    divSpan.textContent="More for your mood";
+    divider.appendChild(divSpan);
+    listWrap.appendChild(divider);
+
+    const stack=document.createElement("div");
+    stack.className="picks-stack";
+
+    others.forEach((rec,i)=>{
+      const pct=Math.round((rec.matchScore||.75)*100);
+      const rt=rec.runtime?Math.floor(rec.runtime/60)+"h "+rec.runtime%60+"m":"";
+      const card=document.createElement("div");
+      card.className="film-card";
+      card.dataset.recJson=JSON.stringify(rec);
+
+      // Card number
+      const num=document.createElement("div");
+      num.className="film-card-num";
+      num.textContent="0"+(i+2);
+      card.appendChild(num);
+
+      // Poster column
+      const posterCol=document.createElement("div");
+      posterCol.className="film-poster-col";
+      if(rec.poster){
+        const img=document.createElement("img");
+        img.src=rec.poster;
+        img.alt=rec.title;
+        img.loading="lazy";
+        img.onerror=function(){this.style.opacity="0"};
+        posterCol.appendChild(img);
+      } else {
+        const ph=document.createElement("div");
+        ph.className="film-poster-ph";
+        posterCol.appendChild(ph);
+      }
+      const genreBadge=document.createElement("div");
+      genreBadge.className="film-genre-badge";
+      genreBadge.textContent=rec.genre||"";
+      posterCol.appendChild(genreBadge);
+      card.appendChild(posterCol);
+
+      // Gold divider
+      const divLine=document.createElement("div");
+      divLine.className="film-divider";
+      card.appendChild(divLine);
+
+      // Body
+      const body=document.createElement("div");
+      body.className="film-body";
+
+      const titleEl=document.createElement("h3");
+      titleEl.className="film-title";
+      titleEl.textContent=rec.title;
+      body.appendChild(titleEl);
+
+      const meta=document.createElement("div");
+      meta.className="film-meta-row";
+      if(rec.releaseYear){const yr=document.createElement("span");yr.className="film-year";yr.textContent=rec.releaseYear;meta.appendChild(yr);}
+      if(rec.rating){
+        const s=document.createElement("span");s.className="film-mid";s.textContent="·";meta.appendChild(s);
+        const r=document.createElement("span");r.className="film-rating";r.textContent="★ "+rec.rating;meta.appendChild(r);
+      }
+      if(rt){
+        const s=document.createElement("span");s.className="film-mid";s.textContent="·";meta.appendChild(s);
+        const r=document.createElement("span");r.className="film-runtime";r.textContent=rt;meta.appendChild(r);
+      }
+      body.appendChild(meta);
+
+      // Match bar
+      const mr=document.createElement("div");mr.className="film-match-row";
+      const mt=document.createElement("div");mt.className="film-match-track";
+      const mf=document.createElement("div");mf.className="film-match-fill";mf.dataset.pct=pct;mf.style.width="0";
+      mt.appendChild(mf);mr.appendChild(mt);
+      const mp=document.createElement("span");mp.className="film-match-pct";mp.textContent=pct+"%";
+      mr.appendChild(mp);body.appendChild(mr);
+
+      // Explanation
+      const exp=document.createElement("p");
+      exp.className="film-explanation";
+      exp.textContent=rec.explanation||"";
+      body.appendChild(exp);
+
+      // Spoken languages
+      if(rec.spokenLanguages?.length){
+        const lg=document.createElement("p");
+        lg.className="film-langs";
+        lg.textContent="Spoken: "+rec.spokenLanguages.slice(0,2).join(" / ");
+        body.appendChild(lg);
+      }
+
+      // Bottom row: OTT + link
+      const bottom=document.createElement("div");
+      bottom.className="film-bottom";
+      const ottMini=document.createElement("div");
+      ottMini.className="film-ott-mini";
+      const recOTT=(rec.streaming||[]).filter(p=>p.name!=="Check JustWatch").slice(0,2);
+      if(recOTT.length){
+        recOTT.forEach(p=>{
+          const badge=document.createElement("span");
+          badge.className="film-ott-badge";
+          const dot=document.createElement("span");
+          dot.className="film-ott-microdot";
+          dot.style.background=p.colour||"#666";
+          badge.appendChild(dot);
+          badge.appendChild(document.createTextNode(p.name));
+          ottMini.appendChild(badge);
+        });
+      } else {
+        const jw=document.createElement("span");
+        jw.className="film-ott-badge";
+        jw.style.color="rgba(200,137,90,.5)";
+        jw.textContent="JustWatch";
+        ottMini.appendChild(jw);
+      }
+      bottom.appendChild(ottMini);
+      if(rec.tmdbUrl){
+        const link=document.createElement("a");
+        link.className="film-link";
+        link.href=rec.tmdbUrl;
+        link.target="_blank";
+        link.rel="noopener noreferrer";
+        link.textContent="Info";
+        bottom.appendChild(link);
+      }
+      body.appendChild(bottom);
+      card.appendChild(body);
+      stack.appendChild(card);
+    });
+    listWrap.appendChild(stack);
+  }
+
+  chat.appendChild(listWrap);
+
+  // Animate match bars
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    listWrap.querySelectorAll("[data-pct]").forEach(el=>{
+      el.style.width=el.dataset.pct+"%";
+    });
+  }));
+
+  // Hide composer, show quick actions
+  const composer=document.getElementById("composer");
+  if(composer)composer.style.display="none";
+  const qa=document.getElementById("quick-actions");
+  if(qa)qa.classList.add("show");
+  // Tighten chat side padding so cards have full width
+  const chatEl=document.getElementById("chat");
+  if(chatEl)chatEl.style.padding="12px 8px 6px";
+  // Scroll to hero card
+  setTimeout(()=>{listWrap.scrollIntoView({behavior:"smooth",block:"start"});},80);
+}
 
 init();
 </script>
