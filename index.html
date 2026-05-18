@@ -2,1691 +2,983 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Moodfilm - Find Movies by Mood</title>
-<link rel="manifest" href="manifest.json">
-<script>if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{})</script>
-<meta property="og:title" content="Moodfilm - Find Movies by Mood">
-<meta property="og:description" content="Tell us how you feel and we find your perfect film. Free, always.">
-<meta property="og:image" content="https://aaronkankipati.github.io/moodfilm-app/og-image.png">
-<meta property="og:url" content="https://aaronkankipati.github.io/moodfilm-app/">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Moodfilm — Card Redesign</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  /* Terracotta-gold — organic, warm, human. Not metallic. */
-  --gold:#C8895A;--gold-l:#E8A87C;--gold-d:#96583A;--gold-glow:rgba(200,137,90,.18);
-  /* Warm dark navy backgrounds — safety, depth, not void */
-  --ink:#0B0B0F;--ink2:#11111A;--ink3:#181824;--ink4:#1F1F2E;--ink5:#272738;
-  /* Warm off-white text — readable, soft, never clinical */
-  --paper:#EDE8E2;--paper2:#C4BAB0;--muted:#7A7088;
-  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
-}
-html,body{width:100%;height:100%;overflow:hidden;position:fixed;inset:0;background:var(--ink);color:var(--paper);font-family:'DM Sans',sans-serif}
-button,a,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");background-size:160px;pointer-events:none;z-index:9998;mix-blend-mode:overlay;opacity:.5}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ══ SPLASH ══════════════════════════════════════════════
-   A cinema before the curtain rises.
-   Warm light blooms from centre, mark breathes into existence,
-   title draws itself, tagline whispers, then stillness.
-   ══════════════════════════════════════════════════════ */
-#splash{
-  position:fixed;inset:0;z-index:9000;
-  /* Warm vignette — projector light before curtain */
+:root {
+  --c-bg: #090909;
+  --c-surface: #0f0f0f;
+  --c-border: rgba(255,255,255,0.06);
+  --c-border-warm: rgba(210,160,90,0.18);
+  --c-gold: #D4A056;
+  --c-gold-pale: #E8C080;
+  --c-gold-dim: rgba(212,160,86,0.5);
+  --c-text: #F2EDE6;
+  --c-muted: rgba(242,237,230,0.42);
+  --c-dim: rgba(242,237,230,0.22);
+  --r-card: 14px;
+  --r-inner: 10px;
+}
+
+html, body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  /* Simulate phone width */
+}
+
+body {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0 0 80px;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--c-border);
+  position: sticky; top: 0;
+  background: rgba(9,9,9,0.95);
+  backdrop-filter: blur(20px);
+  z-index: 50;
+}
+.topbar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  color: var(--c-gold);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar-logo svg { opacity: 0.9; }
+.topbar-tag { font-size: 10px; color: var(--c-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── CHAT LEAD-IN ── */
+.lead-wrap { padding: 20px 20px 10px; }
+.lead-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--c-gold);
+  margin-bottom: 6px;
+  display: block;
+}
+.lead-summary {
+  font-family: 'EB Garamond', serif;
+  font-size: 17px;
+  font-style: italic;
+  color: rgba(242,237,230,0.78);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.lead-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.lead-chip {
+  font-size: 10px;
+  border: 1px solid rgba(212,160,86,0.25);
+  border-radius: 100px;
+  padding: 3px 10px;
+  color: var(--c-gold-dim);
+  letter-spacing: 0.04em;
+}
+
+/* ── SECTION LABEL ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px 10px;
+}
+.section-header::before, .section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--c-border);
+}
+.section-header span {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════
+   TOP PICK — IMMERSIVE HERO CARD
+   Full-bleed poster. Film grain overlay.
+   Title erupts from darkness at bottom.
+   Genre, year, rating float over image.
+   Mood match is a thin gold thread.
+   ══════════════════════════════════════════ */
+.hero-card {
+  margin: 0 16px 6px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(212,160,86,0.25);
+  background: #0c0c0c;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(212,160,86,0.08),
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 80px rgba(212,160,86,0.05);
+}
+
+/* ── Poster — fills full card width, 4:5 ── */
+.hero-poster-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+}
+.hero-poster-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Slight desaturation — cinematic */
+  filter: saturate(0.88) brightness(0.92);
+  transition: filter 0.6s ease;
+}
+
+/* Layered gradient — lifts text from image */
+.hero-poster-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 48%,
-      rgba(32,24,18,.0) 0%,
-      rgba(18,14,10,.6) 55%,
-      rgba(11,11,15,1) 100%),
-    #0B0B0F;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:40px 32px;
-  transition:opacity 1.4s cubic-bezier(.4,0,.2,1);
+    linear-gradient(to top,
+      rgba(9,9,9,1) 0%,
+      rgba(9,9,9,0.85) 20%,
+      rgba(9,9,9,0.4) 42%,
+      rgba(9,9,9,0.08) 62%,
+      transparent 78%
+    ),
+    linear-gradient(to bottom,
+      rgba(9,9,9,0.35) 0%,
+      transparent 22%
+    );
 }
-#splash.fade-out{opacity:0;pointer-events:none}
 
-/* Thin horizontal rule draws left to right */
-.splash-rule{
-  width:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,137,90,.5),transparent);
-  margin-bottom:44px;
-  transition:width 1.2s cubic-bezier(.76,0,.24,1);
+/* Film grain overlay */
+.hero-poster-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: 120px;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  opacity: 0.4;
 }
-.splash-rule.drawn{width:100px}
 
-/* Film mark — larger, more present, subtle entry */
-.splash-mark{
-  opacity:0;
-  transform:scale(.82) translateY(4px);
-  transition:opacity 1.1s ease .35s,
-             transform 1.1s cubic-bezier(.25,.46,.45,.94) .35s;
-  margin-bottom:36px;
+/* Top chrome — top pick badge + meta floating over image */
+.hero-top-chrome {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 5;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
-.splash-mark.show{opacity:1;transform:scale(1) translateY(0)}
-
-/* Subtle breath on the mark after it appears */
-@keyframes markBreathe{
-  0%,100%{opacity:.92;transform:scale(1)}
-  50%{opacity:1;transform:scale(1.018)}
+.hero-top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(212,160,86,0.95), rgba(180,120,56,0.95));
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  padding: 4px 10px 4px 8px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #0a0a0a;
 }
-.splash-mark.show{animation:markBreathe 4s ease-in-out 1.5s infinite}
-
-/* Title — wider spacing, slower, more weight */
-.splash-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(36px,9.5vw,50px);
-  font-weight:300;
-  letter-spacing:.28em;
-  text-transform:uppercase;
-  color:var(--paper);
-  overflow:hidden;
-  white-space:nowrap;
-  clip-path:inset(0 100% 0 0);
-  transition:clip-path 1.2s cubic-bezier(.76,0,.24,1) .8s;
-  margin-bottom:14px;
+.hero-top-badge::before {
+  content: '★';
+  font-size: 8px;
 }
-.splash-title.reveal{clip-path:inset(0 0% 0 0)}
-
-/* Tagline — italic, lowercase, terracotta whisper */
-.splash-tagline{
-  font-family:'Cormorant Garamond',serif;
-  font-size:15px;
-  font-weight:300;
-  font-style:italic;
-  letter-spacing:.12em;
-  color:rgba(200,137,90,.7);
-  /* No uppercase — whisper not shout */
-  opacity:0;
-  transform:translateY(6px);
-  transition:opacity 1s ease 2.1s, transform 1s ease 2.1s;
+.hero-meta-float {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 }
-.splash-tagline.show{opacity:1;transform:translateY(0)}
-
-/* Bottom rule — wider, more presence */
-.splash-rule-bottom{
-  position:absolute;
-  bottom:56px;left:50%;transform:translateX(-50%);
-  width:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,137,90,.25),transparent);
-  transition:width 1.1s cubic-bezier(.76,0,.24,1) 1.2s;
+.hero-rating {
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 5px 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-gold-pale);
+  font-family: 'Playfair Display', serif;
+  line-height: 1;
 }
-.splash-rule-bottom.drawn{width:100px}
-
-/* Enter prompt — warmer, more personal */
-.splash-enter{
-  position:absolute;
-  bottom:36px;left:50%;transform:translateX(-50%);
-  font-family:'Cormorant Garamond',serif;
-  font-size:12px;
-  font-style:italic;
-  letter-spacing:.18em;
-  color:rgba(200,137,90,.45);
-  opacity:0;
-  transition:opacity .8s ease;
-  white-space:nowrap;
+.hero-rating-label {
+  font-size: 8px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
-.splash-enter.show{opacity:1}
-@keyframes breathe{0%,100%{opacity:.3}50%{opacity:.7}}
-.splash-enter.breathing{animation:breathe 2.5s ease-in-out infinite}
 
-/* ══ APP SHELL ════════════════════════════════════════════ */
-#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--safe-t)}
-#topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px 10px;border-bottom:1px solid rgba(160,150,180,.12);background:rgba(11,11,15,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:10}
-.logo{display:flex;align-items:center;gap:8px}
-.logo-reel{width:22px;height:22px;flex-shrink:0}
-.logo-text{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);-webkit-text-fill-color:var(--gold)}
-.topbar-tag{font-size:10px;color:var(--muted);letter-spacing:.08em}
+/* Bottom text — emerges from darkness */
+.hero-text-layer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 5;
+  padding: 0 18px 20px;
+}
+.hero-genre-year {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.hero-genre {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--c-gold);
+  font-weight: 500;
+}
+.hero-sep { color: var(--c-dim); font-size: 8px; }
+.hero-year { font-size: 10px; color: var(--c-muted); letter-spacing: 0.1em; }
+.hero-runtime { font-size: 10px; color: var(--c-muted); }
 
-/* ══ LISTENING STATE — inside #chat, no keyboard math ═══
-   Lives as position:absolute inside #chat.
-   #chat shrinks naturally when keyboard opens (no interactive-widget).
-   The listening state fills exactly the visible space.
-   Pure focus/blur trigger — no visualViewport dependency.
-   ══════════════════════════════════════════════════════ */
-#listening-state{
-  position:absolute;
-  inset:0;                    /* fills entire #chat area */
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:28px 36px;
-  text-align:center;
-  background:radial-gradient(
-    ellipse at 50% 40%,
-    rgba(52,48,96,.92) 0%,
-    rgba(28,24,52,.97) 45%,
-    rgba(11,11,15,1) 100%
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 6.5vw, 30px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--c-text);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+/* Mood match — a single illuminated thread */
+.hero-match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.hero-match-track {
+  flex: 1;
+  height: 1.5px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 100px;
+  overflow: visible;
+  position: relative;
+}
+.hero-match-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(212,160,86,0.4), var(--c-gold));
+  border-radius: 100px;
+  position: relative;
+  transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+}
+/* Glowing tip on the fill */
+.hero-match-fill::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-gold-pale);
+  box-shadow: 0 0 8px var(--c-gold), 0 0 16px rgba(212,160,86,0.4);
+}
+.hero-match-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-gold);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Tagline */
+.hero-tagline {
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(212,160,86,0.7);
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+  line-height: 1.45;
+}
+
+/* ── Hero card body — below poster ── */
+.hero-body {
+  padding: 18px 18px 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.hero-explanation {
+  font-size: 13.5px;
+  color: rgba(242,237,230,0.72);
+  line-height: 1.72;
+  margin-bottom: 16px;
+  font-family: 'EB Garamond', serif;
+  font-size: 15px;
+}
+
+/* OTT row */
+.ott-section-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--c-muted);
+  margin-bottom: 8px;
+  display: block;
+}
+.ott-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+.ott-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: 11px;
+  color: rgba(242,237,230,0.75);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.ott-pill:active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+.ott-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Actions ── */
+.hero-actions { display: flex; gap: 8px; }
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, var(--c-gold), #9E6A2A);
+  border: none;
+  border-radius: 11px;
+  padding: 13px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #060606;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.btn-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--c-muted);
+}
+.btn-icon:active { background: rgba(255,255,255,0.08); color: var(--c-text); }
+
+/* ══════════════════════════════════════════
+   OTHER PICKS — STACKED JOURNAL CARDS
+   Each card: large poster left column (38%),
+   with rich typographic detail on right.
+   A vertical gold line separates them.
+   Card number floats as a typographic element.
+   ══════════════════════════════════════════ */
+.picks-stack {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.film-card {
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  display: flex;
+  position: relative;
+  min-height: 178px;
+  transition: border-color 0.2s;
+}
+.film-card:active { border-color: rgba(212,160,86,0.3); }
+
+/* Card number — typographic element, top-right */
+.film-card-num {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 10;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.06);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Left: poster column */
+.film-poster-col {
+  width: 38%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.film-poster-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.85);
+}
+.film-poster-ph {
+  width: 100%;
+  height: 100%;
+  min-height: 178px;
+  background: #141414;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Genre badge — bottom of poster */
+.film-genre-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  padding: 18px 8px 8px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+}
+
+/* Vertical gold divider */
+.film-divider {
+  width: 1px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(212,160,86,0.2) 20%,
+    rgba(212,160,86,0.35) 50%,
+    rgba(212,160,86,0.2) 80%,
+    transparent 100%
   );
-  opacity:0;
-  pointer-events:none;
-  z-index:20;                 /* above chat content */
-  transition:opacity .5s ease;
-  will-change:opacity;
-}
-#listening-state.show{
-  opacity:1;
-}
-#listening-state.fading{
-  opacity:0;
-  transition:opacity .5s ease;
-}
-#listening-state.fading .listen-content{
-  animation-play-state:paused;
+  flex-shrink: 0;
 }
 
-/* ── BREATHING ANIMATION ── */
-/* The whole content block breathes — 40% to 100% opacity, 4s loop */
-@keyframes breatheIn{
-  0%,100%{opacity:.5;transform:translateY(0px)}
-  50%{opacity:1;transform:translateY(-3px)}
+/* Right: details */
+.film-body {
+  flex: 1;
+  padding: 12px 12px 12px 13px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
-.listen-content{
-  animation:breatheIn 4s ease-in-out infinite;
+.film-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(14px, 3.8vw, 17px);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--c-text);
+  margin-bottom: 5px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  /* Ligatures for elegance */
+  font-variant-ligatures: common-ligatures;
+}
+.film-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 9px;
+  flex-wrap: wrap;
+}
+.film-year { font-size: 10px; color: var(--c-muted); }
+.film-mid { color: var(--c-dim); font-size: 8px; }
+.film-rating { font-size: 10px; color: var(--c-gold); font-weight: 500; }
+.film-runtime { font-size: 10px; color: var(--c-muted); }
+
+/* Match — minimal, elegant */
+.film-match-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+}
+.film-match-track {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 100px;
+  position: relative;
+  overflow: visible;
+}
+.film-match-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(212,160,86,0.3), var(--c-gold));
+  border-radius: 100px;
+  position: relative;
+  transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.film-match-fill::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--c-gold-pale);
+  box-shadow: 0 0 6px var(--c-gold);
+}
+.film-match-pct {
+  font-size: 11px;
+  color: var(--c-gold);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 400;
+  min-width: 32px;
+  text-align: right;
 }
 
-.listen-line-1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(22px,6vw,28px);
-  font-weight:300;
-  font-style:italic;
-  color:var(--paper);
-  line-height:1.2;
-  margin-bottom:20px;
-  letter-spacing:.02em;
-}
-.listen-line-2{
-  font-size:13px;
-  /* Slightly lavender — warm, soft, safe */
-  color:rgba(200,196,220,.7);
-  line-height:2;
-  letter-spacing:.03em;
-  font-weight:300;
-}
-.listen-line-2 span{
-  display:block;
-}
-.listen-final{
-  display:block;
-  margin-top:16px;
-  /* Lavender-gold — warm trust colour */
-  color:rgba(180,168,220,.75);
-  font-style:italic;
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px;
-  font-weight:300;
-  letter-spacing:.06em;
-}
-.listen-em{
-  margin-top:10px;
-  display:block;
-  color:rgba(200,137,90,.65);
-  font-style:italic;
-  font-family:'Cormorant Garamond',serif;
-  font-size:16px;
-  font-weight:300;
-  letter-spacing:.03em;
-}
-.listen-im{
-  display:block;
-  margin-top:12px;
-  color:rgba(200,137,90,.7);
-  font-style:italic;
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px;
-  font-weight:300;
-  letter-spacing:.04em;
-}
-/* ══ CHAT ════════════════════════════════════════════════ */
-#chat{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 18px 6px;display:flex;flex-direction:column;gap:10px;overscroll-behavior-y:contain;position:relative}
-#chat::-webkit-scrollbar{display:none}
-.msg-app{display:flex;gap:10px;align-items:flex-end;max-width:92%}
-.msg-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ink4),var(--ink3));border:1px solid rgba(200,137,90,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-bottom:2px}
-.bubble-app{background:linear-gradient(145deg,var(--ink3),var(--ink2));border:1px solid rgba(160,150,180,.14);border-radius:18px 18px 18px 4px;padding:14px 17px;font-size:14px;color:var(--paper2);line-height:1.65}
-.bubble-app .serif{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--paper);font-style:italic;line-height:1.25;letter-spacing:.01em}
-.msg-user{display:flex;justify-content:flex-end;align-self:flex-end;max-width:85%}
-.bubble-user{background:linear-gradient(135deg,#D4906A,#A85E3A);color:#FFF8F4;border-radius:18px 18px 4px 18px;padding:11px 15px;font-size:14px;font-weight:500;line-height:1.5;word-break:break-word}
-.typing{display:flex;align-items:center;gap:5px;padding:4px 2px}
-.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingBounce 1.2s infinite}
-.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
-@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-
-/* ══ COMPOSER PILLS — text-first, tags as secondary ═════
-   Sit below the input box, clearly labelled "or pick a feeling"
-   Horizontal scroll, single row, visually subordinate to text
-   ══════════════════════════════════════════════════════ */
-#composer-pills{
-  padding:4px 14px 10px;
-  overflow:hidden;
-}
-#composer-pills-label{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.15em;
-  color:var(--muted);
-  margin-bottom:7px;
-  opacity:.7;
-}
-#composer-pills-inner{
-  display:flex;
-  gap:6px;
-  overflow-x:auto;
-  overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  padding-bottom:2px;
-}
-#composer-pills-inner::-webkit-scrollbar{display:none}
-.composer-pill{
-  flex-shrink:0;
-  background:rgba(200,137,90,.06);
-  border:1px solid rgba(200,137,90,.22);
-  border-radius:50px;
-  color:var(--paper2);
-  font-size:12px;
-  padding:6px 13px;
-  cursor:pointer;
-  white-space:nowrap;
-  user-select:none;-webkit-user-select:none;
-  transition:background .15s,border-color .15s,color .15s;
-}
-.composer-pill:active{
-  background:rgba(200,137,90,.18);
-  border-color:var(--gold);
-  color:var(--gold-l);
+/* Explanation — Garamond, 2-3 lines max */
+.film-explanation {
+  font-family: 'EB Garamond', serif;
+  font-size: 13.5px;
+  color: rgba(242,237,230,0.58);
+  line-height: 1.55;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  margin-bottom: 9px;
 }
 
-/* ══ INTENT CARDS ════════════════════════════════════════ */
-.intent-choices{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;margin-left:38px}
-.intent-choice{flex:1;min-width:calc(50% - 4px);background:linear-gradient(145deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.18);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .18s,background .18s,box-shadow .18s;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:80px}
-.intent-choice:active{background:rgba(200,137,90,.06)}
-.intent-choice.selected{border-color:var(--gold);background:rgba(200,137,90,.14);box-shadow:0 0 18px rgba(200,137,90,.15)}
-.ic-icon{font-size:20px;margin-bottom:5px;display:block}
-.ic-title{font-size:13px;font-weight:500;color:var(--paper);display:block;margin-bottom:2px}
-.ic-desc{font-size:12px;color:var(--muted);margin-top:1px}
-
-/* ══ LANG CHIPS ══════════════════════════════════════════ */
-.lang-choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
-.lang-choice{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 14px;font-size:13px;color:var(--paper2);cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:44px}
-.lang-choice:active{background:rgba(200,137,90,.08)}
-.lang-choice.selected{border-color:var(--gold);color:var(--gold-l);background:rgba(200,137,90,.1)}
-.lang-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.locked{pointer-events:none;opacity:.55}
-
-/* ══ RESULTS — FULL EXPERIENCE ════════════════════════════
-   Inspired by reference design:
-   - Top pick: hero card with full-width poster + all details
-   - Other picks: split-layout cards (poster left, details right)
-   - Everything visible immediately, no tap-to-expand needed
-   - Vertical scroll through picks
-   ══════════════════════════════════════════════════════ */
-.results-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:4px}
-.mood-summary-text{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.4;margin-bottom:8px}
-.mood-tags{display:flex;flex-wrap:wrap;gap:4px}
-.mood-tag{border:1px solid rgba(200,137,90,.2);border-radius:50px;color:var(--gold-l);font-size:10px;padding:2px 9px;text-transform:capitalize}
-
-/* Results scroll container — vertical, full width */
-.results-list{display:flex;flex-direction:column;gap:12px;margin:10px 0}
-
-/* ── TOP PICK CARD — hero, full width poster ── */
-.top-pick-card{
-  background:linear-gradient(160deg,var(--ink4),var(--ink3));
-  border:1px solid var(--gold);
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow:0 0 24px rgba(200,137,90,.15);
+/* Bottom row: OTT + link */
+.film-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
-.top-pick-section-label{
-  font-size:9px;text-transform:uppercase;letter-spacing:.18em;
-  color:var(--gold);padding:10px 14px 0;margin-bottom:-4px;
+.film-ott-mini {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
-.top-pick-poster{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
-.top-pick-poster-ph{width:100%;aspect-ratio:16/9;background:var(--ink4);display:flex;align-items:center;justify-content:center}
-.top-pick-body{padding:14px 14px 10px}
-.top-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#C8895A,#96583A);color:#FFF8F4;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:5px;margin-bottom:8px}
-.tp-genre-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.tp-genre{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.tp-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5.5vw,28px);font-weight:400;line-height:1.1;margin-bottom:6px;color:var(--paper)}
-.tp-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.tp-meta span{font-size:12px;color:var(--muted)}.tp-meta .tp-rating{color:var(--gold)}
-.tp-match-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
-.tp-match-pct{color:var(--gold);font-weight:500}
-.tp-match-track{height:2px;background:var(--ink5);border-radius:2px;overflow:hidden;margin-bottom:10px}
-.tp-match-fill{height:100%;background:linear-gradient(90deg,#96583A,#C8895A);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.tp-tagline{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--gold-l);font-style:italic;margin-bottom:8px;line-height:1.4}
-.tp-explanation{font-size:13px;color:var(--paper2);line-height:1.65;margin-bottom:12px}
-.tp-ott-label{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:6px}
-.tp-actions{display:flex;gap:8px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
-.tp-btn-tmdb{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--ink);background:linear-gradient(135deg,var(--gold),var(--gold-d));border-radius:10px;padding:11px;text-decoration:none;display:block;touch-action:manipulation}
-.tp-btn-share{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid rgba(200,137,90,.25);background:none;cursor:pointer;color:var(--muted);touch-action:manipulation}
-.tp-btn-share:active{border-color:var(--gold);color:var(--gold)}
-
-/* ── OTHER PICKS SECTION ── */
-.more-picks-label{font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);padding:4px 0 8px;text-align:center}
-
-/* ── SPLIT CARD — poster left 42%, details right 58% ── */
-.split-card{
-  background:linear-gradient(160deg,var(--ink4),var(--ink3));
-  border:1px solid rgba(160,150,180,.14);
-  border-radius:14px;
-  overflow:hidden;
-  display:flex;
-  min-height:160px;
+.film-ott-dot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  color: rgba(242,237,230,0.5);
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.split-card:active{border-color:rgba(200,137,90,.3)}
-.split-poster-wrap{width:42%;flex-shrink:0;position:relative}
-.split-poster{width:100%;height:100%;object-fit:cover;display:block}
-.split-poster-ph{width:100%;height:100%;background:var(--ink4);display:flex;align-items:center;justify-content:center;min-height:160px}
-.split-genre-badge{
-  position:absolute;top:8px;left:8px;
-  background:rgba(11,11,15,.7);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  border:1px solid rgba(200,137,90,.25);
-  border-radius:20px;padding:2px 8px;
-  font-size:9px;color:var(--paper2);
-  white-space:nowrap;
+.ott-micro-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
-.split-body{flex:1;padding:12px 12px 10px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-.split-title{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,3.8vw,18px);font-weight:400;line-height:1.2;margin-bottom:4px;color:var(--paper);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.split-meta{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-.split-meta span{font-size:10px;color:var(--muted)}.split-meta .split-rating{color:var(--gold)}
-.split-match-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px}
-.split-match-pct{color:var(--gold)}
-.split-match-track{height:2px;background:var(--ink5);border-radius:2px;overflow:hidden;margin-bottom:7px}
-.split-match-fill{height:100%;background:linear-gradient(90deg,#96583A,#C8895A);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.split-explanation{font-size:11px;color:var(--paper2);line-height:1.55;margin-bottom:7px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;flex:1}
-.split-ott{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
-.split-ott-badge{display:inline-flex;align-items:center;gap:2px;background:var(--ink5);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 6px;font-size:9px;color:var(--paper2);text-decoration:none;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
-.split-ott-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.split-more-btn{font-size:11px;font-weight:500;color:var(--gold-l);text-decoration:none;display:inline-flex;align-items:center;gap:3px;touch-action:manipulation}
-.split-more-btn:active{opacity:.7}
-
-/* Shared */
-.ott-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.ott-badge{display:inline-flex;align-items:center;gap:3px;background:var(--ink5);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--paper);text-decoration:none;white-space:nowrap}
-.ott-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
-.ott-none{font-size:10px;color:var(--muted);font-style:italic;display:block}
-.action-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
-.action-chip{background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-size:12px;padding:7px 16px;cursor:pointer;user-select:none;-webkit-user-select:none}
-.action-chip:active{background:rgba(200,137,90,.16)}
-.action-chip.gold{color:var(--gold-l);border-color:rgba(200,137,90,.45);background:rgba(200,137,90,.13)}
-.rl-wrap{margin-left:38px;margin-top:4px}
-.rl-bar{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:7px;width:180px}
-.rl-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
-.rl-text{font-size:12px;color:var(--muted);font-style:italic}
-/* Error bubble */
-.error-bubble{text-align:center;padding:16px!important}
-.error-icon{font-size:28px;margin-bottom:8px}
-.error-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--paper);margin-bottom:4px}
-.error-sub{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
-.error-retry{background:linear-gradient(135deg,var(--gold),var(--gold-d));border:none;border-radius:10px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;touch-action:manipulation}
-.error-retry:active{opacity:.85}
-
-/* ══ EXPANDED CARD OVERLAY ══════════════════════════════
-   Slides up from bottom when user taps a film card.
-   Full screen — large poster, full explanation, all details.
-   Swipe down or tap × to close. Chat stays underneath.
-   ══════════════════════════════════════════════════════ */
-#card-overlay{
-  position:fixed;inset:0;z-index:400;
-  display:flex;flex-direction:column;
-  background:var(--ink2);
-  transform:translateY(100%);
-  transition:transform .38s cubic-bezier(.4,0,.2,1);
-  overflow:hidden;
+.film-link {
+  font-size: 11px;
+  color: var(--c-gold-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
-#card-overlay.open{transform:translateY(0)}
-#card-overlay-inner{
-  flex:1;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  padding-bottom:calc(var(--safe-b) + 20px);
+.film-link::after { content: '→'; font-size: 11px; }
+
+/* ── QUICK ACTIONS ── */
+.quick-bar {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  background: rgba(9,9,9,0.92);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--c-border);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 7px;
+  z-index: 100;
 }
-#card-overlay-inner::-webkit-scrollbar{display:none}
-.co-poster{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;flex-shrink:0}
-.co-poster-ph{width:100%;height:56vw;background:linear-gradient(160deg,var(--ink4),var(--ink3));display:flex;align-items:center;justify-content:center}
-.co-body{padding:20px 20px 8px}
-.co-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
-.co-close{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;color:var(--muted);touch-action:manipulation}
-.co-close:active{background:rgba(255,255,255,.12)}
-.co-badge-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-.co-top-badge{background:linear-gradient(135deg,var(--gold),var(--gold-d));color:var(--ink);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
-.co-genre{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
-.co-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,6vw,32px);font-weight:400;line-height:1.15;margin-bottom:6px;color:var(--paper)}
-.co-meta{display:flex;gap:10px;margin-bottom:4px}
-.co-meta span{font-size:12px;color:var(--muted)}.co-meta .co-rating{color:var(--gold)}
-.co-langs{font-size:11px;color:var(--muted);margin-bottom:12px}
-.co-match-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
-.co-match-pct{color:var(--gold);font-weight:500}
-.co-match-track{height:2px;background:var(--ink4);border-radius:2px;overflow:hidden;margin-bottom:14px}
-.co-match-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:2px}
-.co-tagline{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-l);font-style:italic;margin-bottom:10px;line-height:1.4}
-.co-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:6px}
-.co-explanation{font-size:14px;color:var(--paper2);line-height:1.7;margin-bottom:18px}
-.co-divider{height:1px;background:rgba(255,255,255,.06);margin:14px 0}
-.co-actions{display:flex;gap:10px;padding:14px 20px calc(14px + var(--safe-b));border-top:1px solid rgba(255,255,255,.06);background:var(--ink2);flex-shrink:0}
-.co-btn-tmdb{flex:1;text-align:center;font-size:14px;font-weight:600;color:var(--ink);background:linear-gradient(135deg,var(--gold),var(--gold-d));border-radius:12px;padding:13px;text-decoration:none;display:block;touch-action:manipulation}
-.co-btn-share{width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid rgba(200,137,90,.3);background:none;cursor:pointer;color:var(--muted);touch-action:manipulation}
-.co-btn-share:active{border-color:var(--gold);color:var(--gold)}
-/* Drag handle at top */
-.co-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:3px;margin:10px auto 0;flex-shrink:0}
+.qa-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 9px 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(242,237,230,0.65);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.qa-btn:active { background: rgba(255,255,255,0.08); color: var(--c-text); }
+.qa-btn.gold {
+  background: rgba(212,160,86,0.1);
+  border-color: rgba(212,160,86,0.3);
+  color: var(--c-gold);
+}
+.qa-btn.gold:active { background: rgba(212,160,86,0.18); }
 
-/* ══ COMPOSER ════════════════════════════════════════════ */
-#composer{flex-shrink:0;border-top:1px solid rgba(160,150,180,.12);padding-bottom:var(--safe-b);background:var(--ink2);transition:opacity .3s ease}
-#quick-actions{display:none;flex-direction:row;gap:8px;padding:10px 14px calc(10px + var(--safe-b));border-top:1px solid rgba(200,137,90,.18);background:var(--ink2);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-shrink:0}
-#quick-actions::-webkit-scrollbar{display:none}
-#quick-actions.show{display:flex}
-.qa-chip{flex-shrink:0;background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;cursor:pointer;white-space:nowrap;touch-action:manipulation;min-height:44px;display:flex;align-items:center;gap:6px}
-.qa-chip:active{background:rgba(200,137,90,.18)}
-.qa-chip.gold{color:var(--gold-l);border-color:rgba(200,137,90,.45);background:rgba(200,137,90,.13)}
-
-
-#input-row{display:flex;align-items:flex-end;gap:10px;padding:10px 14px 12px}#input-glow-wrap{flex:1}
-
-/* ══ TEXTAREA — SERIAL LIGHT BORDER ════════════════════
-   A single point of gold light travels continuously
-   around the entire border perimeter — clockwise, calm,
-   hypnotic. Like a lit fuse or a luxury bezel catching light.
-   
-   Technique: the textarea sits inside #input-glow-wrap.
-   A ::before pseudo-element uses a rotating conic-gradient
-   clipped to just the border area via overflow+padding trick.
-   ══════════════════════════════════════════════════════ */
-
-/* Wrapper — provides the rotating light canvas */
-#input-glow-wrap{
-  flex:1;
-  position:relative;
-  border-radius:23px; /* 1px more than textarea for border */
-  padding:1.5px;      /* this IS the border — gradient shows here */
-  background:rgba(200,137,90,.22); /* resting base border colour */
-  transition:background .3s;
+/* ── Placeholder SVG icon ── */
+.ph-icon {
+  opacity: 0.15;
 }
 
-/* The rotating light — a conic-gradient that spins */
-@keyframes serialLight{
-  from{--light-angle:0deg}
-  to{--light-angle:360deg}
+/* animate fills on load */
+@keyframes fillIn {
+  from { width: 0; }
 }
-@property --light-angle{
-  syntax:'<angle>';
-  inherits:false;
-  initial-value:0deg;
+.hero-match-fill, .film-match-fill {
+  animation: fillIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+.film-card:nth-child(1) .film-match-fill { animation-delay: 0.1s; }
+.film-card:nth-child(2) .film-match-fill { animation-delay: 0.2s; }
+.film-card:nth-child(3) .film-match-fill { animation-delay: 0.3s; }
+.film-card:nth-child(4) .film-match-fill { animation-delay: 0.4s; }
+.film-card:nth-child(5) .film-match-fill { animation-delay: 0.5s; }
 
-#input-glow-wrap::before{
-  content:'';
-  position:absolute;
-  inset:-1px;
-  border-radius:24px;
-  background:conic-gradient(
-    from var(--light-angle),
-    transparent 0deg,
-    transparent 280deg,
-    rgba(200,137,90,.15) 300deg,
-    rgba(232,168,124,.7)  340deg,
-    rgba(255,200,160,1)  360deg,
-    transparent 360deg
-  );
-  animation:serialLight 4s linear infinite;
-  z-index:0;
+/* Slide up animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
+.hero-card { animation: slideUp 0.5s ease both; }
+.film-card:nth-child(1) { animation: slideUp 0.5s 0.08s ease both; }
+.film-card:nth-child(2) { animation: slideUp 0.5s 0.16s ease both; }
+.film-card:nth-child(3) { animation: slideUp 0.5s 0.24s ease both; }
+.film-card:nth-child(4) { animation: slideUp 0.5s 0.32s ease both; }
+.film-card:nth-child(5) { animation: slideUp 0.5s 0.40s ease both; }
 
-/* Outer glow that follows the light — soft ambient */
-#input-glow-wrap::after{
-  content:'';
-  position:absolute;
-  inset:-3px;
-  border-radius:26px;
-  background:conic-gradient(
-    from var(--light-angle),
-    transparent 0deg,
-    transparent 300deg,
-    rgba(200,137,90,.04) 330deg,
-    rgba(200,137,90,.12) 355deg,
-    transparent 360deg
-  );
-  animation:serialLight 4s linear infinite;
-  z-index:0;
-  filter:blur(4px);
+/* Spoken languages */
+.film-langs {
+  font-size: 9.5px;
+  color: var(--c-dim);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
 }
-
-/* Textarea itself — sits ON TOP of the gradient border */
-#mood-input{
-  position:relative;
-  z-index:1;
-  width:100%;
-  background:var(--ink2);
-  border:none;
-  border-radius:22px;
-  color:var(--paper);
-  font-family:'DM Sans',sans-serif;
-  font-size:max(16px,14px);
-  line-height:1.55;
-  padding:12px 18px;
-  resize:none;outline:none;
-  min-height:48px;max-height:120px;
-  overflow-y:auto;scrollbar-width:none;
-  display:block;
-}
-#mood-input::-webkit-scrollbar{display:none}
-#mood-input::placeholder{color:rgba(107,100,120,.65)}
-
-/* Nudge — speed up the light, brighten it */
-#input-glow-wrap.nudge::before{
-  animation-duration:2.2s;
-  background:conic-gradient(
-    from var(--light-angle),
-    transparent 0deg,
-    transparent 260deg,
-    rgba(200,137,90,.25) 290deg,
-    rgba(232,168,124,.9)  335deg,
-    rgba(255,210,170,1)  355deg,
-    transparent 360deg
-  );
-}
-#input-glow-wrap.nudge::after{
-  animation-duration:2.2s;
-}
-#input-glow-wrap.nudge{
-  background:rgba(200,137,90,.35);
-}
-
-/* Focus — steady full glow, light pauses */
-#input-glow-wrap.focused{
-  background:rgba(200,137,90,.5);
-  box-shadow:0 0 0 3px rgba(200,137,90,.1),0 0 20px rgba(200,137,90,.18);
-}
-#input-glow-wrap.focused::before{
-  animation-play-state:paused;
-  background:conic-gradient(
-    from var(--light-angle),
-    rgba(200,137,90,.3) 0deg,
-    rgba(232,168,124,.6) 180deg,
-    rgba(200,137,90,.3) 360deg
-  );
-}
-#input-glow-wrap.focused::after{
-  animation-play-state:paused;
-}
-
-/* Fallback for browsers without @property support */
-@supports not (background:conic-gradient(from 0deg, red, blue)){
-  #input-glow-wrap::before{
-    background:rgba(200,137,90,.3);
-    animation:none;
-  }
-  @keyframes fallbackBreathe{0%,100%{opacity:.4}50%{opacity:.9}}
-  #input-glow-wrap::before{animation:fallbackBreathe 3s ease-in-out infinite}
-}
-
-#send-btn{width:44px;height:44px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#D4906A,#96583A);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.25;pointer-events:none;transition:opacity .2s,transform .18s,box-shadow .2s}
-#send-btn.ready{opacity:1;pointer-events:auto;box-shadow:0 4px 20px rgba(200,137,90,.3)}
-#send-btn:active{transform:scale(.92)}
-
-/* ══ PREFETCH BAR ════════════════════════════════════════ */
-#prefetch-bar{height:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold),var(--gold-l));background-size:200% auto;animation:shimmer 1.5s linear infinite;width:0;position:fixed;top:0;left:0;z-index:600;opacity:0;transition:width .4s ease,opacity .3s}
-
-/* ══ AD GATE — bottom sheet ══════════════════════════════
-   Slides up after language is picked
-   API fires simultaneously at 5 seconds into countdown
-   ══════════════════════════════════════════════════════ */
-#ad-gate{position:fixed;inset:0;z-index:500;background:rgba(7,7,9,.88);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(4px)}
-#ad-gate.show{opacity:1;pointer-events:auto}
-#ad-sheet{background:var(--ink2);border-radius:24px 24px 0 0;border-top:1px solid rgba(200,137,90,.22);padding:22px 22px calc(22px + var(--safe-b));transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1)}
-#ad-gate.show #ad-sheet{transform:translateY(0)}
-.ad-handle{width:36px;height:3px;background:var(--ink4);border-radius:3px;margin:0 auto 20px}
-
-/* Film icon + text */
-.ad-icon{font-size:32px;text-align:center;margin-bottom:10px}
-.ad-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;text-align:center;color:var(--paper);line-height:1.2;margin-bottom:6px}
-.ad-title em{font-style:italic;color:var(--gold)}
-.ad-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:22px;max-width:280px;margin-left:auto;margin-right:auto}
-
-/* The big watch ad button — premium gold */
-#btn-watch-ad{
-  width:100%;
-  background:linear-gradient(135deg,var(--gold-l),var(--gold));
-  border:none;border-radius:16px;
-  padding:16px 24px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
-  color:var(--ink);
-  transition:transform .18s,box-shadow .18s;
-  box-shadow:0 4px 24px rgba(200,137,90,.3);
-  margin-bottom:12px;
-}
-#btn-watch-ad:active{transform:scale(.98)}
-
-/* Ad countdown timer ring */
-.ad-timer-wrap{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
-.ad-timer-ring{position:relative;width:52px;height:52px;flex-shrink:0}
-.ad-timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
-.ad-timer-ring circle{fill:none;stroke:var(--ink4);stroke-width:3}
-.ad-timer-ring .progress{stroke:var(--gold);stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:138;transition:stroke-dashoffset .9s linear}
-.ad-timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold)}
-.ad-timer-label{font-size:13px;color:var(--paper2);line-height:1.5}
-
-/* Simulated ad view (pre-Play Store) */
-#ad-simulated{display:none;background:var(--ink3);border:1px solid rgba(200,137,90,.18);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px}
-#ad-simulated.show{display:block}
-.ad-sim-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
-.ad-sim-content{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.5}
-
-/* ══ TOAST ════════════════════════════════════════════════ */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink3);border:1px solid rgba(200,137,90,.3);border-radius:50px;padding:9px 20px;font-size:12px;color:var(--gold-l);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;z-index:700}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes shimmer{to{background-position:200% center}}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.slide-up{animation:slideUp .3s ease both}
 </style>
 </head>
 <body>
-<div id="prefetch-bar"></div>
-<div class="toast" id="toast"></div>
 
-<!-- ══ SPLASH ══════════════════════════════════════════════ -->
-<div id="splash">
-  <div class="splash-rule" id="splash-rule-top"></div>
-
-  <!-- Film mark — 80px, more commanding presence -->
-  <div class="splash-mark" id="splash-mark">
-    <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Outer frame -->
-      <rect x="2" y="2" width="76" height="76" rx="12"
-            stroke="#C8895A" stroke-width="1.4" opacity="0.55"/>
-      <!-- Inner frame -->
-      <rect x="11" y="11" width="58" height="58" rx="7"
-            stroke="#C8895A" stroke-width="1" opacity="0.25"/>
-      <!-- Centre lens -->
-      <circle cx="40" cy="40" r="14"
-              stroke="#C8895A" stroke-width="1.4" opacity="0.75"/>
-      <!-- Aperture dot -->
-      <circle cx="40" cy="40" r="5" fill="#C8895A" opacity="0.85"/>
-      <!-- Corner sprockets -->
-      <rect x="5"  y="5"  width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
-      <rect x="66" y="5"  width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
-      <rect x="5"  y="66" width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
-      <rect x="66" y="66" width="9" height="9" rx="2" fill="#C8895A" opacity="0.45"/>
-      <!-- Side film perforations -->
-      <rect x="5"  y="34" width="6" height="12" rx="2" fill="#C8895A" opacity="0.2"/>
-      <rect x="69" y="34" width="6" height="12" rx="2" fill="#C8895A" opacity="0.2"/>
-      <rect x="34" y="5"  width="12" height="6" rx="2" fill="#C8895A" opacity="0.2"/>
-      <rect x="34" y="69" width="12" height="6" rx="2" fill="#C8895A" opacity="0.2"/>
-      <!-- Subtle glow ring -->
-      <circle cx="40" cy="40" r="22"
-              stroke="#C8895A" stroke-width=".5" opacity="0.15"/>
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+      <rect x="1" y="1" width="20" height="20" rx="4" stroke="#D4A056" stroke-width="1.4"/>
+      <circle cx="11" cy="11" r="4" stroke="#D4A056" stroke-width="1.4"/>
+      <circle cx="11" cy="11" r="1.4" fill="#D4A056"/>
+      <rect x="3.5" y="3.5" width="3" height="3" rx="0.8" fill="#D4A056" opacity="0.5"/>
+      <rect x="15.5" y="3.5" width="3" height="3" rx="0.8" fill="#D4A056" opacity="0.5"/>
+      <rect x="3.5" y="15.5" width="3" height="3" rx="0.8" fill="#D4A056" opacity="0.5"/>
+      <rect x="15.5" y="15.5" width="3" height="3" rx="0.8" fill="#D4A056" opacity="0.5"/>
     </svg>
+    Moodfilm
   </div>
-
-  <h1 class="splash-title" id="splash-title">Moodfilm</h1>
-  <!-- Tagline: italic whisper, not uppercase shout -->
-  <p class="splash-tagline" id="splash-tagline">find movies by mood</p>
-
-  <div class="splash-rule-bottom" id="splash-rule-bottom"></div>
-  <!-- Warmer, more personal prompt -->
-  <p class="splash-enter" id="splash-enter">touch to begin</p>
+  <span class="topbar-tag">Find Movies by Mood</span>
 </div>
 
-<!-- ══ AD GATE ════════════════════════════════════════════ -->
-<div id="ad-gate">
-  <div id="ad-sheet">
-    <div class="ad-handle" onclick="dismissAdEarly()" style="cursor:pointer;padding:8px 0"></div>
-    <div class="ad-icon">🎬</div>
-    <h2 class="ad-title">Your picks are <em>ready</em></h2>
-    <p class="ad-sub">Watch a short ad and your films appear the moment it ends. Completely free, always.</p>
+<!-- ── MOOD SUMMARY ── -->
+<div class="lead-wrap">
+  <span class="lead-label">Your Picks</span>
+  <div class="lead-summary">"A quiet hollow — occupied but somehow still empty inside."</div>
+  <div class="lead-chips">
+    <span class="lead-chip">wistful</span>
+    <span class="lead-chip">hollow</span>
+    <span class="lead-chip">longing</span>
+    <span class="lead-chip">bittersweet</span>
+  </div>
+</div>
 
-    <!-- Simulated ad (shown during countdown) -->
-    <div id="ad-simulated">
-      <div class="ad-sim-label">Advertisement</div>
-      <div class="ad-sim-content">Your ad will appear here after Play Store approval</div>
-    </div>
-
-    <!-- Timer + label (shown after tap) -->
-    <div class="ad-timer-wrap" id="ad-timer-wrap" style="display:none">
-      <div class="ad-timer-ring">
-        <svg viewBox="0 0 52 52" width="52" height="52">
-          <circle cx="26" cy="26" r="22"/>
-          <circle cx="26" cy="26" r="22" class="progress" id="ad-ring-progress"/>
-        </svg>
-        <div class="ad-timer-num" id="ad-timer-num">30</div>
+<!-- ── TOP PICK HERO ── -->
+<div class="hero-card">
+  <!-- Poster -->
+  <div class="hero-poster-wrap">
+    <img
+      src="https://image.tmdb.org/t/p/w500/aCaP4y0aLH7GGFtH01j4P1n0HLq.jpg"
+      alt="Past Lives"
+      onerror="this.style.display='none'"
+    >
+    <!-- Top chrome -->
+    <div class="hero-top-chrome">
+      <span class="hero-top-badge">Top Pick</span>
+      <div class="hero-meta-float">
+        <span class="hero-rating">8.0</span>
+        <span class="hero-rating-label">TMDb</span>
       </div>
-      <div class="ad-timer-label">Your films are being<br>curated right now</div>
     </div>
+    <!-- Bottom text layer -->
+    <div class="hero-text-layer">
+      <div class="hero-genre-year">
+        <span class="hero-genre">Romance</span>
+        <span class="hero-sep">·</span>
+        <span class="hero-year">2023</span>
+        <span class="hero-sep">·</span>
+        <span class="hero-runtime">1h 46m</span>
+      </div>
+      <h2 class="hero-title">Past Lives</h2>
+      <div class="hero-match">
+        <div class="hero-match-track">
+          <div class="hero-match-fill" style="width: 93%"></div>
+        </div>
+        <span class="hero-match-pct">93%</span>
+      </div>
+      <p class="hero-tagline">"Some connections survive across lifetimes."</p>
+    </div>
+  </div>
 
-    <!-- Main CTA button -->
-    <button id="btn-watch-ad" onclick="startAdFlow()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-      Watch a short ad, it's free
-    </button>
-
-    <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
-      Your picks load while the ad plays. Zero wait after it ends.
+  <!-- Body — below poster -->
+  <div class="hero-body">
+    <p class="hero-explanation">
+      This film lives exactly in the feeling you're carrying — the quiet ache of a life that could have been. Celine Song understands that longing isn't about what you lost, it's about who you became without it. It will hold you gently.
     </p>
-  </div>
-</div>
-
-<!-- ══ CARD OVERLAY — full screen expanded card ══ -->
-<div id="card-overlay">
-  <div class="co-handle" id="co-handle"></div>
-  <div id="card-overlay-inner">
-    <div id="co-poster-wrap"></div>
-    <div class="co-body">
-      <div class="co-top-row">
-        <div id="co-badges" class="co-badge-row"></div>
-        <button class="co-close" onclick="closeCardOverlay()">✕</button>
-      </div>
-      <h2 class="co-title" id="co-title"></h2>
-      <div class="co-meta" id="co-meta"></div>
-      <div class="co-langs" id="co-langs"></div>
-      <div class="co-match-row"><span>Mood match</span><span class="co-match-pct" id="co-pct"></span></div>
-      <div class="co-match-track"><div class="co-match-fill" id="co-match-fill"></div></div>
-      <p class="co-tagline" id="co-tagline"></p>
-      <div class="co-section-label">Why this film</div>
-      <p class="co-explanation" id="co-explanation"></p>
-      <div class="co-divider"></div>
-      <div class="co-section-label">Where to watch</div>
-      <div id="co-ott" class="ott-row" style="margin-top:6px"></div>
+    <span class="ott-section-label">Available on</span>
+    <div class="ott-row">
+      <a class="ott-pill" href="#">
+        <span class="ott-dot" style="background:#E50914"></span>Netflix
+      </a>
+      <a class="ott-pill" href="#">
+        <span class="ott-dot" style="background:#00A8E0"></span>Prime Video
+      </a>
     </div>
-  </div>
-  <div class="co-actions">
-    <a id="co-tmdb-btn" href="#" target="_blank" rel="noopener noreferrer" class="co-btn-tmdb">Open on TMDb</a>
-    <button class="co-btn-share" id="co-share-btn" onclick="shareFilm(document.getElementById('co-title').textContent)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-    </button>
-  </div>
-</div>
-
-
-
-<!-- ══ MAIN APP ════════════════════════════════════════════ -->
-<div id="app">
-  <div id="topbar">
-    <div class="logo">
-      <svg class="logo-reel" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="1" y="1" width="20" height="20" rx="4" stroke="#C8895A" stroke-width="1.4"/>
-        <circle cx="11" cy="11" r="4" stroke="#C8895A" stroke-width="1.4"/>
-        <circle cx="11" cy="11" r="1.4" fill="#C8895A"/>
-        <rect x="3.5" y="3.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
-        <rect x="15.5" y="3.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
-        <rect x="3.5" y="15.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
-        <rect x="15.5" y="15.5" width="3" height="3" rx="0.8" fill="#C8895A" opacity="0.5"/>
-      </svg>
-      <span class="logo-text">Moodfilm</span>
-    </div>
-    <span class="topbar-tag">Find Movies by Mood</span>
-  </div>
-  <div id="chat">
-    <!-- Listening state — absolute inside chat, fills visible space naturally -->
-    <div id="listening-state">
-      <div class="listen-content">
-        <p class="listen-line-1">Take your time.</p>
-        <p class="listen-line-2">
-          <span>Talk about your day, your week,</span>
-          <span>what&#39;s been sitting with you.</span>
-          <span class="listen-final">I&#39;m listening.</span>
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div id="composer">
-    <div id="input-row">
-      <div id="input-glow-wrap">
-        <textarea id="mood-input" rows="1" placeholder="I'm feeling..." oninput="onInput()"></textarea>
-      </div>
-      <button id="send-btn" type="button" onclick="onSend()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M12 19V5M5 12l7-7 7 7" stroke="var(--ink)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">More Info →</a>
+      <button class="btn-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
         </svg>
       </button>
     </div>
-  <!-- Pills below input — secondary, horizontal scroll -->
-  <div id="composer-pills">
-    <div id="composer-pills-label">or pick a feeling</div>
-    <div id="composer-pills-inner"></div>
   </div>
-  </div>
-
-<!-- ══ QUICK ACTIONS — shown after recommendations ══ -->
-<div id="quick-actions">
-  <button class="qa-chip" onclick="restartAll()">↺ New Mood</button>
-  <button class="qa-chip" onclick="quickChangeLang()">🌍 Language</button>
-  <button class="qa-chip" onclick="changeIntent()">🎯 Vibe</button>
-  <button class="qa-chip gold" onclick="shareAll()">↑ Share</button>
-</div>
 </div>
 
-<script>
-const WORKER_URL="https://moodfilm-api.kankipati-aaron.workers.dev";
-const COUNTRY=(()=>{try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";if(tz.includes("Kolkata")||tz.includes("Calcutta"))return"IN";return(navigator.language||"").split("-")[1]?.toUpperCase()||"IN"}catch{return"IN"}})();
+<!-- ── MORE PICKS LABEL ── -->
+<div class="section-header">
+  <span>More for your mood</span>
+</div>
 
-const LANGS=[
-  {value:"any", dot:"#C8895A", label:"🌍 Any"},
-  {value:"en",  dot:"#4A90D9", label:"🇬🇧 English"},
-  {value:"hi",  dot:"#FF8C2A", label:"🇮🇳 Hindi"},
-  {value:"te",  dot:"#00B89F", label:"తె Telugu"},
-  {value:"ta",  dot:"#E040FB", label:"த Tamil"},
-];
-const INTENTS=[
-  {value:"Feel better",  icon:"🌤", title:"Feel Better",   desc:"Something to lift me up"},
-  {value:"Escape",       icon:"🚀", title:"Escape",        desc:"Take me somewhere else"},
-  {value:"Relate",       icon:"🤝", title:"Relate",        desc:"A film that gets me"},
-  {value:"Get motivated",icon:"⚡", title:"Get Motivated", desc:"Something to fire me up"},
-];
-const MOOD_CHIPS=["😰 Anxious","🌙 Nostalgic","😢 Sad","✨ Excited","🤝 Lonely","😴 Tired","💪 Hopeful","😤 Angry","🛋 Cozy","💡 Inspired","💔 Heartbroken","😐 Bored"];
-const GENRE_ICONS={Drama:"🎭",Comedy:"😄",Romance:"💕",Thriller:"😰",Action:"⚡",Horror:"👻",Animation:"✨",Fantasy:"🔮","Sci-Fi":"🚀",Documentary:"📽️"};
-const STAGES=["Curating your films...","Writing your explanations...","Almost there..."];
-const FACTS=["Parasite is the first non-English film to win the Oscar for Best Picture.","The Inception hallway fight took 3 weeks on a custom rotating set.","Schindler's List was shot almost entirely in black and white, intentionally.","Interstellar's black hole led to a published Nature Physics paper.","Mad Max: Fury Road was 90% practical effects, shot over 80 days in Namibia.","The Godfather was the first film to gross $100M domestically.","Spirited Away is the only non-English animated film to win an Oscar.","Hiding the Jaws shark accidentally made the film scarier.","Jurassic Park's roar blended elephant, tiger, alligator, and penguin sounds."];
-const AD_DURATION = 30; // seconds — replace with real AdMob duration after Play Store
+<!-- ── FILM CARDS STACK ── -->
+<div class="picks-stack">
 
-/* ── STATE ── */
-let mood="", selectedChips=[], selectedIntent="", selectedLang="any";
-let chatStep="idle"; // idle | awaiting_intent | awaiting_lang | ad_gate | loading | done
-let prefetchData=null, prefetchPromise=null, prefetchProgress=0;
-let lastRecs=null;
-let adCountdownInterval=null, adApiPromise=null;
-let _keyboardInited=false;
-
-/* ── CHAT HELPERS ── */
-function appendApp(html){
-  const w=document.createElement("div");
-  w.className="msg-app slide-up";
-  w.innerHTML=`<div class="msg-avatar">🎬</div><div class="bubble-app">${html}</div>`;
-  document.getElementById("chat").appendChild(w);
-  scrollChat();return w;
-}
-function appendUser(text){
-  const w=document.createElement("div");
-  w.className="msg-user slide-up";
-  w.innerHTML=`<div class="bubble-user">${esc(text)}</div>`;
-  document.getElementById("chat").appendChild(w);
-  scrollChat();return w;
-}
-function appendTyping(){
-  const w=document.createElement("div");
-  w.className="msg-app slide-up";w.id="typing-ind";
-  w.innerHTML=`<div class="msg-avatar">🎬</div><div class="bubble-app"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
-  document.getElementById("chat").appendChild(w);scrollChat();return w;
-}
-function removeTyping(){const t=document.getElementById("typing-ind");if(t)t.remove()}
-function scrollChat(){setTimeout(()=>{const c=document.getElementById("chat");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})},80)}
-
-
-
-/* ── INPUT ── */
-function onInput(){
-  const ta=document.getElementById("mood-input");
-  ta.style.height="auto";
-  ta.style.height=Math.min(ta.scrollHeight,120)+"px";
-  // Nudge glow on wrapper when user has typed something
-  const wrap=document.getElementById("input-glow-wrap");
-  if(wrap)wrap.classList.toggle("nudge", ta.value.trim().length > 0);
-  // Listening state stays while typing — hides on send
-  updateSendBtn();
-}
-function updateSendBtn(){
-  const hasText=document.getElementById("mood-input").value.trim().length>0;
-  document.getElementById("send-btn").classList.toggle("ready",(hasText||selectedChips.length>0)&&chatStep==="idle");
-}
-
-/* ── COMPOSER PILLS — below input, text-first secondary ── */
-function buildComposerPills(){
-  const container=document.getElementById("composer-pills-inner");
-  if(!container)return;
-  container.innerHTML="";
-  MOOD_CHIPS.forEach(chip=>{
-    const b=document.createElement("button");
-    b.className="composer-pill";b.type="button";
-    b.textContent=chip;
-    b.onclick=function(){
-      if(chatStep!=="idle")return;
-      // If user already has text, append chip as text enhancement
-      const ta=document.getElementById("mood-input");
-      if(ta.value.trim().length>0){
-        // Append to existing text
-        const current=ta.value.trim();
-        const chipText=chip.replace(/^\S+\s/,"").toLowerCase();
-        ta.value=current+(current.endsWith(",")?" ":", ")+chipText;
-      } else {
-        // No text — use chip as starter but nudge them to add more
-        const chipText=chip.replace(/^\S+\s/,"");
-        ta.value="I'm feeling "+chipText.toLowerCase();
-        // Place cursor at end and focus so they can elaborate
-        setTimeout(()=>{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)},50);
-      }
-      onInput();
-    };
-    container.appendChild(b);
-  });
-}
-
-
-
-/* ── SEND ── */
-function onSend(){
-  if(chatStep!=="idle")return;
-  const ta=document.getElementById("mood-input");
-  const text=ta.value.trim();
-  const chipText=selectedChips.map(c=>c.replace(/^\S+\s/,"")).join(", ");
-  mood=text||chipText||"";
-  if(!mood)return; // truly empty — nothing typed, no chip
-  ta.value="";ta.style.height="auto";
-  const gw=document.getElementById("input-glow-wrap");if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
-  selectedChips=[];buildComposerPills();updateSendBtn();ta.blur();
-  submitMood();
-}
-function pillTap(rawChip){
-  if(chatStep!=="idle")return;
-  hideListeningState(true);
-  mood=rawChip.replace(/^\S+\s/,"");
-  selectedChips=[];
-  const mp=document.getElementById("mood-pills-row");
-  if(mp){mp.style.pointerEvents="none";mp.style.opacity=".55";}
-  submitMood();
-}
-/* ── ACKNOWLEDGEMENT ──────────────────────────────────────
-   After user submits mood, app reflects back what it heard.
-   Text comes from Haiku's prefetch response.
-   While prefetch runs, we show a warm contextual fallback.
-   ─────────────────────────────────────────────────────── */
-async function getAcknowledgement(){
-  // If prefetch already done and has acknowledgement — use it
-  if(prefetchData&&prefetchData.acknowledgement){
-    return prefetchData.acknowledgement;
-  }
-  // Wait up to 3s for prefetch to return acknowledgement
-  if(prefetchPromise){
-    try{
-      await Promise.race([
-        prefetchPromise,
-        new Promise((_,r)=>setTimeout(()=>r("timeout"),3000))
-      ]);
-      if(prefetchData&&prefetchData.acknowledgement){
-        return prefetchData.acknowledgement;
-      }
-    }catch(e){}
-  }
-  // Fallback — warm, human, works for any mood
-  return pickFallbackAck(mood);
-}
-
-function pickFallbackAck(moodText){
-  // Read the mood text for emotional cues
-  const m=(moodText||"").toLowerCase();
-  if(/anxi|stress|worried|nervous|panic/.test(m))
-    return "That kind of anxious energy is exhausting to carry. I've got you.";
-  if(/sad|cry|tear|depress|down|low/.test(m))
-    return "I hear you. Some days just feel heavier than others.";
-  if(/angry|frustrat|annoyed|rage|mad/.test(m))
-    return "That frustration makes sense. Let's find something that helps.";
-  if(/lonely|alone|miss|empty/.test(m))
-    return "Loneliness at night hits differently. I'm here.";
-  if(/happy|excit|joy|great|amazing/.test(m))
-    return "That energy is everything. Let's find something worthy of it.";
-  if(/tired|exhaust|sleep|rest|drain/.test(m))
-    return "You've clearly been running on empty. Let's find something easy on the soul.";
-  if(/bored|nothing|meh|whatever/.test(m))
-    return "Sometimes nothing feels right. Let's change that.";
-  if(/nostalgic|memory|memories|past|miss/.test(m))
-    return "There's something beautiful about that kind of feeling.";
-  if(/lost|confus|don.t know|unsure/.test(m))
-    return "Not knowing how you feel is a feeling too. I've got you.";
-  // Gibberish, single chars, anything unmapped — most human response
-  return "I can feel something in that. Let's find your film.";
-}
-
-function appendAck(text){
-  const w=document.createElement("div");
-  w.className="msg-app slide-up";
-  w.innerHTML=`<div class="msg-avatar">🎬</div>
-    <div class="bubble-app">
-      <span class="serif" style="font-size:16px">${esc(text)}</span>
-    </div>`;
-  document.getElementById("chat").appendChild(w);
-  scrollChat();
-}
-
-function submitMood(){
-  hideListeningState(true);
-  chatStep="awaiting_intent";
-  appendUser(mood);
-  startPrefetch();
-  setTimeout(()=>{
-    appendTyping();
-    // Wait for prefetch — it may already be done by now
-    // Use acknowledgement from Haiku if available, fallback otherwise
-    setTimeout(async()=>{
-      removeTyping();
-      // Get acknowledgement — from prefetch if ready, else warm fallback
-      let ack = await getAcknowledgement();
-      appendAck(ack);
-      // Breath — let the acknowledgement land before asking
-      setTimeout(showIntentQuestion, 1200);
-    },900);
-  },300);
-}
-
-/* ── PREFETCH (fires immediately on mood submit) ── */
-function startPrefetch(){
-  prefetchData=null;prefetchProgress=0;
-  const bar=document.getElementById("prefetch-bar");
-  bar.style.opacity="1";bar.style.width="0%";
-  let pInt=setInterval(()=>{prefetchProgress=Math.min(prefetchProgress+Math.random()*3,82);bar.style.width=prefetchProgress+"%"},350);
-  prefetchPromise=fetch(WORKER_URL,{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({mood,moodChips:selectedChips,prefetch:true,country:COUNTRY})
-  }).then(r=>r.json()).then(data=>{
-    prefetchData=data;clearInterval(pInt);
-    bar.style.width="100%";
-    setTimeout(()=>{bar.style.opacity="0";setTimeout(()=>bar.style.width="0%",300)},500);
-  }).catch(()=>{prefetchData=null;clearInterval(pInt);bar.style.opacity="0"});
-}
-
-/* ── STEP 2: INTENT ── */
-function showIntentQuestion(){
-  appendApp(`<span class="serif">What do you need from a film right now?</span>`);
-  const grid=document.createElement("div");
-  grid.className="intent-choices slide-up";
-  INTENTS.forEach(intent=>{
-    const card=document.createElement("div");card.className="intent-choice";
-    card.innerHTML=`<span class="ic-icon">${intent.icon}</span><span class="ic-title">${intent.title}</span><span class="ic-desc">${intent.desc}</span>`;
-    card.onclick=function(){if(chatStep!=="awaiting_intent")return;selectIntent(intent,card,grid)};
-    grid.appendChild(card);
-  });
-  document.getElementById("chat").appendChild(grid);scrollChat();
-}
-function selectIntent(intent,card,grid){
-  selectedIntent=intent.value;
-  grid.querySelectorAll(".intent-choice").forEach(c=>c.classList.remove("selected"));
-  card.classList.add("selected");grid.classList.add("locked");
-  chatStep="awaiting_lang";
-  appendUser(intent.icon+" "+intent.title);
-  setTimeout(()=>{appendTyping();setTimeout(()=>{removeTyping();showLangQuestion()},700)},400);
-}
-
-/* ── STEP 3: LANGUAGE ── */
-function showLangQuestion(){
-  appendApp(`<span class="serif">Any language preference?</span>`);
-  const row=document.createElement("div");row.className="lang-choices slide-up";
-  LANGS.forEach(lang=>{
-    const b=document.createElement("button");
-    b.className="lang-choice";b.type="button";b.dataset.value=lang.value;
-    b.innerHTML=`<span class="lang-dot" style="background:${lang.dot}"></span>${lang.label}`;
-    b.onclick=function(){if(chatStep!=="awaiting_lang")return;selectLang(lang,row)};
-    row.appendChild(b);
-  });
-  document.getElementById("chat").appendChild(row);scrollChat();
-}
-function selectLang(lang,row){
-  selectedLang=lang.value;
-  row.querySelectorAll(".lang-choice").forEach(b=>b.classList.toggle("selected",b.dataset.value===lang.value));
-  row.classList.add("locked");
-  chatStep="ad_gate";
-  appendUser(lang.label);
-  // Show ad gate after short delay
-  setTimeout(showAdGate, 400);
-}
-
-/* ══ AD GATE LOGIC ════════════════════════════════════════
-   Strategy:
-   - Show the gate with "Watch a short ad" button
-   - User taps button
-   - Simulated ad plays (countdown from 30)
-   - At 5 seconds in: API fires silently in background
-   - At 0 seconds: ad done, wait for API if needed, show results
-   ══════════════════════════════════════════════════════ */
-function showAdGate(){
-  document.getElementById("ad-gate").classList.add("show");
-}
-function hideAdGate(){
-  document.getElementById("ad-gate").classList.remove("show");
-}
-// User dismisses ad before completion — return to language step
-function dismissAdEarly(){
-  clearInterval(adCountdownInterval);
-  adApiPromise=null;
-  hideAdGate();
-  // Reset ad UI for next time
-  document.getElementById("btn-watch-ad").style.display="flex";
-  document.getElementById("ad-timer-wrap").style.display="none";
-  document.getElementById("ad-simulated").classList.remove("show");
-  // Go back to language question
-  chatStep="awaiting_lang";
-  const chat=document.getElementById("chat");
-  // Remove last user bubble (language choice) and lang chips
-  const children=Array.from(chat.children);
-  // Remove everything after intent user bubble
-  let intentUserIdx=-1;
-  children.forEach((c,i)=>{if(c.classList.contains("msg-user"))intentUserIdx=i;});
-  while(chat.children.length>intentUserIdx+1)chat.lastChild.remove();
-  setTimeout(showLangQuestion,200);
-}
-
-function startAdFlow(){
-  // Switch button to timer
-  document.getElementById("btn-watch-ad").style.display="none";
-  document.getElementById("ad-timer-wrap").style.display="flex";
-  document.getElementById("ad-simulated").classList.add("show");
-
-  let secondsLeft=AD_DURATION;
-  const ring=document.getElementById("ad-ring-progress");
-  const numEl=document.getElementById("ad-timer-num");
-  const circumference=138; // 2π × 22
-
-  // Update ring every second
-  adCountdownInterval=setInterval(()=>{
-    secondsLeft--;
-    numEl.textContent=secondsLeft;
-    // Animate ring
-    const offset=circumference-(circumference*((AD_DURATION-secondsLeft)/AD_DURATION));
-    ring.style.strokeDashoffset=offset;
-
-    // At 5 seconds remaining — fire API silently (revenue locked by AdMob by now)
-    if(secondsLeft===AD_DURATION-5){
-      adApiPromise=fireFinalAPI();
-    }
-
-    if(secondsLeft<=0){
-      clearInterval(adCountdownInterval);
-      onAdComplete();
-    }
-  },1000);
-
-  // Safety: also fire API at 5s in case timer is slow
-  setTimeout(()=>{if(!adApiPromise)adApiPromise=fireFinalAPI()},5000);
-}
-
-async function onAdComplete(){
-  // Hide ad gate
-  hideAdGate();
-  chatStep="loading";
-
-  // Show in-chat loading state
-  const rlWrap=document.createElement("div");
-  rlWrap.className="rl-wrap slide-up";rlWrap.id="rl-wrap";
-  rlWrap.innerHTML=`<div class="rl-bar"><div class="rl-fill" id="rl-fill"></div></div><div class="rl-text" id="rl-text">Putting your picks together...</div>`;
-  document.getElementById("chat").appendChild(rlWrap);scrollChat();
-
-  // Animate bar while waiting for API
-  let rlProg=0;
-  const rlInt=setInterval(()=>{rlProg=Math.min(rlProg+6,95);const f=document.getElementById("rl-fill");if(f)f.style.width=rlProg+"%"},200);
-
-  try{
-    // Wait for API (should already be done or nearly done)
-    const data=await(adApiPromise||fireFinalAPI());
-    clearInterval(rlInt);
-    const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-    if(data.error)throw new Error(data.error);
-    lastRecs=data.recommendations;
-    renderResults(data.recommendations,data.moodAnalysis);
-    chatStep="done";
-  }catch(e){
-    clearInterval(rlInt);
-    const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-    const errType=(e.message==="TIMEOUT")?"TIMEOUT":(!navigator.onLine)?"OFFLINE":"REQUEST_FAILED";
-    showError(errType,function(){adApiPromise=null;chatStep="loading";onAdComplete();});
-    chatStep="awaiting_lang";
-  }
-}
-
-/* ── FINAL API CALL — with full error handling ── */
-function isOffline(){ return typeof navigator!=="undefined"&&!navigator.onLine; }
-
-async function fireFinalAPI(){
-  // Offline check
-  if(isOffline()) return {error:"OFFLINE"};
-  try{
-    if(prefetchPromise)await prefetchPromise;
-    let data;
-    // Race with 45s timeout
-    const timeoutPromise=new Promise((_,r)=>setTimeout(()=>r(new Error("TIMEOUT")),45000));
-    if(prefetchData&&!prefetchData.error){
-      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,prefetchResult:prefetchData,finalPickOnly:true})}).then(r=>r.json());
-      data=await Promise.race([fetchPromise,timeoutPromise]);
-    }else{
-      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})}).then(r=>r.json());
-      data=await Promise.race([fetchPromise,timeoutPromise]);
-    }
-    return data;
-  }catch(e){
-    const msg=e.message||"";
-    if(msg==="TIMEOUT")return{error:"TIMEOUT"};
-    if(!navigator.onLine)return{error:"OFFLINE"};
-    return{error:msg||"REQUEST_FAILED"};
-  }
-}
-
-/* ── ERROR DISPLAY — never leaves user stuck ── */
-function showError(type, retryFn){
-  const messages={
-    OFFLINE:        {icon:"📡", title:"You're offline", sub:"Check your connection and try again."},
-    TIMEOUT:        {icon:"⏱", title:"That took too long", sub:"The AI is busy. Try again in a moment."},
-    EMPTY_RESULTS:  {icon:"🎬", title:"No films found", sub:"Try describing your mood differently."},
-    REQUEST_FAILED: {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
-    DEFAULT:        {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
-  };
-  const m=messages[type]||messages.DEFAULT;
-  const w=document.createElement("div");
-  w.className="msg-app slide-up";
-  w.innerHTML=`<div class="msg-avatar">🎬</div>
-    <div class="bubble-app error-bubble">
-      <div class="error-icon">${m.icon}</div>
-      <div class="error-title">${m.title}</div>
-      <div class="error-sub">${m.sub}</div>
-      <button class="error-retry" onclick="this.closest('.error-bubble').parentElement.parentElement.remove();(${retryFn.toString()})()">Try again</button>
-    </div>`;
-  document.getElementById("chat").appendChild(w);
-  scrollChat();
-}
-
-/* ── RESULTS ── */
-function renderResults(recs,moodData){
-  // Empty results guard
-  if(!recs||recs.length===0){
-    showError("EMPTY_RESULTS",function(){adApiPromise=null;chatStep="awaiting_lang";changeIntent();});
-    return;
-  }
-  const chat=document.getElementById("chat");
-
-  // ── Summary bubble ──
-  const sumWrap=document.createElement("div");sumWrap.className="msg-app slide-up";
-  let sumHtml=`<div class="msg-avatar">🎬</div><div class="bubble-app">`;
-  sumHtml+=`<div class="results-eyebrow">Your picks</div>`;
-  if(moodData?.moodSummary)sumHtml+=`<div class="mood-summary-text">"${esc(moodData.moodSummary)}"</div>`;
-  if(moodData?.emotions?.length)sumHtml+=`<div class="mood-tags">${moodData.emotions.slice(0,4).map(e=>'<span class="mood-tag">'+esc(e)+'</span>').join("")}</div>`;
-  sumHtml+=`</div>`;
-  sumWrap.innerHTML=sumHtml;
-  chat.appendChild(sumWrap);
-
-  // Sort: top pick first
-  const sorted=[...recs].sort((a,b)=>b.isTopPick-a.isTopPick);
-  const topPick=sorted[0];
-  const others=sorted.slice(1);
-  const FILM_PH='<div class="top-pick-poster-ph"><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="opacity:.25"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/><rect x="4" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="4" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/></svg></div>';
-  const SPLIT_PH='<div class="split-poster-ph"><svg width="36" height="36" viewBox="0 0 52 52" fill="none" style="opacity:.2"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/></svg></div>';
-
-  const listWrap=document.createElement("div");
-  listWrap.className="results-list slide-up";
-
-  // ── TOP PICK — hero card full width ──
-  if(topPick){
-    const pct=Math.round((topPick.matchScore||.75)*100);
-    const icon=GENRE_ICONS[topPick.genre]||"🎬";
-    const tpCard=document.createElement("div");
-    tpCard.className="top-pick-card";
-    const posterHtml=topPick.poster
-      ?`<img src="${esc(topPick.poster)}" class="top-pick-poster" alt="${esc(topPick.title)}" loading="lazy" onerror="this.outerHTML='${FILM_PH.replace(/'/g,"\'")}'">` : FILM_PH;
-    tpCard.innerHTML=`
-      <p class="top-pick-section-label">★ Your top pick</p>
-      ${posterHtml}
-      <div class="top-pick-body">
-        <span class="top-badge">Top Pick</span>
-        <div class="tp-genre-row"><span class="tp-genre">${esc(topPick.genre||'')}</span></div>
-        <h2 class="tp-title">${esc(topPick.title)}</h2>
-        <div class="tp-meta">
-          ${topPick.releaseYear?`<span>${topPick.releaseYear}</span>`:''}
-          ${topPick.rating?`<span class="tp-rating">★ ${topPick.rating}</span>`:''}
-          ${topPick.runtime?`<span>${Math.floor(topPick.runtime/60)}h ${topPick.runtime%60}m</span>`:''}
-        </div>
-        <div class="tp-match-row"><span>Mood match</span><span class="tp-match-pct">${pct}%</span></div>
-        <div class="tp-match-track"><div class="tp-match-fill" data-pct="${pct}" style="width:0"></div></div>
-        ${topPick.tagline?`<p class="tp-tagline">"${esc(topPick.tagline)}"</p>`:''}
-        <p class="tp-explanation">${esc(topPick.explanation||'')}</p>
-        ${topPick.spokenLanguages?.length?`<p class="tp-ott-label" style="margin-bottom:4px">Spoken in: ${esc(topPick.spokenLanguages.slice(0,3).join(' · '))}</p>`:''}
-        ${topPick.streaming?.length?`<p class="tp-ott-label">Available on</p><div class="ott-row">${topPick.streaming.filter(p=>p.name!=='Check JustWatch').map(p=>`<a class="ott-badge" href="${esc(p.link||'#')}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join('')}</div>`:`<p class="ott-none">Not on major streaming · <a href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="color:var(--gold-l);text-decoration:none">Check JustWatch</a></p>`}
-        <div class="tp-actions">
-          ${topPick.tmdbUrl?`<a href="${esc(topPick.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="tp-btn-tmdb">More Info →</a>`:''}
-          <button class="tp-btn-share" data-title="${esc(topPick.title)}" onclick="shareFilm(this.dataset.title)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
-        </div>
-      </div>`;
-    listWrap.appendChild(tpCard);
-  }
-
-  // ── OTHER PICKS — split layout cards ──
-  if(others.length>0){
-    const moreLabel=document.createElement("p");
-    moreLabel.className="more-picks-label";
-    moreLabel.textContent="More for your mood";
-    listWrap.appendChild(moreLabel);
-
-    others.forEach(rec=>{
-      const pct=Math.round((rec.matchScore||.75)*100);
-      const icon=GENRE_ICONS[rec.genre]||"🎬";
-      const card=document.createElement("div");
-      card.className="split-card";
-      card.dataset.recJson=JSON.stringify(rec);
-      const ottBadges=(rec.streaming||[])
-        .filter(p=>p.name!=='Check JustWatch')
-        .slice(0,2)
-        .map(p=>`<a class="split-ott-badge" href="${esc(p.link||'#')}" target="_blank" rel="noopener noreferrer"><span class="split-ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`)
-        .join('');
-      const ottOrJW=ottBadges||`<span style="font-size:9px;color:var(--muted)">Check JustWatch</span>`;
-      const posterHtml=rec.poster
-        ?`<img src="${esc(rec.poster)}" class="split-poster" alt="${esc(rec.title)}" loading="lazy" onerror="this.outerHTML='${SPLIT_PH.replace(/'/g,"\'")}'">` : SPLIT_PH;
-      card.innerHTML=`
-        <div class="split-poster-wrap">
-          ${posterHtml}
-          <span class="split-genre-badge">${esc(rec.genre||'')}</span>
-        </div>
-        <div class="split-body">
-          <h3 class="split-title">${esc(rec.title)}</h3>
-          <div class="split-meta">
-            ${rec.releaseYear?`<span>${rec.releaseYear}</span>`:''}
-            ${rec.rating?`<span class="split-rating">★ ${rec.rating}</span>`:''}
-          </div>
-          <div class="split-match-row"><span>Mood match</span><span class="split-match-pct">${pct}%</span></div>
-          <div class="split-match-track"><div class="split-match-fill" data-pct="${pct}" style="width:0"></div></div>
-          <p class="split-explanation">${esc(rec.explanation||'')}</p>
-          <div class="split-ott">${ottOrJW}</div>
-          ${rec.tmdbUrl?`<a href="${esc(rec.tmdbUrl)}" target="_blank" rel="noopener noreferrer" class="split-more-btn">More Info →</a>`:''}
-        </div>`;
-      listWrap.appendChild(card);
-    });
-  }
-
-  chat.appendChild(listWrap);
-
-  // Animate match bars after paint
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    listWrap.querySelectorAll('[data-pct]').forEach(el=>el.style.width=el.getAttribute('data-pct')+'%');
-  }));
-
-  // Hide composer, show quick action bar
-  const composer=document.getElementById("composer");
-  if(composer)composer.style.display="none";
-  const qa=document.getElementById("quick-actions");
-  if(qa)qa.classList.add("show");
-  scrollChat();
-}
-
-/* ── RESET ── */
-function restartAll(){
-  document.getElementById("chat").innerHTML="";
-  mood="";selectedChips=[];selectedIntent="";selectedLang="any";
-  chatStep="idle";prefetchData=null;prefetchPromise=null;lastRecs=null;
-  adApiPromise=null;
-  clearInterval(adCountdownInterval);
-  hideAdGate();
-  closeCardOverlay();
-  document.getElementById("btn-watch-ad").style.display="flex";
-  document.getElementById("ad-timer-wrap").style.display="none";
-  document.getElementById("ad-simulated").classList.remove("show");
-  document.getElementById("mood-input").value="";
-  document.getElementById("mood-input").style.height="auto";
-  const gw=document.getElementById("input-glow-wrap");
-  if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
-  const rComp=document.getElementById("composer");if(rComp)rComp.style.display="";
-  const rQa=document.getElementById("quick-actions");if(rQa)rQa.classList.remove("show");
-  hideListeningState(true);
-  updateSendBtn();
-  init();
-}
-function quickChangeLang(){
-  closeCardOverlay();selectedLang="any";adApiPromise=null;
-  const chat=document.getElementById("chat");const ch=Array.from(chat.children);
-  let ku=ch.length,ic=0;
-  for(let i=0;i<ch.length;i++){if(ch[i].classList.contains("msg-user"))ic++;if(ic===2){ku=i+1;break;}}
-  while(chat.children.length>ku)chat.lastChild.remove();
-  const comp=document.getElementById("composer");if(comp)comp.style.display="";
-  const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
-  chatStep="awaiting_lang";adApiPromise=null;
-  setTimeout(showLangQuestion,150);
-}
-function changeIntent(){
-  selectedIntent="";selectedLang="any";adApiPromise=null;
-  closeCardOverlay();
-  const chat=document.getElementById("chat");const children=Array.from(chat.children);
-  let keepUntil=children.length;
-  for(let i=0;i<children.length;i++){if(children[i].classList.contains("msg-user")){keepUntil=i+1;break}}
-  while(chat.children.length>keepUntil)chat.lastChild.remove();
-  // Restore composer
-  const composer=document.getElementById("composer");
-  if(composer)composer.style.display="";
-  const qa=document.getElementById("quick-actions");
-  if(qa)qa.classList.remove("show");
-  const ciComp=document.getElementById("composer");if(ciComp)ciComp.style.display="";
-  const ciQa=document.getElementById("quick-actions");if(ciQa)ciQa.classList.remove("show");
-  chatStep="awaiting_intent";prefetchData=null;startPrefetch();
-  setTimeout(showIntentQuestion,100);
-}
-
-/* ── KEYBOARD ── */
-let _listenTimer=null;
-function showListeningState(){
-  const ls=document.getElementById("listening-state");
-  // Only show on idle step, no text typed
-  if(!ls||chatStep!=="idle")return;
-  const ta=document.getElementById("mood-input");
-  if(ta&&ta.value.trim().length>0)return;
-  // Simply add show — position is handled by CSS (absolute inside #chat)
-  ls.classList.add("show");
-}
-function hideListeningState(instant){
-  const ls=document.getElementById("listening-state");
-  if(!ls)return;
-  if(instant){
-    ls.classList.remove("show","fading");
-    return;
-  }
-  // Graceful 600ms fade out
-  ls.classList.add("fading");
-  setTimeout(function(){
-    ls.classList.remove("show","fading");
-  },620);
-}
-
-function initKeyboard(){
-  // Only handle composer layout on keyboard open
-  // Listening state is now purely focus/blur — no visualViewport needed
-  if(!window.visualViewport||_keyboardInited)return;
-  _keyboardInited=true;
-  function update(){
-    const kbH=Math.max(0,window.innerHeight-window.visualViewport.height);
-    const comp=document.getElementById("composer");
-    comp.style.transform=kbH>50?`translateY(-${kbH}px)`:"translateY(0)";
-    if(kbH>50)scrollChat();
-  }
-  window.visualViewport.addEventListener("resize",update,{passive:true});
-  window.visualViewport.addEventListener("scroll",update,{passive:true});
-}
-
-/* ── HELPERS ── */
-/* ── CARD OVERLAY ── */
-let _overlayRec=null;
-function openCardOverlay(rec){
-  _overlayRec=rec;
-  const ol=document.getElementById("card-overlay");
-  const icon=GENRE_ICONS[rec.genre]||"🎬";
-  const pct=Math.round((rec.matchScore||.75)*100);
-  // Poster
-  const pw=document.getElementById("co-poster-wrap");
-  const CO_PH='<div class="co-poster-ph"><svg width="64" height="64" viewBox="0 0 52 52" fill="none" style="opacity:.3"><rect x="2" y="2" width="48" height="48" rx="8" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="10" stroke="#C8895A" stroke-width="1.5"/><circle cx="26" cy="26" r="3" fill="#C8895A"/><rect x="4" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="4" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="4" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/><rect x="40" y="40" width="8" height="8" rx="2" fill="#C8895A" opacity=".5"/></svg></div>';
-  pw.innerHTML=rec.poster?`<img src="${esc(rec.poster)}" class="co-poster" alt="${esc(rec.title)}" onerror="this.outerHTML='${CO_PH}'">`:(CO_PH);
-  // Badges
-  const badges=document.getElementById("co-badges");
-  badges.innerHTML=(rec.isTopPick?'<span class="co-top-badge">Top Pick</span>':'')+`<span class="co-genre">${icon} ${esc(rec.genre||"")}</span>`;
-  // Title + meta
-  document.getElementById("co-title").textContent=rec.title||"";
-  const meta=document.getElementById("co-meta");
-  meta.innerHTML=(rec.releaseYear?`<span>${rec.releaseYear}</span>`:"")+
-    (rec.runtime?`<span>${Math.floor(rec.runtime/60)}h ${rec.runtime%60}m</span>`:"")+
-    (rec.rating?`<span class="co-rating">★ ${rec.rating}</span>`:"");
-  // Languages
-  const langs=document.getElementById("co-langs");
-  langs.textContent=(rec.spokenLanguages&&rec.spokenLanguages.length)?`🗣 ${rec.spokenLanguages.slice(0,3).join(" · ")}`:"";
-  // Match
-  document.getElementById("co-pct").textContent=pct+"%";
-  document.getElementById("co-match-fill").style.width=pct+"%";
-  // Tagline + explanation
-  document.getElementById("co-tagline").textContent=rec.tagline?`"${rec.tagline}"`:"";
-  document.getElementById("co-explanation").textContent=rec.explanation||"";
-  // OTT
-  document.getElementById("co-ott").innerHTML=renderOTT(rec.streaming);
-  // TMDB
-  const tmdbBtn=document.getElementById("co-tmdb-btn");
-  tmdbBtn.href=rec.tmdbUrl||"https://www.themoviedb.org";
-  // Open
-  ol.classList.add("open");
-  document.body.style.overflow="hidden";
-  // Swipe down to close
-  setupOverlaySwipe(ol);
-}
-function closeCardOverlay(){
-  const ol=document.getElementById("card-overlay");
-  ol.classList.remove("open");
-  document.body.style.overflow="";
-}
-function setupOverlaySwipe(el){
-  let startY=0;
-  el.ontouchstart=e=>startY=e.touches[0].clientY;
-  el.ontouchmove=e=>{
-    const dy=e.touches[0].clientY-startY;
-    if(dy>0){el.style.transform=`translateY(${dy}px)`;e.preventDefault();}
-  };
-  el.ontouchend=e=>{
-    const dy=e.changedTouches[0].clientY-startY;
-    el.style.transform="";
-    if(dy>80){closeCardOverlay();}
-  };
-}
-
-function renderSpokenLangs(langs, runtime){
-  const parts=[];
-  if(runtime&&runtime>0){
-    const h=Math.floor(runtime/60),m=runtime%60;
-    parts.push(`<span class="card-runtime">${h>0?h+"h ":""}${m}m</span>`);
-  }
-  if(langs&&langs.length>0){
-    const display=langs.slice(0,3).join(" · ");
-    parts.push(`<span class="card-langs">🗣 ${esc(display)}</span>`);
-  }
-  if(!parts.length)return"";
-  return`<div class="card-meta-row">${parts.join('<span class="meta-dot">·</span>')}</div>`;
-}
-function renderOTT(s){
-  if(!s||!s.length)return'<span class="ott-none">Not on major streaming · <a href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="color:var(--gold-l);text-decoration:none">Check JustWatch</a></span>';
-  const hasJW=s.some(p=>p.name==="Check JustWatch");
-  const regular=s.filter(p=>p.name!=="Check JustWatch");
-  let html='<div class="ott-row">'+regular.map(p=>`<a class="ott-badge" href="${esc(p.link||"#")}" target="_blank" rel="noopener noreferrer"><span class="ott-dot" style="background:${esc(p.colour)}"></span>${esc(p.name)}</a>`).join("");
-  if(hasJW||regular.length===0)html+=`<a class="ott-badge" href="https://www.justwatch.com/in" target="_blank" rel="noopener noreferrer" style="border-color:rgba(232,125,13,.3)"><span class="ott-dot" style="background:#E87D0D"></span>JustWatch</a>`;
-  return html+'</div>';
-}
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function shareFilm(title){const text=`Moodfilm picked "${title}" for my mood.\nhttps://aaronkankipati.github.io/moodfilm-app/`;if(navigator.share)navigator.share({title:"Moodfilm Pick",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
-function shareAll(){if(!lastRecs)return;const text="My Moodfilm picks\n"+lastRecs.map(r=>r.title).join(", ")+"\nhttps://aaronkankipati.github.io/moodfilm-app/";if(navigator.share)navigator.share({title:"My Moodfilm Picks",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
-function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
-
-/* ── INIT ── */
-function init(){
-  const h=new Date().getHours();
-  const tw=h>=5&&h<12?"today":h>=12&&h<17?"this afternoon":h>=17&&h<22?"tonight":"right now";
-  const greetingWrap=document.createElement("div");
-  greetingWrap.className="msg-app slide-up";greetingWrap.style.maxWidth="100%";
-  greetingWrap.innerHTML=`
-    <div class="msg-avatar">🎬</div>
-    <div class="bubble-app" style="flex:1">
-      <div style="margin-bottom:12px">
-        <span class="serif" style="font-size:clamp(22px,5.5vw,28px);display:block;margin-bottom:6px">How are you feeling ${tw}?</span>
-        <span style="font-size:13px;color:var(--muted);line-height:1.65;display:block">Tell me what's going on and I'll find the perfect film for this moment.</span>
+  <!-- Card 1 -->
+  <div class="film-card">
+    <div class="film-card-num">02</div>
+    <div class="film-poster-col">
+      <img src="https://image.tmdb.org/t/p/w342/hcKIFRi1D7dEVH5EUjxMcnmxuG8.jpg" alt="Lost in Translation" onerror="this.outerHTML='<div class=film-poster-ph><svg class=ph-icon width=32 height=32 viewBox=&quot;0 0 52 52&quot; fill=none><rect x=2 y=2 width=48 height=48 rx=8 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=10 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=3 fill=%23D4A056/></svg></div>'">
+      <div class="film-genre-badge">Drama</div>
+    </div>
+    <div class="film-divider"></div>
+    <div class="film-body">
+      <h3 class="film-title">Lost in Translation</h3>
+      <div class="film-meta-row">
+        <span class="film-year">2003</span>
+        <span class="film-mid">·</span>
+        <span class="film-rating">★ 7.8</span>
+        <span class="film-mid">·</span>
+        <span class="film-runtime">1h 42m</span>
       </div>
-      <div style="height:1px;background:linear-gradient(90deg,rgba(200,137,90,.3),transparent);margin:12px 0"></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(200,137,90,.12);border:1px solid rgba(200,137,90,.25);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">1</span>
-          <span>Tell me how you're feeling and what you need</span>
+      <div class="film-match-row">
+        <div class="film-match-track">
+          <div class="film-match-fill" style="width: 88%"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(200,137,90,.12);border:1px solid rgba(200,137,90,.25);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">2</span>
-          <span>Your film picks are completely free, always</span>
-        </div>
+        <span class="film-match-pct">88%</span>
       </div>
-    </div>`;
-  document.getElementById("chat").appendChild(greetingWrap);
+      <p class="film-explanation">Two people adrift in a city that doesn't speak their language. Coppola captures the specific loneliness of being somewhere surrounded by people and still feeling utterly alone.</p>
+      <div class="film-bottom">
+        <div class="film-ott-mini">
+          <span class="film-ott-dot-badge"><span class="ott-micro-dot" style="background:#E50914"></span>Netflix</span>
+        </div>
+        <a href="#" class="film-link">Info</a>
+      </div>
+    </div>
+  </div>
 
-  buildComposerPills();
+  <!-- Card 2 -->
+  <div class="film-card">
+    <div class="film-card-num">03</div>
+    <div class="film-poster-col">
+      <img src="https://image.tmdb.org/t/p/w342/sFDmBlfVqjUFLIFoKjSCBT0gqKT.jpg" alt="Aftersun" onerror="this.outerHTML='<div class=film-poster-ph><svg class=ph-icon width=32 height=32 viewBox=&quot;0 0 52 52&quot; fill=none><rect x=2 y=2 width=48 height=48 rx=8 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=10 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=3 fill=%23D4A056/></svg></div>'">
+      <div class="film-genre-badge">Drama</div>
+    </div>
+    <div class="film-divider"></div>
+    <div class="film-body">
+      <h3 class="film-title">Aftersun</h3>
+      <div class="film-meta-row">
+        <span class="film-year">2022</span>
+        <span class="film-mid">·</span>
+        <span class="film-rating">★ 7.7</span>
+        <span class="film-mid">·</span>
+        <span class="film-runtime">1h 41m</span>
+      </div>
+      <div class="film-match-row">
+        <div class="film-match-track">
+          <div class="film-match-fill" style="width: 84%"></div>
+        </div>
+        <span class="film-match-pct">84%</span>
+      </div>
+      <p class="film-explanation">Memory as grief. A daughter reconstructing a holiday with her father, slowly realising what she couldn't see then. Devastating in its tenderness.</p>
+      <div class="film-bottom">
+        <div class="film-ott-mini">
+          <span class="film-ott-dot-badge"><span class="ott-micro-dot" style="background:#1CE783"></span>Mubi</span>
+        </div>
+        <a href="#" class="film-link">Info</a>
+      </div>
+    </div>
+  </div>
 
-  const ta=document.getElementById("mood-input");
-  const wrap=document.getElementById("input-glow-wrap");
-  // Focus: show listening state immediately — no delay needed
-  // because position is CSS-driven, not calculated
-  ta.addEventListener("focus",function(){
-    if(wrap)wrap.classList.add("focused");
-    showListeningState();
-  },{passive:true});
+  <!-- Card 3 -->
+  <div class="film-card">
+    <div class="film-card-num">04</div>
+    <div class="film-poster-col">
+      <img src="https://image.tmdb.org/t/p/w342/gKkl37BQuKTanygYQo1otkqBDJO.jpg" alt="The Boy, the Mole" onerror="this.outerHTML='<div class=film-poster-ph><svg class=ph-icon width=32 height=32 viewBox=&quot;0 0 52 52&quot; fill=none><rect x=2 y=2 width=48 height=48 rx=8 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=10 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=3 fill=%23D4A056/></svg></div>'">
+      <div class="film-genre-badge">Animation</div>
+    </div>
+    <div class="film-divider"></div>
+    <div class="film-body">
+      <h3 class="film-title">The Boy, the Mole, the Fox and the Horse</h3>
+      <div class="film-meta-row">
+        <span class="film-year">2022</span>
+        <span class="film-mid">·</span>
+        <span class="film-rating">★ 8.2</span>
+        <span class="film-mid">·</span>
+        <span class="film-runtime">0h 35m</span>
+      </div>
+      <div class="film-match-row">
+        <div class="film-match-track">
+          <div class="film-match-fill" style="width: 80%"></div>
+        </div>
+        <span class="film-match-pct">80%</span>
+      </div>
+      <p class="film-explanation">A quiet miracle of kindness. Four unlikely companions on a journey that asks the softest, most important questions. You'll feel held by the end.</p>
+      <div class="film-bottom">
+        <div class="film-ott-mini">
+          <span class="film-ott-dot-badge"><span class="ott-micro-dot" style="background:#CCCCCC"></span>Apple TV+</span>
+        </div>
+        <a href="#" class="film-link">Info</a>
+      </div>
+    </div>
+  </div>
 
-  // Blur: hide listening state, but wait briefly to
-  // avoid hiding when user taps a composer pill
-  ta.addEventListener("blur",function(){
-    if(wrap)wrap.classList.remove("focused");
-    clearTimeout(_listenTimer);
-    _listenTimer=setTimeout(function(){
-      // Only hide if focus moved outside composer
-      const active=document.activeElement;
-      const comp=document.getElementById("composer");
-      if(!comp||!comp.contains(active)){
-        hideListeningState();
-      }
-    },150);
-  },{passive:true});
+  <!-- Card 4 — no poster demo -->
+  <div class="film-card">
+    <div class="film-card-num">05</div>
+    <div class="film-poster-col">
+      <img src="https://image.tmdb.org/t/p/w342/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg" alt="Flow" onerror="this.outerHTML='<div class=film-poster-ph><svg class=ph-icon width=32 height=32 viewBox=&quot;0 0 52 52&quot; fill=none><rect x=2 y=2 width=48 height=48 rx=8 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=10 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=3 fill=%23D4A056/></svg></div>'">
+      <div class="film-genre-badge">Animation</div>
+    </div>
+    <div class="film-divider"></div>
+    <div class="film-body">
+      <h3 class="film-title">Flow</h3>
+      <div class="film-meta-row">
+        <span class="film-year">2024</span>
+        <span class="film-mid">·</span>
+        <span class="film-rating">★ 8.1</span>
+        <span class="film-mid">·</span>
+        <span class="film-runtime">1h 24m</span>
+      </div>
+      <div class="film-match-row">
+        <div class="film-match-track">
+          <div class="film-match-fill" style="width: 75%"></div>
+        </div>
+        <span class="film-match-pct">75%</span>
+      </div>
+      <p class="film-explanation">No dialogue. Just a small cat finding its way in a flooded world alongside improbable companions. Silent, stunning, and unexpectedly moving.</p>
+      <div class="film-bottom">
+        <div class="film-ott-mini">
+          <span class="film-ott-dot-badge"><span class="ott-micro-dot" style="background:#00A8E0"></span>Prime Video</span>
+        </div>
+        <a href="#" class="film-link">Info</a>
+      </div>
+    </div>
+  </div>
 
-  initKeyboard();
-  scrollChat();
-}
+  <!-- Card 5 -->
+  <div class="film-card">
+    <div class="film-card-num">06</div>
+    <div class="film-poster-col">
+      <img src="https://image.tmdb.org/t/p/w342/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg" alt="Look Back" onerror="this.outerHTML='<div class=film-poster-ph><svg class=ph-icon width=32 height=32 viewBox=&quot;0 0 52 52&quot; fill=none><rect x=2 y=2 width=48 height=48 rx=8 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=10 stroke=%23D4A056 stroke-width=1.5/><circle cx=26 cy=26 r=3 fill=%23D4A056/></svg></div>'">
+      <div class="film-genre-badge">Animation</div>
+    </div>
+    <div class="film-divider"></div>
+    <div class="film-body">
+      <h3 class="film-title">Look Back</h3>
+      <div class="film-meta-row">
+        <span class="film-year">2024</span>
+        <span class="film-mid">·</span>
+        <span class="film-rating">★ 8.1</span>
+        <span class="film-mid">·</span>
+        <span class="film-runtime">0h 58m</span>
+      </div>
+      <div class="film-match-row">
+        <div class="film-match-track">
+          <div class="film-match-fill" style="width: 75%"></div>
+        </div>
+        <span class="film-match-pct">75%</span>
+      </div>
+      <p class="film-explanation">A friendship forged through creation, fractured by time, and held together by what we make. Fujimoto distills grief and love into 58 quiet minutes.</p>
+      <div class="film-bottom">
+        <div class="film-ott-mini">
+          <span class="film-ott-dot-badge"><span class="ott-micro-dot" style="background:#00A8E0"></span>Prime Video</span>
+        </div>
+        <a href="#" class="film-link">Info</a>
+      </div>
+    </div>
+  </div>
 
-/* ══ SPLASH ══════════════════════════════════════════════ */
-(function(){
-  let dismissed=false;
-  function dismissSplash(){
-    if(dismissed)return;dismissed=true;
-    const s=document.getElementById("splash");s.classList.add("fade-out");
-    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s)},1300);
-  }
-  function runSplashSequence(){
-    const rule=document.getElementById("splash-rule-top");
-    const mark=document.getElementById("splash-mark");
-    const title=document.getElementById("splash-title");
-    const tagline=document.getElementById("splash-tagline");
-    const ruleBot=document.getElementById("splash-rule-bottom");
-    const enterEl=document.getElementById("splash-enter");
-    requestAnimationFrame(()=>{
-      // Rule draws first — sets the stage
-      setTimeout(()=>rule.classList.add("drawn"),80);
-      // Mark blooms in — slower, more presence
-      setTimeout(()=>mark.classList.add("show"),350);
-      // Title reveals — waits for mark to settle
-      setTimeout(()=>title.classList.add("reveal"),900);
-      // Bottom rule draws
-      setTimeout(()=>ruleBot.classList.add("drawn"),1300);
-      // Tagline whispers in
-      setTimeout(()=>tagline.classList.add("show"),2200);
-      // Enter prompt — appears last, breathes
-      setTimeout(()=>{
-        enterEl.classList.add("show");
-        setTimeout(()=>enterEl.classList.add("breathing"),800);
-      },3400);
-      // Auto-dismiss — enough time to read everything
-      setTimeout(dismissSplash,7000);
-    });
-  }
-  let splashReady=false;
-  setTimeout(()=>splashReady=true,1900);
-  document.getElementById("splash").addEventListener("touchend",e=>{e.preventDefault();if(splashReady)dismissSplash()},{passive:false});
-  document.getElementById("splash").addEventListener("click",()=>{if(splashReady)dismissSplash()});
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",runSplashSequence);
-  else runSplashSequence();
-})();
+</div>
 
-init();
-</script>
+<!-- ── QUICK ACTIONS ── -->
+<div class="quick-bar">
+  <button class="qa-btn">↺ New Mood</button>
+  <button class="qa-btn">🌍 Language</button>
+  <button class="qa-btn">🎯 Vibe</button>
+  <button class="qa-btn gold">↑ Share</button>
+</div>
+
 </body>
 </html>
