@@ -2148,21 +2148,40 @@ function showError(type, retryFn){
   const messages={
     OFFLINE:        {icon:"📡", title:"You're offline", sub:"Check your connection and try again."},
     TIMEOUT:        {icon:"⏱", title:"That took too long", sub:"The AI is busy. Try again in a moment."},
-    EMPTY_RESULTS:  {icon:"🎬", title:"No films found", sub:"Try describing your mood differently."},
+    EMPTY_RESULTS:  {icon:"🎬", title:"No films found", sub:"Try a different mood or vibe."},
     REQUEST_FAILED: {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
     DEFAULT:        {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
   };
   const m=messages[type]||messages.DEFAULT;
   const w=document.createElement("div");
   w.className="msg-app slide-up";
+  // Use a data attribute for retry count — avoids closure/serialisation issues
+  w.dataset.retryCount="0";
   w.innerHTML=`<div class="msg-avatar">${AVATAR_SVG}</div>
     <div class="bubble-app error-bubble">
       <div class="error-icon">${m.icon}</div>
       <div class="error-title">${m.title}</div>
       <div class="error-sub">${m.sub}</div>
-      <button class="error-retry" onclick="this.closest('.error-bubble').parentElement.parentElement.remove();(${retryFn.toString()})()">Try again</button>
+      <button class="error-retry" id="err-retry-btn">Try again</button>
     </div>`;
-  document.getElementById("chat").appendChild(w);
+  // Wire retry button — no inline string serialisation
+  const chat=document.getElementById("chat");
+  chat.appendChild(w);
+  const btn=w.querySelector("#err-retry-btn");
+  btn.id=""; // clear id to avoid duplicates
+  btn.onclick=function(){
+    const count=parseInt(w.dataset.retryCount||"0");
+    w.remove();
+    if(count===0){
+      // First retry — clean re-attempt of the API
+      w.dataset.retryCount="1";
+      adApiPromise=null;
+      try{ retryFn(); }catch(e){ restartAll(); }
+    } else {
+      // Second retry — user is stuck, hard reset to main page
+      restartAll();
+    }
+  };
   scrollChat();
 }
 
@@ -2188,8 +2207,12 @@ function restartAll(){
   if(gw){gw.classList.remove("nudge");gw.classList.remove("focused");}
   const chatEl2=document.getElementById("chat");
   if(chatEl2)chatEl2.style.padding="";
-  const rComp=document.getElementById("composer");if(rComp)rComp.style.display="";
+  const rComp=document.getElementById("composer");
+  if(rComp){rComp.style.display="";rComp.classList.remove("collapsed");}
   const rQa=document.getElementById("quick-actions");if(rQa)rQa.classList.remove("show");
+  // Also remove collapsed from bottom-bar children
+  const pills=document.getElementById("composer-pills");
+  if(pills)pills.classList.remove("hidden");
   hideListeningState(true);
   updateSendBtn();
   init();
@@ -2221,7 +2244,8 @@ function quickChangeLang(){
   }
   while(chat.children.length>ku) chat.lastChild.remove();
 
-  const comp=document.getElementById("composer");if(comp)comp.style.display="";
+  const comp=document.getElementById("composer");
+  if(comp){comp.style.display="";comp.classList.remove("collapsed");}
   const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
   chatStep="awaiting_lang";
   // Tracker: reset fully, mark steps 0+1 done, activate step 2 (Language)
