@@ -1629,18 +1629,21 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <div class="jt-dot" id="jt-dot-1"></div>
     <div class="jt-line" id="jt-line-1"></div>
     <div class="jt-dot" id="jt-dot-2"></div>
+    <div class="jt-line" id="jt-line-2"></div>
+    <div class="jt-dot" id="jt-dot-3"></div>
   </div>
   <div class="jt-labels">
-    <span class="jt-label" id="jt-lbl-0">Mood</span>
+    <span class="jt-label" id="jt-lbl-0">New Mood</span>
     <span class="jt-label" id="jt-lbl-1">Vibe</span>
     <span class="jt-label" id="jt-lbl-2">Language</span>
+    <span class="jt-label" id="jt-lbl-3">Your Films</span>
   </div>
 </div>
 
 <div id="quick-actions">
   <button class="qa-chip" onclick="restartAll()">↺ New Mood</button>
-  <button class="qa-chip" onclick="quickChangeLang()">🌍 Language</button>
   <button class="qa-chip" onclick="changeIntent()">🎯 Vibe</button>
+  <button class="qa-chip" onclick="quickChangeLang()">🌍 Language</button>
   <button class="qa-chip gold" onclick="shareAll()">↑ Share</button>
 </div>
 
@@ -1697,34 +1700,34 @@ function advanceTracker(completedStep){
   if(nl)nl.classList.add("active");
 }
 function completeTracker(){
-  // All done — mark all filled
-  for(let i=0;i<3;i++){
+  // All 4 dots done, all 3 lines filled
+  for(let i=0;i<4;i++){
     const d=document.getElementById("jt-dot-"+i);
     const l=document.getElementById("jt-lbl-"+i);
     if(d){d.classList.remove("active");d.classList.add("done");}
     if(l){l.classList.remove("active");l.classList.add("done");}
   }
-  for(let i=0;i<2;i++){
+  for(let i=0;i<3;i++){
     const ln=document.getElementById("jt-line-"+i);
     if(ln)ln.classList.add("filled");
   }
-  // Fade tracker out smoothly as results come in
+  // Fade tracker out smoothly after results settle
   setTimeout(()=>{
     const t=document.getElementById("journey-tracker");
     if(t){t.style.transition="opacity .8s ease";t.style.opacity="0";
       setTimeout(()=>t.style.display="none",800);}
-  },600);
+  },1200);
 }
 function resetTracker(){
   const t=document.getElementById("journey-tracker");
   if(t){t.classList.remove("show");t.style.opacity="";t.style.display="";}
-  for(let i=0;i<3;i++){
+  for(let i=0;i<4;i++){
     const d=document.getElementById("jt-dot-"+i);
     const l=document.getElementById("jt-lbl-"+i);
     if(d){d.className="jt-dot";}
     if(l){l.className="jt-label";}
   }
-  for(let i=0;i<2;i++){
+  for(let i=0;i<3;i++){
     const ln=document.getElementById("jt-line-"+i);
     if(ln)ln.classList.remove("filled");
   }
@@ -2014,6 +2017,8 @@ function selectLang(lang,row){
   row.classList.add("locked");
   chatStep="ad_gate";
   appendUser(lang.label);
+  // Advance tracker: Language done → Your Films active (waiting for results)
+  advanceTracker(2);
   // Show ad gate after short delay
   setTimeout(showAdGate, 400);
 }
@@ -2231,6 +2236,20 @@ function quickChangeLang(){
   const comp=document.getElementById("composer");if(comp)comp.style.display="";
   const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
   chatStep="awaiting_lang";
+  // Tracker: reset fully, mark steps 0+1 done, activate step 2 (Language)
+  resetTracker();
+  showTracker();
+  // Mark Mood done
+  const d0=document.getElementById("jt-dot-0");if(d0){d0.className="jt-dot done";}
+  const l0=document.getElementById("jt-lbl-0");if(l0){l0.className="jt-label done";}
+  const ln0=document.getElementById("jt-line-0");if(ln0)ln0.classList.add("filled");
+  // Mark Vibe done
+  const d1=document.getElementById("jt-dot-1");if(d1){d1.className="jt-dot done";}
+  const l1=document.getElementById("jt-lbl-1");if(l1){l1.className="jt-label done";}
+  const ln1=document.getElementById("jt-line-1");if(ln1)ln1.classList.add("filled");
+  // Activate Language
+  const d2=document.getElementById("jt-dot-2");if(d2){d2.className="jt-dot active";}
+  const l2=document.getElementById("jt-lbl-2");if(l2){l2.className="jt-label active";}
   startPrefetch();
   setTimeout(showLangQuestion, 180);
 }
@@ -2264,6 +2283,14 @@ function changeIntent(){
   const comp=document.getElementById("composer");if(comp)comp.style.display="";
   const qa=document.getElementById("quick-actions");if(qa)qa.classList.remove("show");
   chatStep="awaiting_intent";
+  // Tracker: reset fully, mark step 0 done, activate step 1 (Vibe)
+  resetTracker();
+  showTracker();
+  const d0c=document.getElementById("jt-dot-0");if(d0c){d0c.className="jt-dot done";}
+  const l0c=document.getElementById("jt-lbl-0");if(l0c){l0c.className="jt-label done";}
+  const ln0c=document.getElementById("jt-line-0");if(ln0c)ln0c.classList.add("filled");
+  const d1c=document.getElementById("jt-dot-1");if(d1c){d1c.className="jt-dot active";}
+  const l1c=document.getElementById("jt-lbl-1");if(l1c){l1c.className="jt-label active";}
   startPrefetch();
   setTimeout(showIntentQuestion, 120);
 }
@@ -2551,6 +2578,8 @@ function init(){
 
 /* ── RESULTS ── */
 function renderResults(recs,moodData){
+  // Step 3 complete — "Your Films" done, tracker fills and fades
+  completeTracker();
   if(!recs||recs.length===0){
     showError("EMPTY_RESULTS",function(){adApiPromise=null;chatStep="awaiting_lang";changeIntent();});
     return;
