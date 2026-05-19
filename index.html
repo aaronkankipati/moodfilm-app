@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://aaronkankipati.github.io/moodfilm-app/og-image.png">
 <meta property="og:url" content="https://aaronkankipati.github.io/moodfilm-app/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=EB+Garamond:ital,wght@0,400;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=EB+Garamond:ital,wght@0,400;1,400;1,500&family=Outfit:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -26,7 +26,7 @@
   --paper:#EDE8E2;--paper2:#C4BAB0;--muted:#7A7088;
   --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
 }
-html,body{width:100%;height:100%;overflow:hidden;position:fixed;inset:0;background:var(--ink);color:var(--paper);font-family:'DM Sans',sans-serif}
+html,body{width:100%;height:100%;overflow:hidden;position:fixed;inset:0;background:var(--ink);color:var(--paper);font-family:'Lora',Georgia,serif}
 button,a,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");background-size:160px;pointer-events:none;z-index:9998;mix-blend-mode:overlay;opacity:.5}
 
@@ -52,13 +52,27 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 #splash.fade-out{opacity:0;pointer-events:none}
 
 /* Thin horizontal rule draws left to right */
+@keyframes ruleSweep{
+  0%{background-position:200% center}
+  100%{background-position:-200% center}
+}
 .splash-rule{
   width:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,137,90,.5),transparent);
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(200,137,90,.15) 20%,
+    rgba(236,196,130,.9) 50%,
+    rgba(200,137,90,.15) 80%,
+    transparent 100%);
+  background-size:200% 100%;
   margin-bottom:44px;
   transition:width 1.2s cubic-bezier(.76,0,.24,1);
+  box-shadow:0 0 8px rgba(200,137,90,.35),0 0 20px rgba(200,137,90,.12);
 }
-.splash-rule.drawn{width:100px}
+.splash-rule.drawn{
+  width:160px;
+  animation:ruleSweep 3s ease-in-out 1.4s infinite;
+}
 
 /* Film mark — larger, more present, subtle entry */
 .splash-mark{
@@ -103,30 +117,31 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   line-height:1.18;
   text-align:center;
   color:var(--paper);
-  opacity:0;
-  transform:translateY(12px);
-  transition:opacity 1.2s cubic-bezier(.25,.46,.45,.94) 1.1s,
-             transform 1.2s cubic-bezier(.25,.46,.45,.94) 1.1s;
+  opacity:0;transform:translateY(12px);
+  transition:opacity 1.2s cubic-bezier(.25,.46,.45,.94) 1.1s,transform 1.2s cubic-bezier(.25,.46,.45,.94) 1.1s;
 }
-@keyframes taglineGlow{
-  0%,100%{text-shadow:none}
-  50%{text-shadow:0 2px 32px rgba(200,137,90,.18)}
-}
-.splash-tagline.show{
-  opacity:1;
-  transform:translateY(0);
-  animation:taglineGlow 4s ease-in-out 2.2s infinite;
-}
+@keyframes taglineGlow{0%,100%{text-shadow:none}50%{text-shadow:0 2px 32px rgba(200,137,90,.18)}}
+.splash-tagline.show{opacity:1;transform:translateY(0);animation:taglineGlow 4s ease-in-out 2.2s infinite;}
 
 /* Bottom rule — wider, more presence */
 .splash-rule-bottom{
   position:absolute;
-  bottom:50px;left:50%;transform:translateX(-50%);
+  bottom:72px;left:50%;transform:translateX(-50%);
   width:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,137,90,.25),transparent);
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(200,137,90,.12) 20%,
+    rgba(236,196,130,.5) 50%,
+    rgba(200,137,90,.12) 80%,
+    transparent 100%);
+  background-size:200% 100%;
+  box-shadow:0 0 6px rgba(200,137,90,.2);
   transition:width 1.1s cubic-bezier(.76,0,.24,1) 1.2s;
 }
-.splash-rule-bottom.drawn{width:100px}
+.splash-rule-bottom.drawn{
+  width:120px;
+  animation:ruleSweep 3.5s ease-in-out 2s infinite;
+}
 
 /* Enter prompt — warmer, more personal */
 .splash-enter{
@@ -152,41 +167,162 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   bottom:16px;left:0;right:0;
   text-align:center;
   font-family:'Cormorant Garamond',serif;
-  font-size:11.5px;
-  font-style:italic;
-  font-weight:300;
+  font-size:11.5px;font-style:italic;font-weight:300;
   letter-spacing:.14em;
-  color:rgba(236,220,200,.6);
-  opacity:0;
-  transition:opacity 1.4s ease 2.4s;
+  color:rgba(236,220,200,.55);
+  opacity:0;transition:opacity 1.4s ease 2.4s;
 }
 .splash-house.show{opacity:1}
 
+
+/* ── SPLASH SKYLINE ── */
 .splash-skyline{
+  /* Full width, natural aspect ratio — entire skyline visible edge to edge */
   position:absolute;
   top:0;left:0;right:0;
-  width:100%;
-  /* Respect the image's 853×304 ratio — fills full width naturally */
+  width:108%;
+  left:-4%;right:-4%;
+  /* 853:304 ratio — on a 390px wide phone this is ~174px tall, full image shown */
   aspect-ratio:853/304;
-  background:center top/cover no-repeat;
-  /* Buildings stay fully visible — only the very bottom edge fades */
+  background:center center/100% 100% no-repeat;
+  /* Soft bottom fade only — sides and top are flush with screen edge */
   -webkit-mask-image:linear-gradient(to bottom,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) 65%,
-    rgba(0,0,0,.4) 85%,
-    transparent 100%);
+    black 0%, black 60%, rgba(0,0,0,.4) 85%, transparent 100%);
   mask-image:linear-gradient(to bottom,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) 65%,
-    rgba(0,0,0,.4) 85%,
-    transparent 100%);
-  opacity:0;
-  transform:translateY(-8px) scale(1.02);
+    black 0%, black 60%, rgba(0,0,0,.4) 85%, transparent 100%);
+  opacity:0;transform:translateY(-8px) scale(1.02);
   transition:opacity 1.6s cubic-bezier(.2,.7,.2,1) .1s,
              transform 1.6s cubic-bezier(.2,.7,.2,1) .1s;
   pointer-events:none;
 }
-.splash-skyline.show{opacity:1;transform:translateY(0) scale(1);}
+.splash-skyline.show{opacity:1;transform:translateY(0) scale(1)}
+
+
+/* ── BOTTOM GLOW — after input, light from below ── */
+#bottom-glow{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  height:180px;
+  background:radial-gradient(ellipse 70% 100% at 50% 100%,
+    rgba(200,137,90,.18) 0%,
+    rgba(200,137,90,.08) 40%,
+    transparent 100%);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 1.2s cubic-bezier(.25,.46,.45,.94);
+  z-index:5;
+}
+#bottom-glow.lit{opacity:1}
+@keyframes glowPulse{
+  0%,100%{opacity:.85}
+  50%{opacity:1}
+}
+#bottom-glow.lit{animation:glowPulse 3.5s ease-in-out infinite}
+
+
+/* ── JOURNEY TRACKER ───────────────────────────────────
+   Three steps: Mood → Vibe → Language
+   Appears after input collapses, replaces composer bar.
+   Thin connecting lines, minimal dots, soft gold fill.
+   ──────────────────────────────────────────────────── */
+#journey-tracker{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  padding:14px 24px calc(14px + var(--safe-b));
+  background:var(--ink2);
+  border-top:1px solid rgba(160,150,180,.1);
+  flex-shrink:0;
+  gap:8px;
+}
+#journey-tracker.show{display:flex}
+
+/* The track itself */
+.jt-track{
+  display:flex;
+  align-items:center;
+  width:100%;
+  max-width:280px;
+  position:relative;
+}
+
+/* Connecting line between dots */
+.jt-line{
+  flex:1;height:1px;
+  background:rgba(200,137,90,.15);
+  position:relative;
+  overflow:hidden;
+}
+.jt-line::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,rgba(200,137,90,.7),rgba(236,196,130,.9));
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .7s cubic-bezier(.76,0,.24,1);
+}
+.jt-line.filled::after{transform:scaleX(1)}
+
+/* Step dot */
+.jt-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  border:1.5px solid rgba(200,137,90,.35);
+  background:transparent;
+  flex-shrink:0;
+  position:relative;
+  transition:border-color .4s ease, background .4s ease, box-shadow .4s ease;
+  z-index:1;
+}
+.jt-dot.done{
+  border-color:rgba(200,137,90,.8);
+  background:rgba(200,137,90,.9);
+  box-shadow:0 0 8px rgba(200,137,90,.4);
+}
+.jt-dot.active{
+  border-color:rgba(200,137,90,.6);
+  background:transparent;
+  box-shadow:0 0 10px rgba(200,137,90,.3);
+  animation:dotPulse 1.8s ease-in-out infinite;
+}
+@keyframes dotPulse{
+  0%,100%{box-shadow:0 0 4px rgba(200,137,90,.2)}
+  50%{box-shadow:0 0 14px rgba(200,137,90,.5),0 0 4px rgba(200,137,90,.4)}
+}
+
+/* Labels below the track */
+.jt-labels{
+  display:flex;
+  justify-content:space-between;
+  width:100%;
+  max-width:280px;
+}
+.jt-label{
+  font-family:'Lora',Georgia,serif;
+  font-size:9.5px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(200,137,90,.3);
+  text-align:center;
+  flex:1;
+  transition:color .4s ease;
+}
+.jt-label:first-child{text-align:left}
+.jt-label:last-child{text-align:right}
+.jt-label.done{color:rgba(200,137,90,.65)}
+.jt-label.active{color:rgba(236,196,130,.85)}
+
+
+/* ── BOTTOM BAR — single keyboard-avoidance unit ── */
+#bottom-bar{
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+  position:relative;
+}
 
 /* ══ APP SHELL ════════════════════════════════════════════ */
 #app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--safe-t)}
@@ -202,113 +338,170 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
    The listening state fills exactly the visible space.
    Pure focus/blur trigger — no visualViewport dependency.
    ══════════════════════════════════════════════════════ */
+/* ══ TYPING COMPANION ════════════════════════════════════
+   Sits between #chat and #composer as a flex sibling.
+   flex-shrink:0 so it's never crushed.
+   Hidden: max-height:0. Shown: expands to reveal the card.
+   The keyboard pushes the entire column (#chat + card + composer)
+   up via initKeyboard — card stays visible just above input.
+   ═══════════════════════════════════════════════════════════ */
 #listening-state{
+  /* Absolute, anchored to BOTTOM of bottom-bar, grows UPWARD */
   position:absolute;
-  /* Only occupy top portion — keyboard won't cover it */
-  top:0; left:0; right:0;
-  height:55%;          /* never reaches keyboard area */
-  min-height:180px;
+  bottom:100%;          /* sits flush above the composer */
+  left:0;right:0;
+  /* Fill the full viewport height above the composer */
+  height:100vh;
+  /* Hidden: pushed down and invisible */
+  transform:translateY(100%);
+  opacity:0;
+  pointer-events:none;
+  transition:
+    transform .5s cubic-bezier(.4,0,.2,1),
+    opacity .4s ease;
+  /* Gradient: fully transparent at very top → deep purple in centre → 
+     slightly lighter at bottom edge where it meets the composer */
+  background:
+    linear-gradient(180deg,
+      rgba(11,11,15,0) 0%,
+      rgba(11,11,15,0) 8%,
+      rgba(38,32,80,.82) 28%,
+      rgba(62,52,110,.92) 55%,
+      rgba(50,42,96,.95) 80%,
+      rgba(30,24,64,.98) 100%
+    );
+  /* No hard border — blends naturally */
+  border:none;
+  /* Content sits at the bottom of the card (near the composer) */
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  overflow:hidden;
+}
+#listening-state.show{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
+}
+#listening-state.fading{
+  transform:translateY(100%);
+  opacity:0;
+  pointer-events:none;
+}
+
+.listen-content{
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  padding:24px 36px 20px;
   text-align:center;
-  background:radial-gradient(
-    ellipse at 50% 50%,
-    rgba(52,48,96,.95) 0%,
-    rgba(28,24,52,.98) 55%,
-    rgba(11,11,15,1) 100%
-  );
-  opacity:0;
-  pointer-events:none;
-  z-index:20;
-  transition:opacity .5s ease;
-  will-change:opacity;
-  border-radius:0 0 24px 24px;
-}
-#listening-state.show{
-  opacity:1;
-}
-#listening-state.fading{
-  opacity:0;
-  transition:opacity .5s ease;
-}
-#listening-state.fading .listen-content{
-  animation-play-state:paused;
+  /* Content near bottom — close to where user types */
+  padding:0 28px 32px;
+  gap:14px;
+  width:100%;
 }
 
-/* ── BREATHING ANIMATION ── */
-/* The whole content block breathes — 40% to 100% opacity, 4s loop */
-@keyframes breatheIn{
-  0%,100%{opacity:.5;transform:translateY(0px)}
-  50%{opacity:1;transform:translateY(-3px)}
+/* Waveform — 5 bars, pure CSS */
+.listen-wave{
+  display:flex;
+  align-items:flex-end;
+  gap:5px;
+  height:32px;
 }
-.listen-content{
-  animation:breatheIn 4s ease-in-out infinite;
+.listen-bar{
+  width:3px;
+  border-radius:3px;
+  background:rgba(180,168,230,.5);
+  animation:waveIdle 2s ease-in-out infinite;
+  transform-origin:center;
+}
+/* Idle: slow ambient breath */
+@keyframes idlePulse{
+  0%,100%{height:5px;opacity:.3}
+  50%{height:8px;opacity:.5}
+}
+/* Heartbeat: lub (quick peak) → dub (secondary peak) → rest
+   Full cycle: 1.1s — calm resting heart rhythm ~55bpm */
+@keyframes hbCentre{
+  0%    {height:6px}
+  8%    {height:26px}   /* lub — main beat */
+  16%   {height:8px}
+  24%   {height:20px}   /* dub — secondary beat */
+  36%   {height:5px}
+  100%  {height:5px}    /* rest */
+}
+@keyframes hbMid{
+  0%    {height:5px}
+  10%   {height:20px}
+  18%   {height:7px}
+  26%   {height:15px}
+  38%   {height:5px}
+  100%  {height:5px}
+}
+@keyframes hbOuter{
+  0%    {height:4px}
+  12%   {height:13px}
+  20%   {height:5px}
+  28%   {height:10px}
+  40%   {height:4px}
+  100%  {height:4px}
 }
 
-.listen-line-1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(22px,6vw,28px);
-  font-weight:300;
+.listen-bar:nth-child(1){animation:idlePulse 2.2s ease-in-out infinite}
+.listen-bar:nth-child(2){animation:idlePulse 2.2s ease-in-out infinite .3s}
+.listen-bar:nth-child(3){animation:idlePulse 2.2s ease-in-out infinite .15s}
+.listen-bar:nth-child(4){animation:idlePulse 2.2s ease-in-out infinite .45s}
+.listen-bar:nth-child(5){animation:idlePulse 2.2s ease-in-out infinite .6s}
+
+/* Heartbeat fires when typing */
+#listening-state.typing .listen-bar{
+  background:rgba(200,186,255,.85);
+  box-shadow:0 0 8px rgba(160,140,240,.3);
+}
+#listening-state.typing .listen-bar:nth-child(1){animation:hbOuter  1.1s ease-in-out infinite 0s}
+#listening-state.typing .listen-bar:nth-child(2){animation:hbMid    1.1s ease-in-out infinite .05s}
+#listening-state.typing .listen-bar:nth-child(3){animation:hbCentre 1.1s ease-in-out infinite 0s}
+#listening-state.typing .listen-bar:nth-child(4){animation:hbMid    1.1s ease-in-out infinite .05s}
+#listening-state.typing .listen-bar:nth-child(5){animation:hbOuter  1.1s ease-in-out infinite 0s}
+
+.listen-status{
+  font-family:'Lora',Georgia,serif;
+  font-size:14px;
   font-style:italic;
-  color:var(--paper);
-  line-height:1.2;
-  margin-bottom:20px;
-  letter-spacing:.02em;
-}
-.listen-line-2{
-  font-size:13px;
-  /* Slightly lavender — warm, soft, safe */
-  color:rgba(200,196,220,.7);
-  line-height:2;
-  letter-spacing:.03em;
-  font-weight:300;
-}
-.listen-line-2 span{
-  display:block;
-}
-.listen-final{
-  display:block;
-  margin-top:16px;
-  /* Lavender-gold — warm trust colour */
-  color:rgba(180,168,220,.75);
-  font-style:italic;
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px;
-  font-weight:300;
-  letter-spacing:.06em;
-}
-.listen-em{
-  margin-top:10px;
-  display:block;
-  color:rgba(200,137,90,.65);
-  font-style:italic;
-  font-family:'Cormorant Garamond',serif;
-  font-size:16px;
-  font-weight:300;
-  letter-spacing:.03em;
-}
-.listen-im{
-  display:block;
-  margin-top:12px;
-  color:rgba(200,137,90,.7);
-  font-style:italic;
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px;
-  font-weight:300;
+  color:rgba(200,192,230,.6);
   letter-spacing:.04em;
+  transition:color .35s ease, font-size .3s ease;
+  text-align:center;
+  line-height:1.5;
 }
+#listening-state.typing .listen-status{
+  color:rgba(200,180,230,.9);
+}
+
+
 /* ══ CHAT ════════════════════════════════════════════════ */
-#chat{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 18px 6px;display:flex;flex-direction:column;gap:10px;overscroll-behavior-y:contain;position:relative}
+#chat{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 14px 4px;display:flex;flex-direction:column;gap:7px;overscroll-behavior-y:contain;position:relative}
+/* Warm ambient bloom — barely there, felt not seen */
+#chat::before{
+  content:'';
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:80vw;height:60vh;
+  background:radial-gradient(ellipse at center,
+    rgba(180,110,55,.045) 0%,
+    rgba(180,110,55,.018) 40%,
+    transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
 #chat::-webkit-scrollbar{display:none}
 .msg-app{display:flex;gap:10px;align-items:flex-end;max-width:92%}
-.msg-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ink4),var(--ink3));border:1px solid rgba(200,137,90,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-bottom:2px}
-.bubble-app{background:linear-gradient(145deg,var(--ink3),var(--ink2));border:1px solid rgba(160,150,180,.14);border-radius:18px 18px 18px 4px;padding:14px 17px;font-size:14px;color:var(--paper2);line-height:1.65}
-.bubble-app .serif{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:var(--paper);font-style:italic;line-height:1.25;letter-spacing:.01em}
+.msg-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,rgba(255,200,120,.18) 0%,rgba(200,137,90,.12) 40%,rgba(14,10,6,1) 100%),linear-gradient(135deg,#2e1e0e,#0e0a06);border:1.5px solid rgba(200,137,90,.6);box-shadow:0 0 0 1px rgba(200,137,90,.12),0 3px 12px rgba(200,137,90,.22),inset 0 1px 0 rgba(255,200,120,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:2px}
+.msg-avatar svg{width:17px;height:17px;display:block;filter:drop-shadow(0 1px 3px rgba(200,137,90,.4))}
+.bubble-app{background:linear-gradient(145deg,var(--ink3),var(--ink2));border:1px solid rgba(160,150,180,.14);border-radius:16px 16px 16px 4px;padding:12px 16px;font-size:14px;font-family:'Lora',Georgia,serif;color:var(--paper2);line-height:1.65}
+.bubble-app .serif{font-family:'Lora',Georgia,serif;font-size:20px;font-weight:500;color:var(--paper);font-style:italic;line-height:1.3;letter-spacing:.01em}
 .msg-user{display:flex;justify-content:flex-end;align-self:flex-end;max-width:85%}
-.bubble-user{background:linear-gradient(135deg,#D4906A,#A85E3A);color:#FFF8F4;border-radius:18px 18px 4px 18px;padding:11px 15px;font-size:14px;font-weight:500;line-height:1.5;word-break:break-word}
+.bubble-user{background:linear-gradient(135deg,#D4906A,#A85E3A);color:#FFF8F4;border-radius:18px 18px 4px 18px;padding:11px 15px;font-size:14px;font-weight:500;font-family:'Lora',Georgia,serif;font-style:italic;line-height:1.5;word-break:break-word}
 .typing{display:flex;align-items:center;gap:5px;padding:4px 2px}
 .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingBounce 1.2s infinite}
 .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
@@ -321,7 +514,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 #composer-pills{
   padding:4px 14px 10px;
   overflow:hidden;
+  transition:opacity .3s ease,max-height .35s ease;
+  max-height:80px;
 }
+#composer-pills.hidden{opacity:0;max-height:0;padding:0;pointer-events:none}
 #composer-pills-label{
   font-size:10px;
   text-transform:uppercase;
@@ -364,16 +560,16 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .intent-choice{flex:1;min-width:calc(50% - 4px);background:linear-gradient(145deg,var(--ink4),var(--ink3));border:1px solid rgba(160,150,180,.18);border-radius:14px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .18s,background .18s,box-shadow .18s;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:80px}
 .intent-choice:active{background:rgba(200,137,90,.06)}
 .intent-choice.selected{border-color:var(--gold);background:rgba(200,137,90,.14);box-shadow:0 0 18px rgba(200,137,90,.15)}
-.ic-icon{font-size:20px;margin-bottom:5px;display:block}
-.ic-title{font-size:13px;font-weight:500;color:var(--paper);display:block;margin-bottom:2px}
-.ic-desc{font-size:12px;color:var(--muted);margin-top:1px}
+.ic-icon{font-size:22px;margin-bottom:6px;display:block}
+.ic-title{font-size:14px;font-weight:600;font-family:'Lora',Georgia,serif;color:var(--paper);display:block;margin-bottom:3px;}
+.ic-desc{font-size:12px;font-family:'Lora',Georgia,serif;color:var(--muted);margin-top:1px;line-height:1.5}
 
 /* ══ LANG CHIPS ══════════════════════════════════════════ */
 .lang-choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;margin-left:38px}
-.lang-choice{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 14px;font-size:13px;color:var(--paper2);cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:44px}
+.lang-choice{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 16px;font-size:13px;font-family:'Lora',Georgia,serif;color:var(--paper2);cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:8px;user-select:none;-webkit-user-select:none;touch-action:manipulation;min-height:44px}
 .lang-choice:active{background:rgba(200,137,90,.08)}
 .lang-choice.selected{border-color:var(--gold);color:var(--gold-l);background:rgba(200,137,90,.1)}
-.lang-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lang-script{font-size:14px;font-weight:600;flex-shrink:0;min-width:20px;text-align:center;line-height:1}
 .locked{pointer-events:none;opacity:.55}
 
 /* ══ RESULTS — FULL EXPERIENCE ════════════════════════════
@@ -858,10 +1054,30 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   line-height: 1.58;
   max-height: 5.5em;
   overflow: hidden;
-  margin-bottom: 9px;
+  margin-bottom: 4px;
   flex-shrink: 0;
   word-break: break-word;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1);
 }
+.film-explanation.expanded {
+  max-height: 40em;
+}
+.film-see-more {
+  background: none;
+  border: none;
+  padding: 0 0 8px 0;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(200,137,90,.55);
+  cursor: pointer;
+  text-align: left;
+  touch-action: manipulation;
+  display: block;
+  flex-shrink: 0;
+  transition: color .2s ease;
+}
+.film-see-more:active { color: var(--gold); }
 
 /* Bottom row: OTT + link */
 .film-bottom {
@@ -894,17 +1110,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   border-radius: 50%;
   flex-shrink: 0;
 }
-.film-link {
-  font-size: 11px;
-  color: rgba(200,137,90,0.5);
-  text-decoration: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-.film-link::after { content: '→'; font-size: 11px; }
+
 .film-share-btn{background:none;border:none;padding:4px;cursor:pointer;color:rgba(200,137,90,.45);display:flex;align-items:center;touch-action:manipulation;flex-shrink:0;}
 .film-share-btn:active{color:var(--gold)}
 .film-langs { font-size: 10px; color: rgba(237,232,226,0.32); margin-bottom: 6px; letter-spacing: 0.03em; }
@@ -962,7 +1168,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .error-icon{font-size:28px;margin-bottom:8px}
 .error-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--paper);margin-bottom:4px}
 .error-sub{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
-.error-retry{background:linear-gradient(135deg,var(--gold),var(--gold-d));border:none;border-radius:10px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;touch-action:manipulation}
+.error-retry{background:linear-gradient(135deg,var(--gold),var(--gold-d));border:none;border-radius:10px;color:var(--ink);font-family:'Lora',Georgia,serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;touch-action:manipulation}
 .error-retry:active{opacity:.85}
 
 /* ══ EXPANDED CARD OVERLAY ══════════════════════════════
@@ -1015,11 +1221,19 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .co-handle{width:36px;height:3px;background:rgba(255,255,255,.15);border-radius:3px;margin:10px auto 0;flex-shrink:0}
 
 /* ══ COMPOSER ════════════════════════════════════════════ */
-#composer{flex-shrink:0;border-top:1px solid rgba(160,150,180,.12);padding-bottom:var(--safe-b);background:var(--ink2);transition:opacity .3s ease}
+#composer{
+  flex-shrink:0;
+  border-top:1px solid rgba(160,150,180,.12);
+  padding-bottom:var(--safe-b);
+  background:var(--ink2);
+  transition:opacity .35s ease, max-height .4s cubic-bezier(.4,0,.2,1), padding .35s ease;
+  overflow:hidden;max-height:200px;
+}
+#composer.collapsed{opacity:0;max-height:0;padding:0;pointer-events:none;border-top-color:transparent}
 #quick-actions{display:none;flex-direction:row;gap:8px;padding:10px 14px calc(10px + var(--safe-b));border-top:1px solid rgba(200,137,90,.18);background:var(--ink2);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-shrink:0}
 #quick-actions::-webkit-scrollbar{display:none}
 #quick-actions.show{display:flex}
-.qa-chip{flex-shrink:0;background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;cursor:pointer;white-space:nowrap;touch-action:manipulation;min-height:44px;display:flex;align-items:center;gap:6px}
+.qa-chip{flex-shrink:0;background:rgba(200,137,90,.09);border:1px solid rgba(200,137,90,.28);border-radius:50px;color:var(--paper);font-family:'Lora',Georgia,serif;font-size:13px;padding:9px 16px;cursor:pointer;white-space:nowrap;touch-action:manipulation;min-height:44px;display:flex;align-items:center;gap:6px}
 .qa-chip:active{background:rgba(200,137,90,.18)}
 .qa-chip.gold{color:var(--gold-l);border-color:rgba(200,137,90,.45);background:rgba(200,137,90,.13)}
 
@@ -1103,7 +1317,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   border:none;
   border-radius:22px;
   color:var(--paper);
-  font-family:'DM Sans',sans-serif;
+  font-family:'Lora',Georgia,serif;
   font-size:max(16px,14px);
   line-height:1.55;
   padding:12px 18px;
@@ -1194,7 +1408,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   padding:16px 24px;
   display:flex;align-items:center;justify-content:center;gap:10px;
   cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  font-family:'Lora',Georgia,serif;font-size:15px;font-weight:600;
   color:var(--ink);
   transition:transform .18s,box-shadow .18s;
   box-shadow:0 4px 24px rgba(200,137,90,.3);
@@ -1279,11 +1493,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- ══ AD GATE ════════════════════════════════════════════ -->
 <div id="ad-gate">
   <div id="ad-sheet">
-    <div class="ad-handle" onclick="dismissAdEarly()" style="cursor:pointer;padding:8px 0"></div>
+    <div class="ad-handle" style="padding:8px 0;cursor:default"></div>
     <div class="ad-icon">🎬</div>
     <h2 class="ad-title">Your picks are <em>ready</em></h2>
     <p class="ad-sub">Watch a short ad and your films appear the moment it ends. Completely free, always.</p>
-    <button onclick="dismissAdEarly()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:6px;touch-action:manipulation;line-height:1">×</button>
 
     <!-- Simulated ad (shown during countdown) -->
     <div id="ad-simulated">
@@ -1367,15 +1580,23 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   </div>
   <div id="chat">
     <!-- Listening state — absolute inside chat, fills visible space naturally -->
-    <div id="listening-state">
-      <div class="listen-content">
-        <p class="listen-line-1">Take your time.</p>
-        <p class="listen-line-2">
-          <span>Talk about your day, your week,</span>
-          <span>what&#39;s been sitting with you.</span>
-          <span class="listen-final">I&#39;m listening.</span>
-        </p>
+
+  </div>
+
+  <!-- Bottom bar — single translateY target for keyboard avoidance -->
+  <div id="bottom-bar">
+
+  <!-- Typing companion -->
+  <div id="listening-state">
+    <div class="listen-content">
+      <div class="listen-wave">
+        <div class="listen-bar"></div>
+        <div class="listen-bar"></div>
+        <div class="listen-bar"></div>
+        <div class="listen-bar"></div>
+        <div class="listen-bar"></div>
       </div>
+      <p class="listen-status" id="listen-status"></p>
     </div>
   </div>
 
@@ -1398,12 +1619,32 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   </div>
 
 <!-- ══ QUICK ACTIONS — shown after recommendations ══ -->
+<div id="bottom-glow"></div>
+
+<!-- Journey tracker — shown after input collapses -->
+<div id="journey-tracker">
+  <div class="jt-track">
+    <div class="jt-dot" id="jt-dot-0"></div>
+    <div class="jt-line" id="jt-line-0"></div>
+    <div class="jt-dot" id="jt-dot-1"></div>
+    <div class="jt-line" id="jt-line-1"></div>
+    <div class="jt-dot" id="jt-dot-2"></div>
+  </div>
+  <div class="jt-labels">
+    <span class="jt-label" id="jt-lbl-0">Mood</span>
+    <span class="jt-label" id="jt-lbl-1">Vibe</span>
+    <span class="jt-label" id="jt-lbl-2">Language</span>
+  </div>
+</div>
+
 <div id="quick-actions">
   <button class="qa-chip" onclick="restartAll()">↺ New Mood</button>
   <button class="qa-chip" onclick="quickChangeLang()">🌍 Language</button>
   <button class="qa-chip" onclick="changeIntent()">🎯 Vibe</button>
   <button class="qa-chip gold" onclick="shareAll()">↑ Share</button>
 </div>
+
+  </div><!-- /#bottom-bar -->
 </div>
 
 <script>
@@ -1411,11 +1652,11 @@ const WORKER_URL="https://moodfilm-api.kankipati-aaron.workers.dev";
 const COUNTRY=(()=>{try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";if(tz.includes("Kolkata")||tz.includes("Calcutta"))return"IN";return(navigator.language||"").split("-")[1]?.toUpperCase()||"IN"}catch{return"IN"}})();
 
 const LANGS=[
-  {value:"any", dot:"#C8895A", label:"🌍 Any"},
-  {value:"en",  dot:"#4A90D9", label:"🇬🇧 English"},
-  {value:"hi",  dot:"#FF8C2A", label:"🇮🇳 Hindi"},
-  {value:"te",  dot:"#00B89F", label:"తె Telugu"},
-  {value:"ta",  dot:"#E040FB", label:"த Tamil"},
+  {value:"any", dot:"#C8895A", script:"✦",  label:"Any Language"},
+  {value:"en",  dot:"#4A90D9", script:"En", label:"English"},
+  {value:"hi",  dot:"#FF8C2A", script:"हि", label:"Hindi"},
+  {value:"te",  dot:"#00B89F", script:"తె",  label:"Telugu"},
+  {value:"ta",  dot:"#E040FB", script:"த",  label:"Tamil"},
 ];
 const INTENTS=[
   {value:"Feel better",  icon:"🌤", title:"Feel Better",   desc:"Something to lift me up"},
@@ -1431,6 +1672,64 @@ const AD_DURATION = 30; // seconds — replace with real AdMob duration after Pl
 
 /* ── STATE ── */
 let mood="", selectedChips=[], selectedIntent="", selectedLang="any";
+
+// ── Journey tracker helpers ──────────────────────────
+function showTracker(){
+  const t=document.getElementById("journey-tracker");
+  if(t)t.classList.add("show");
+}
+// step: 0=mood submitted, 1=vibe chosen, 2=lang chosen
+// state: 'active'|'done'
+function advanceTracker(completedStep){
+  // Mark completed step dot+label as done
+  const dot=document.getElementById("jt-dot-"+completedStep);
+  const lbl=document.getElementById("jt-lbl-"+completedStep);
+  if(dot){dot.classList.remove("active");dot.classList.add("done");}
+  if(lbl){lbl.classList.remove("active");lbl.classList.add("done");}
+  // Fill connecting line after this dot
+  const line=document.getElementById("jt-line-"+completedStep);
+  if(line)line.classList.add("filled");
+  // Activate next step
+  const next=completedStep+1;
+  const nd=document.getElementById("jt-dot-"+next);
+  const nl=document.getElementById("jt-lbl-"+next);
+  if(nd)nd.classList.add("active");
+  if(nl)nl.classList.add("active");
+}
+function completeTracker(){
+  // All done — mark all filled
+  for(let i=0;i<3;i++){
+    const d=document.getElementById("jt-dot-"+i);
+    const l=document.getElementById("jt-lbl-"+i);
+    if(d){d.classList.remove("active");d.classList.add("done");}
+    if(l){l.classList.remove("active");l.classList.add("done");}
+  }
+  for(let i=0;i<2;i++){
+    const ln=document.getElementById("jt-line-"+i);
+    if(ln)ln.classList.add("filled");
+  }
+  // Fade tracker out smoothly as results come in
+  setTimeout(()=>{
+    const t=document.getElementById("journey-tracker");
+    if(t){t.style.transition="opacity .8s ease";t.style.opacity="0";
+      setTimeout(()=>t.style.display="none",800);}
+  },600);
+}
+function resetTracker(){
+  const t=document.getElementById("journey-tracker");
+  if(t){t.classList.remove("show");t.style.opacity="";t.style.display="";}
+  for(let i=0;i<3;i++){
+    const d=document.getElementById("jt-dot-"+i);
+    const l=document.getElementById("jt-lbl-"+i);
+    if(d){d.className="jt-dot";}
+    if(l){l.className="jt-label";}
+  }
+  for(let i=0;i<2;i++){
+    const ln=document.getElementById("jt-line-"+i);
+    if(ln)ln.classList.remove("filled");
+  }
+}
+// ─────────────────────────────────────────────────────
 let chatStep="idle"; // idle | awaiting_intent | awaiting_lang | ad_gate | loading | done
 let prefetchData=null, prefetchPromise=null, prefetchProgress=0;
 let lastRecs=null;
@@ -1441,22 +1740,22 @@ let _keyboardInited=false;
 function appendApp(html){
   const w=document.createElement("div");
   w.className="msg-app slide-up";
-  w.innerHTML=`<div class="msg-avatar">🎬</div><div class="bubble-app">${html}</div>`;
-  document.getElementById("chat").appendChild(w);
+  w.innerHTML=`<div class="msg-avatar">${AVATAR_SVG}</div><div class="bubble-app">${html}</div>`;
+  const chat=document.getElementById("chat");if(chat)chat.appendChild(w);
   scrollChat();return w;
 }
 function appendUser(text){
   const w=document.createElement("div");
   w.className="msg-user slide-up";
   w.innerHTML=`<div class="bubble-user">${esc(text)}</div>`;
-  document.getElementById("chat").appendChild(w);
+  const chat=document.getElementById("chat");if(chat)chat.appendChild(w);
   scrollChat();return w;
 }
 function appendTyping(){
   const w=document.createElement("div");
   w.className="msg-app slide-up";w.id="typing-ind";
-  w.innerHTML=`<div class="msg-avatar">🎬</div><div class="bubble-app"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
-  document.getElementById("chat").appendChild(w);scrollChat();return w;
+  w.innerHTML=`<div class="msg-avatar">${AVATAR_SVG}</div><div class="bubble-app"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  const chat=document.getElementById("chat");if(chat)chat.appendChild(w);scrollChat();return w;
 }
 function removeTyping(){const t=document.getElementById("typing-ind");if(t)t.remove()}
 function scrollChat(){setTimeout(()=>{const c=document.getElementById("chat");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})},80)}
@@ -1468,15 +1767,20 @@ function onInput(){
   const ta=document.getElementById("mood-input");
   ta.style.height="auto";
   ta.style.height=Math.min(ta.scrollHeight,120)+"px";
-  // Nudge glow on wrapper when user has typed something
   const wrap=document.getElementById("input-glow-wrap");
-  if(wrap)wrap.classList.toggle("nudge", ta.value.trim().length > 0);
-  // Listening state stays while typing — hides on send
+  if(wrap)wrap.classList.toggle("nudge",ta.value.trim().length>0);
+  // If user starts typing fresh (no chip), clear the chip flag
+  // We detect this by checking if the current value doesn't start with chip-seeded text
+  if(_inputFromChip && !ta.value.startsWith("I'm feeling ")){
+    _inputFromChip=false;
+  }
+  // Drive typing companion with live text
+  updateListeningState(ta.value);
   updateSendBtn();
 }
 function updateSendBtn(){
   const hasText=document.getElementById("mood-input").value.trim().length>0;
-  document.getElementById("send-btn").classList.toggle("ready",(hasText||selectedChips.length>0)&&chatStep==="idle");
+  const sb=document.getElementById("send-btn");if(sb)sb.classList.toggle("ready",(hasText||selectedChips.length>0)&&chatStep==="idle");
 }
 
 /* ── COMPOSER PILLS — below input, text-first secondary ── */
@@ -1501,6 +1805,7 @@ function buildComposerPills(){
         // No text — use chip as starter but nudge them to add more
         const chipText=chip.replace(/^\S+\s/,"");
         ta.value="I'm feeling "+chipText.toLowerCase();
+        _inputFromChip=true; // chip seeded the input
         // Place cursor at end and focus so they can elaborate
         setTimeout(()=>{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)},50);
       }
@@ -1607,7 +1912,7 @@ function pickFallbackAck(moodText){
 function appendAck(text){
   const w=document.createElement("div");
   w.className="msg-app slide-up";
-  w.innerHTML=`<div class="msg-avatar">🎬</div>
+  w.innerHTML=`<div class="msg-avatar">${AVATAR_SVG}</div>
     <div class="bubble-app">
       <span class="serif" style="font-size:16px">${esc(text)}</span>
     </div>`;
@@ -1616,9 +1921,20 @@ function appendAck(text){
 }
 
 function submitMood(){
+  _inputFromChip=false;
   hideListeningState(true);
   chatStep="awaiting_intent";
   appendUser(mood);
+  const comp=document.getElementById("composer");
+  if(comp)comp.classList.add("collapsed");
+  // Show journey tracker + mark mood step done
+  showTracker();
+  // Dot 0 starts active, advances to done when ack received
+  const d0=document.getElementById("jt-dot-0");if(d0)d0.classList.add("active");
+  const l0=document.getElementById("jt-lbl-0");if(l0)l0.classList.add("active");
+  setTimeout(()=>advanceTracker(0), 1600);
+  // Light the well
+  setTimeout(()=>{const g=document.getElementById("bottom-glow");if(g)g.classList.add("lit");},300);
   startPrefetch();
   // Short pause then show typing
   setTimeout(()=>{
@@ -1656,18 +1972,21 @@ function startPrefetch(){
 
 /* ── STEP 2: INTENT ── */
 function showIntentQuestion(){
+  const pills=document.getElementById("composer-pills");
+  if(pills)pills.classList.add("hidden");
   appendApp(`<span class="serif">What do you need from a film right now?</span>`);
   const grid=document.createElement("div");
   grid.className="intent-choices slide-up";
   INTENTS.forEach(intent=>{
     const card=document.createElement("div");card.className="intent-choice";
-    card.innerHTML=`<span class="ic-icon">${intent.icon}</span><span class="ic-title">${intent.title}</span><span class="ic-desc">${intent.desc}</span>`;
+    card.innerHTML=`<span class="ic-icon">${esc(intent.icon)}</span><span class="ic-title">${esc(intent.title)}</span><span class="ic-desc">${esc(intent.desc)}</span>`;
     card.onclick=function(){if(chatStep!=="awaiting_intent")return;selectIntent(intent,card,grid)};
     grid.appendChild(card);
   });
   document.getElementById("chat").appendChild(grid);scrollChat();
 }
 function selectIntent(intent,card,grid){
+  advanceTracker(1);
   selectedIntent=intent.value;
   grid.querySelectorAll(".intent-choice").forEach(c=>c.classList.remove("selected"));
   card.classList.add("selected");grid.classList.add("locked");
@@ -1683,7 +2002,7 @@ function showLangQuestion(){
   LANGS.forEach(lang=>{
     const b=document.createElement("button");
     b.className="lang-choice";b.type="button";b.dataset.value=lang.value;
-    b.innerHTML=`<span class="lang-dot" style="background:${lang.dot}"></span>${lang.label}`;
+    b.innerHTML=`<span class="lang-script" style="color:${lang.dot}">${lang.script}</span>${lang.label}`;
     b.onclick=function(){if(chatStep!=="awaiting_lang")return;selectLang(lang,row)};
     row.appendChild(b);
   });
@@ -1719,9 +2038,9 @@ function dismissAdEarly(){
   adApiPromise=null;
   hideAdGate();
   // Reset ad UI for next time
-  document.getElementById("btn-watch-ad").style.display="flex";
-  document.getElementById("ad-timer-wrap").style.display="none";
-  document.getElementById("ad-simulated").classList.remove("show");
+  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
+  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
+  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
   // Go back to language question
   chatStep="awaiting_lang";
   const chat=document.getElementById("chat");
@@ -1736,9 +2055,9 @@ function dismissAdEarly(){
 
 function startAdFlow(){
   // Switch button to timer
-  document.getElementById("btn-watch-ad").style.display="none";
-  document.getElementById("ad-timer-wrap").style.display="flex";
-  document.getElementById("ad-simulated").classList.add("show");
+  const _bwa2=document.getElementById("btn-watch-ad");if(_bwa2)_bwa2.style.display="none";
+  const _atw2=document.getElementById("ad-timer-wrap");if(_atw2)_atw2.style.display="flex";
+  const _ads2=document.getElementById("ad-simulated");if(_ads2)_ads2.classList.add("show");
 
   let secondsLeft=AD_DURATION;
   const ring=document.getElementById("ad-ring-progress");
@@ -1816,7 +2135,7 @@ async function fireFinalAPI(){
     // Race with 45s timeout
     const timeoutPromise=new Promise((_,r)=>setTimeout(()=>r(new Error("TIMEOUT")),45000));
     if(prefetchData&&!prefetchData.error){
-      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,prefetchResult:prefetchData,finalPickOnly:true})}).then(r=>r.json());
+      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})}).then(r=>r.json());
       data=await Promise.race([fetchPromise,timeoutPromise]);
     }else{
       const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY})}).then(r=>r.json());
@@ -1843,7 +2162,7 @@ function showError(type, retryFn){
   const m=messages[type]||messages.DEFAULT;
   const w=document.createElement("div");
   w.className="msg-app slide-up";
-  w.innerHTML=`<div class="msg-avatar">🎬</div>
+  w.innerHTML=`<div class="msg-avatar">${AVATAR_SVG}</div>
     <div class="bubble-app error-bubble">
       <div class="error-icon">${m.icon}</div>
       <div class="error-title">${m.title}</div>
@@ -1857,6 +2176,9 @@ function showError(type, retryFn){
 
 /* ── RESET ── */
 function restartAll(){
+  _inputFromChip=false;
+  const g=document.getElementById("bottom-glow");if(g)g.classList.remove("lit");
+  resetTracker();
   document.getElementById("chat").innerHTML="";
   mood="";selectedChips=[];selectedIntent="";selectedLang="any";
   chatStep="idle";prefetchData=null;prefetchPromise=null;lastRecs=null;
@@ -1864,9 +2186,9 @@ function restartAll(){
   clearInterval(adCountdownInterval);
   hideAdGate();
   closeCardOverlay();
-  document.getElementById("btn-watch-ad").style.display="flex";
-  document.getElementById("ad-timer-wrap").style.display="none";
-  document.getElementById("ad-simulated").classList.remove("show");
+  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
+  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
+  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
   document.getElementById("mood-input").value="";
   document.getElementById("mood-input").style.height="auto";
   const gw=document.getElementById("input-glow-wrap");
@@ -1889,9 +2211,9 @@ function quickChangeLang(){
   closeCardOverlay();
   hideAdGate();
   // Reset ad gate UI to clean state
-  document.getElementById("btn-watch-ad").style.display="flex";
-  document.getElementById("ad-timer-wrap").style.display="none";
-  document.getElementById("ad-simulated").classList.remove("show");
+  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
+  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
+  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
 
   const chat=document.getElementById("chat");
   chat.style.padding="";
@@ -1923,9 +2245,9 @@ function changeIntent(){
   closeCardOverlay();
   hideAdGate();
   // Reset ad gate UI to clean state
-  document.getElementById("btn-watch-ad").style.display="flex";
-  document.getElementById("ad-timer-wrap").style.display="none";
-  document.getElementById("ad-simulated").classList.remove("show");
+  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
+  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
+  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
 
   const chat=document.getElementById("chat");
   chat.style.padding="";
@@ -1948,39 +2270,101 @@ function changeIntent(){
 
 /* ── KEYBOARD ── */
 let _listenTimer=null;
+let _typingTimer=null;
+
+
+
+function updateListeningState(text){
+  const ls=document.getElementById("listening-state");
+  const status=document.getElementById("listen-status");
+  if(!ls)return;
+
+  const hasText=text.trim().length>0;
+
+  if(hasText){
+    ls.classList.add("typing");
+    const len=text.trim().length;
+
+    // Three psychological moments as the user opens up:
+    // 0-20  — they've just started, invite them gently further
+    // 21-40 — they're going, acknowledge and give space
+    // 40+   — they're open, validate and hold that space
+    if(status){
+      if(len<=20)       status.textContent="Keep going, I’m listening…";
+      else if(len<=40)  status.textContent="I hear you. Take your time.";
+      else              status.textContent="I’m with you. Tell me everything.";
+    }
+
+    // Debounce — 1.2s after last keystroke, user has paused
+    // Switch to a resting presence rather than active listening
+    clearTimeout(_typingTimer);
+    _typingTimer=setTimeout(()=>{
+      ls.classList.remove("typing");
+      // After pause, keep the phrase that matches their current length
+      // Don't reset to a fixed string — it may contradict what they see
+      const curLen=(document.getElementById("mood-input")?.value.trim().length)||0;
+      if(status){
+        if(curLen===0)          status.textContent="";
+        else if(curLen<=20)     status.textContent="Keep going, I’m listening…";
+        else if(curLen<=40)     status.textContent="I hear you. Take your time.";
+        else                    status.textContent="I’m with you. Tell me everything.";
+      }
+    },1200);
+
+  } else {
+    // Empty input — card goes blank
+    ls.classList.remove("typing");
+    clearTimeout(_typingTimer);
+    if(status)status.textContent="";
+  }
+}
+
 function showListeningState(){
   const ls=document.getElementById("listening-state");
-  // Only show on idle step, no text typed
   if(!ls||chatStep!=="idle")return;
-  const ta=document.getElementById("mood-input");
-  if(ta&&ta.value.trim().length>0)return;
-  // Simply add show — position is handled by CSS (absolute inside #chat)
+  // Cancel any pending debounce timer from before focus fired —
+  // prevents stale timer overwriting the correct phrase after card shows
+  clearTimeout(_typingTimer);
+  // Reset text — blank slate every time
+  const status=document.getElementById("listen-status");
+  if(status)status.textContent="";
+  ls.classList.remove("typing","fading");
   ls.classList.add("show");
+  // If input already has text (chip was tapped before focus fired),
+  // immediately set the correct phrase — no delay, no debounce race
+  const ta=document.getElementById("mood-input");
+  if(ta&&ta.value.trim().length>0){
+    updateListeningState(ta.value);
+  }
 }
+
 function hideListeningState(instant){
   const ls=document.getElementById("listening-state");
   if(!ls)return;
+  clearTimeout(_typingTimer);
+  ls.classList.remove("typing");
+  // Clear text so next show starts blank — no stale text flash
+  const status=document.getElementById("listen-status");
+  if(status)status.textContent="";
   if(instant){
     ls.classList.remove("show","fading");
     return;
   }
-  // Graceful 600ms fade out
   ls.classList.add("fading");
-  setTimeout(function(){
-    ls.classList.remove("show","fading");
-  },620);
+  setTimeout(()=>ls.classList.remove("show","fading"),450);
 }
 
 function initKeyboard(){
-  // Only handle composer layout on keyboard open
-  // Listening state is now purely focus/blur — no visualViewport needed
   if(!window.visualViewport||_keyboardInited)return;
   _keyboardInited=true;
   function update(){
     const kbH=Math.max(0,window.innerHeight-window.visualViewport.height);
-    const comp=document.getElementById("composer");
-    comp.style.transform=kbH>50?`translateY(-${kbH}px)`:"translateY(0)";
-    if(kbH>50)scrollChat();
+    const kbOpen=kbH>50;
+    // Single translateY on the whole bottom-bar — listening card, composer,
+    // tracker and quick-actions all move as one unit. Atomic, reliable.
+    const bar=document.getElementById("bottom-bar");
+    if(bar)bar.style.transform=kbOpen?`translateY(-${kbH}px)`:"translateY(0)";
+    if(kbOpen)scrollChat();
   }
   window.visualViewport.addEventListener("resize",update,{passive:true});
   window.visualViewport.addEventListener("scroll",update,{passive:true});
@@ -2004,9 +2388,9 @@ function openCardOverlay(rec){
   // Title + meta
   document.getElementById("co-title").textContent=rec.title||"";
   const meta=document.getElementById("co-meta");
-  meta.innerHTML=(rec.releaseYear?`<span>${rec.releaseYear}</span>`:"")+
-    (rec.runtime?`<span>${Math.floor(rec.runtime/60)}h ${rec.runtime%60}m</span>`:"")+
-    (rec.rating?`<span class="co-rating">★ ${rec.rating}</span>`:"");
+  meta.innerHTML=(rec.releaseYear?`<span>${esc(String(rec.releaseYear))}</span>`:"")+
+    (rec.runtime?`<span>${esc(String(Math.floor(rec.runtime/60)))}h ${esc(String(rec.runtime%60))}m</span>`:"")+
+    (rec.rating?`<span class="co-rating">★ ${esc(String(rec.rating))}</span>`:"");
   // Languages
   const langs=document.getElementById("co-langs");
   langs.textContent=(rec.spokenLanguages&&rec.spokenLanguages.length)?`🗣 ${rec.spokenLanguages.slice(0,3).join(" · ")}`:"";
@@ -2074,29 +2458,17 @@ function shareAll(){if(!lastRecs)return;const text="My Moodfilm picks\n"+lastRec
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
 /* ── INIT ── */
+const AVATAR_SVG=`<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="16" rx="3" stroke="#C8895A" stroke-width="1.4"/><rect x="2" y="4" width="20" height="4" fill="rgba(200,137,90,0.15)"/><line x1="6" y1="4" x2="8" y2="8" stroke="#C8895A" stroke-width="1.2"/><line x1="11" y1="4" x2="13" y2="8" stroke="#C8895A" stroke-width="1.2"/><line x1="16" y1="4" x2="18" y2="8" stroke="#C8895A" stroke-width="1.2"/><circle cx="12" cy="14" r="3" stroke="#C8895A" stroke-width="1.2"/><circle cx="12" cy="14" r="1" fill="#C8895A"/></svg>`;
 function init(){
   const h=new Date().getHours();
   const tw=h>=5&&h<12?"today":h>=12&&h<17?"this afternoon":h>=17&&h<22?"tonight":"right now";
   const greetingWrap=document.createElement("div");
   greetingWrap.className="msg-app slide-up";greetingWrap.style.maxWidth="100%";
   greetingWrap.innerHTML=`
-    <div class="msg-avatar">🎬</div>
+    <div class="msg-avatar">${AVATAR_SVG}</div>
     <div class="bubble-app" style="flex:1">
-      <div style="margin-bottom:12px">
-        <span class="serif" style="font-size:clamp(22px,5.5vw,28px);display:block;margin-bottom:6px">How are you feeling ${tw}?</span>
-        <span style="font-size:13px;color:var(--muted);line-height:1.65;display:block">Tell me what's going on and I'll find the perfect film for this moment.</span>
-      </div>
-      <div style="height:1px;background:linear-gradient(90deg,rgba(200,137,90,.3),transparent);margin:12px 0"></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(200,137,90,.12);border:1px solid rgba(200,137,90,.25);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">1</span>
-          <span>Tell me how you're feeling and what you need</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
-          <span style="width:22px;height:22px;border-radius:50%;background:rgba(200,137,90,.12);border:1px solid rgba(200,137,90,.25);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">2</span>
-          <span>Your film picks are completely free, always</span>
-        </div>
-      </div>
+      <span class="serif" style="display:block;margin-bottom:8px">How are you feeling ${tw}?</span>
+      <span style="font-size:13px;color:var(--paper2);line-height:1.7;display:block;font-family:'Lora',Georgia,serif">No wrong answers here. Just tell me what's going on.</span>
     </div>`;
   document.getElementById("chat").appendChild(greetingWrap);
 
@@ -2153,7 +2525,7 @@ function init(){
       // Mark blooms in — slower, more presence
       setTimeout(()=>mark.classList.add("show"),350);
       // Title reveals — waits for mark to settle
-      setTimeout(()=>title.classList.add("reveal"),900);
+      setTimeout(()=>title.classList.add("reveal"),700);
       // Bottom rule draws
       setTimeout(()=>ruleBot.classList.add("drawn"),1300);
       // Tagline whispers in
@@ -2163,7 +2535,6 @@ function init(){
         enterEl.classList.add("show");
         setTimeout(()=>enterEl.classList.add("breathing"),800);
       },3400);
-      // House credit fades in last — quiet, assured
       setTimeout(()=>{const h=document.getElementById("splash-house");if(h)h.classList.add("show");},2400);
       // Auto-dismiss — enough time to read everything
       setTimeout(dismissSplash,7000);
@@ -2368,20 +2739,12 @@ function renderResults(recs,moodData){
 
     const actions=document.createElement("div");
     actions.className="hero-actions";
-    if(topPick.tmdbUrl){
-      const btn=document.createElement("a");
-      btn.className="hero-btn-primary";
-      btn.href=topPick.tmdbUrl;
-      btn.target="_blank";
-      btn.rel="noopener noreferrer";
-      btn.textContent="More Info \u2192";
-      actions.appendChild(btn);
-    }
+    // Gold share button — full width, warm CTA
     const shareBtn=document.createElement("button");
-    shareBtn.className="hero-btn-icon";
+    shareBtn.className="hero-btn-primary";
     shareBtn.setAttribute("data-title",topPick.title);
     shareBtn.onclick=function(){shareFilm(this.dataset.title)};
-    shareBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
+    shareBtn.textContent="Share with someone who needs this";
     actions.appendChild(shareBtn);
     body.appendChild(actions);
     heroCard.appendChild(body);
@@ -2477,6 +2840,24 @@ function renderResults(recs,moodData){
       exp.textContent=rec.explanation||"";
       body.appendChild(exp);
 
+      // See more button — only shown if text is actually clamped
+      const seeMore=document.createElement("button");
+      seeMore.className="film-see-more";
+      seeMore.textContent="see more";
+      seeMore.style.display="none"; // hidden until clamping confirmed
+      seeMore.onclick=function(e){
+        e.stopPropagation();
+        exp.classList.add("expanded");
+        seeMore.style.display="none";
+      };
+      body.appendChild(seeMore);
+      // After paint: check if text overflows the max-height clamp
+      requestAnimationFrame(()=>{
+        if(exp.scrollHeight > exp.clientHeight + 2){
+          seeMore.style.display="block";
+        }
+      });
+
       // Spoken languages
       if(rec.spokenLanguages?.length){
         const lg=document.createElement("p");
@@ -2510,15 +2891,7 @@ function renderResults(recs,moodData){
         ottMini.appendChild(jw);
       }
       bottom.appendChild(ottMini);
-      if(rec.tmdbUrl){
-        const link=document.createElement("a");
-        link.className="film-link";
-        link.href=rec.tmdbUrl;
-        link.target="_blank";
-        link.rel="noopener noreferrer";
-        link.textContent="Info";
-        bottom.appendChild(link);
-      }
+
       // Share icon
       const shareB=document.createElement("button");
       shareB.className="film-share-btn";

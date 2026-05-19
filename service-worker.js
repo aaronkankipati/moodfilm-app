@@ -1,7 +1,7 @@
 // Moodfilm Service Worker v1.0
 // Strategy: Cache-first for shell assets, network-only for API calls
 
-const CACHE_NAME = "moodfilm-v1";
+const CACHE_NAME = "moodfilm-v2";
 
 // Static assets to cache on install (the app shell)
 const SHELL_ASSETS = [
