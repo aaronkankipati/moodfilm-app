@@ -1,25 +1,52 @@
 {
   "id": "/moodfilm-app/",
-  "name": "Moodfilm — Find Your Film by Mood",
+  "name": "Moodfilm \u2014 Find Your Film by Mood",
   "short_name": "Moodfilm",
   "description": "Describe your mood. AI picks the perfect film for this exact moment. Free, no sign-up.",
   "start_url": "/moodfilm-app/",
   "scope": "/moodfilm-app/",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone"],
+  "display_override": [
+    "window-controls-overlay",
+    "tabbed",
+    "standalone"
+  ],
   "orientation": "portrait-primary",
   "background_color": "#0D0D0F",
   "theme_color": "#0D0D0F",
   "lang": "en-IN",
   "dir": "ltr",
-  "categories": ["entertainment", "lifestyle"],
+  "categories": [
+    "entertainment",
+    "lifestyle"
+  ],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "prefer_related_applications": false,
   "icons": [
-    { "src": "/moodfilm-app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/moodfilm-app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/moodfilm-app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/moodfilm-app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/moodfilm-app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/moodfilm-app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/moodfilm-app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/moodfilm-app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "screenshots": [
     {
@@ -27,7 +54,7 @@
       "sizes": "1289x2218",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Welcome screen — find movies by mood"
+      "label": "Welcome screen \u2014 find movies by mood"
     },
     {
       "src": "screenshots/screen2.png",
@@ -71,7 +98,12 @@
       "short_name": "Find Film",
       "description": "Jump straight to mood input",
       "url": "/moodfilm-app/",
-      "icons": [{ "src": "/moodfilm-app/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/moodfilm-app/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "share_target": {
@@ -102,9 +134,19 @@
     {
       "action": "/moodfilm-app/",
       "accept": {
-        "text/plain": [".txt"],
-        "text/csv": [".csv"]
+        "text/plain": [
+          ".txt"
+        ],
+        "text/csv": [
+          ".csv"
+        ]
       }
     }
-  ]
+  ],
+  "scope_extensions": [
+    {
+      "origin": "https://aaronkankipati.github.io"
+    }
+  ],
+  "related_applications": []
 }
