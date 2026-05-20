@@ -11,7 +11,8 @@ const SHELL_ASSETS = [
   "/moodfilm-app/",
   "/moodfilm-app/index.html",
   "/moodfilm-app/manifest.json",
-  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap",
+  "/moodfilm-app/icon-192.png",
+  "/moodfilm-app/icon-512.png",
 ];
 
 // ── INSTALL: cache the app shell ─────────────────────────────────────────────
@@ -158,7 +159,7 @@ self.addEventListener("push", (event) => {
     title: "Moodfilm",
     body: "Your daily film pick is ready 🎬",
     icon: "/moodfilm-app/icon-192.png",
-    badge: "/moodfilm-app/icon-96.png",
+    badge: "/moodfilm-app/icon-192.png",
     url: "/moodfilm-app/",
   };
 
