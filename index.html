@@ -149,19 +149,37 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
    Warm light blooms from centre, mark breathes into existence,
    title draws itself, tagline whispers, then stillness.
    ══════════════════════════════════════════════════════ */
+/* ══ SPLASH ══════════════════════════════════════════════
+   A cinema before the curtain rises.
+   Warm light blooms from centre, mark breathes into existence,
+   title draws itself, tagline whispers, then stillness.
+
+   THEME SYNC: All hardcoded colours are replaced with design
+   tokens so splash stays in-sync if tokens ever change.
+   Transition duration reads --theme-duration (default 2.4s)
+   so the exit speed matches the theme engine's rhythm — at
+   idle state (before any mood is set) this gives a 2.4s
+   cinematic dissolve rather than the old 1.4s snap.
+   ══════════════════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9000;
-  /* Warm vignette — projector light before curtain */
+  /* Warm vignette — projector light before curtain.
+     Centre is fully transparent, edges vignette to --ink. */
   background:
     radial-gradient(ellipse 70% 55% at 50% 48%,
-      rgba(32,24,18,.0) 0%,
-      rgba(18,14,10,.6) 55%,
-      rgba(11,11,15,1) 100%),
-    #0B0B0F;
+      rgba(11,11,15,0) 0%,
+      rgba(11,11,15,0.6) 55%,
+      var(--ink) 100%),
+    var(--ink);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   padding:40px 32px;
-  transition:opacity 1.4s cubic-bezier(.4,0,.2,1);
+  /* THEME ENGINE BRIDGE — transition duration reads from the same
+     CSS variable that MoodThemeEngine writes via:
+       root.style.setProperty('--theme-duration', ...)
+     At idle state (splash time) this is 2.4s — a cinematic dissolve.
+     Easing matches --ease-organic for coherence across all transitions. */
+  transition:opacity var(--theme-duration) cubic-bezier(.25,.46,.45,.94);
 }
 #splash.fade-out{opacity:0;pointer-events:none}
 
@@ -170,18 +188,19 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   0%{background-position:200% center}
   100%{background-position:-200% center}
 }
+/* THEME SYNC: Gold values replaced with var(--gold), var(--gold-l), var(--gold-glow) */
 .splash-rule{
   width:0;height:1px;
   background:linear-gradient(90deg,
     transparent 0%,
-    rgba(200,137,90,.15) 20%,
-    rgba(236,196,130,.9) 50%,
-    rgba(200,137,90,.15) 80%,
+    var(--gold-glow) 20%,
+    var(--gold-l) 50%,
+    var(--gold-glow) 80%,
     transparent 100%);
   background-size:200% 100%;
   margin-bottom:44px;
   transition:width 1.2s cubic-bezier(.76,0,.24,1);
-  box-shadow:0 0 8px rgba(200,137,90,.35),0 0 20px rgba(200,137,90,.12);
+  box-shadow:0 0 8px rgba(200,137,90,.35),0 0 20px var(--gold-glow);
 }
 .splash-rule.drawn{
   width:160px;
@@ -206,13 +225,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .splash-mark.show{animation:markBreathe 4s ease-in-out 1.5s infinite}
 
 /* Title — wider spacing, slower, more weight */
+/* THEME SYNC: colour replaced with var(--gold) */
 .splash-title{
   font-family:'Cormorant Garamond',serif;
   font-size:clamp(13px,3.5vw,16px);
   font-weight:300;
   letter-spacing:.45em;
   text-transform:uppercase;
-  color:rgba(200,137,90,.65);
+  color:var(--gold);
+  opacity:0.65;
   overflow:hidden;
   white-space:nowrap;
   clip-path:inset(0 100% 0 0);
@@ -234,19 +255,21 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   opacity:0;transform:translateY(12px);
   transition:opacity 1.2s cubic-bezier(.25,.46,.45,.94) 1.1s,transform 1.2s cubic-bezier(.25,.46,.45,.94) 1.1s;
 }
-@keyframes taglineGlow{0%,100%{text-shadow:none}50%{text-shadow:0 2px 32px rgba(200,137,90,.18)}}
+/* THEME SYNC: tagline glow uses var(--gold-glow) */
+@keyframes taglineGlow{0%,100%{text-shadow:none}50%{text-shadow:0 2px 32px var(--gold-glow)}}
 .splash-tagline.show{opacity:1;transform:translateY(0);animation:taglineGlow 4s ease-in-out 2.2s infinite;}
 
 /* Bottom rule — wider, more presence */
+/* THEME SYNC: gold values replaced with design tokens */
 .splash-rule-bottom{
   position:absolute;
   bottom:72px;left:50%;transform:translateX(-50%);
   width:0;height:1px;
   background:linear-gradient(90deg,
     transparent 0%,
-    rgba(200,137,90,.12) 20%,
+    var(--gold-glow) 20%,
     rgba(236,196,130,.5) 50%,
-    rgba(200,137,90,.12) 80%,
+    var(--gold-glow) 80%,
     transparent 100%);
   background-size:200% 100%;
   box-shadow:0 0 6px rgba(200,137,90,.2);
@@ -258,6 +281,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 }
 
 /* Enter prompt — warmer, more personal */
+/* THEME SYNC: colour replaced with var(--gold) at reduced opacity */
 .splash-enter{
   position:absolute;
   bottom:50px;left:50%;transform:translateX(-50%);
@@ -265,17 +289,18 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   font-size:12px;
   font-style:italic;
   letter-spacing:.18em;
-  color:rgba(200,137,90,.45);
+  color:var(--gold);
   opacity:0;
   transition:opacity .8s ease;
   white-space:nowrap;
 }
-.splash-enter.show{opacity:1}
+.splash-enter.show{opacity:.45}
 @keyframes breathe{0%,100%{opacity:.3}50%{opacity:.7}}
 .splash-enter.breathing{animation:breathe 2.5s ease-in-out infinite}
 
 
 /* ── SPLASH HOUSE CREDIT ── */
+/* THEME SYNC: colour replaced with var(--paper) at reduced opacity */
 .splash-house{
   position:absolute;
   bottom:16px;left:0;right:0;
@@ -283,10 +308,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   font-family:'Cormorant Garamond',serif;
   font-size:11.5px;font-style:italic;font-weight:300;
   letter-spacing:.14em;
-  color:rgba(236,220,200,.55);
+  color:var(--paper);
   opacity:0;transition:opacity 1.4s ease 2.4s;
 }
-.splash-house.show{opacity:1}
+.splash-house.show{opacity:.55}
 
 
 /* ── SPLASH SKYLINE ── */
@@ -424,6 +449,34 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 /* ══ APP SHELL ════════════════════════════════════════════ */
 #app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--safe-t);z-index:2}
+
+/* ── APP ENTRANCE — theme-engine-synced reveal ───────────────────────
+   Triggered by JS: dismissSplash() adds .app-entering via classList.
+   Using class-based trigger (not animation-delay) so it fires correctly
+   on both auto-dismiss (7s) and early tap (1.9s+).
+
+   THEME ENGINE BRIDGE:
+   • Duration: var(--theme-duration) — at idle state this is 2.4s,
+     matching the splash fade exactly for a synchronized crossfade
+   • Easing: cubic-bezier(.25,.46,.45,.94) matches --ease-organic
+   • Transform: 6px translateY — imperceptible as movement, felt as
+     the UI settling into place (gravity/weight metaphor)
+   • Only animates opacity + transform — GPU-composited, zero jank
+     on mobile OLED devices
+   ──────────────────────────────────────────────────────────────────── */
+@keyframes appEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+#app.app-entering {
+  animation: appEntrance var(--theme-duration) cubic-bezier(.25,.46,.45,.94) both;
+}
 #topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px 10px;border-bottom:1px solid rgba(160,150,180,.12);background:rgba(11,11,15,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:10}
 .logo{display:flex;align-items:center;gap:8px}
 .logo-reel{width:22px;height:22px;flex-shrink:0}
@@ -594,7 +647,34 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 }
 #chat::-webkit-scrollbar{display:none}
 .msg-app{display:flex;gap:10px;align-items:flex-end;max-width:92%}
-.msg-avatar{width:38px;height:40px;border-radius:0;background:transparent;border:none;box-shadow:none;display:flex;align-items:flex-start;justify-content:center;flex-shrink:0}
+/* ── BOT AVATAR CONTAINER ──────────────────────────────────────────────
+   Redesigned from a rigid square (border-radius:0, no bg, no border) to
+   a soft, theme-reactive container. Key points:
+   • border-radius:10px — matches the asymmetric chat bubble family
+     (bubble-app uses 16px 16px 16px 4px) while staying rectangular
+   • border reads from --mood-accent-strong — automatically intensifies
+     as the user's mood deepens, written by MoodThemeEngine every 400ms
+   • box-shadow uses --mood-accent (lower opacity) for the ambient halo,
+     --mood-accent-strong for the tighter edge glow — both are CSS vars
+     so the glow shifts color with the emotional state, zero extra JS
+   • background: var(--ink3) provides depth behind the SVG glyph
+   • overflow:hidden clips the SVG cleanly to the rounded container
+   ──────────────────────────────────────────────────────────────────── */
+.msg-avatar{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:var(--ink3);
+  border:1px solid var(--mood-accent-strong);
+  box-shadow:0 0 12px var(--mood-accent), 0 0 3px var(--mood-accent-strong);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  overflow:hidden;
+  /* Smooth glow transition as mood-accent updates */
+  transition:border-color .6s ease, box-shadow .6s ease;
+}
 /* .bubble-app and .bubble-user are defined with animations in the send-btn block below */
 .bubble-app .serif{font-family:'Lora',Georgia,serif;font-size:20px;font-weight:500;color:var(--paper);font-style:italic;line-height:1.3;letter-spacing:.01em}
 .msg-user{display:flex;justify-content:flex-end;align-self:flex-end;max-width:85%}
@@ -2620,6 +2700,11 @@ function restartAll(){
   const g=document.getElementById("bottom-glow");if(g)g.classList.remove("lit");
   // Reset theme engine to baseline instantly
   if(typeof window._themeEngineReset==="function")window._themeEngineReset();
+  /* THEME ENGINE BRIDGE — remove entrance animation class on restart so
+     the app-entering animation does not re-play on "New Mood" taps.
+     The animation is a one-time boot event, not a recurring transition. */
+  const appEl=document.getElementById("app");
+  if(appEl)appEl.classList.remove("app-entering");
   resetTracker();
   document.getElementById("chat").innerHTML="";
   mood="";selectedChips=[];selectedIntent="";selectedLang="any";
@@ -2927,7 +3012,47 @@ function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)|
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
 /* ── INIT ── */
-const AVATAR_SVG=`<img src="data:image/jpeg;base64,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" width="38" height="40" style="display:block;" alt="">`
+
+/*
+ * AVATAR_SVG — Bot icon redesign
+ * ─────────────────────────────────────────────────────────────────────
+ * BEFORE: A base64 JPEG rendered inside a border-radius:0 container.
+ *   Problem: rigid rectangular crop, photo-style asset incompatible
+ *   with the app's SVG linework language, no theme connection.
+ *
+ * AFTER: A pure inline SVG using the same film-reel / aperture motif
+ *   as the logo-reel (topbar) and splash-mark (80px boot screen).
+ *   Design DNA:
+ *   • Outer rounded-rect frame  → same rx:4 family as logo-reel
+ *   • Centre circle + aperture  → same lens/dot pattern
+ *   • Corner sprocket squares   → same 4-corner motif
+ *   • All colours via CSS vars  → strokes read var(--gold) and
+ *     var(--gold-d); fill reads var(--ink3).  When MoodThemeEngine
+ *     writes new --mood-accent values the container border and glow
+ *     shift; the SVG strokes hold gold as a constant anchor.
+ *   • 22×22 viewBox content in a 38×38 container — same proportional
+ *     density as the 22×22 logo-reel in the topbar.
+ * ─────────────────────────────────────────────────────────────────────
+ */
+const AVATAR_SVG=`<svg width="24" height="24" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <!-- Outer frame — same rx:4 as logo-reel -->
+  <rect x="1" y="1" width="20" height="20" rx="4"
+        stroke="var(--gold)" stroke-width="1.4" opacity="0.75"/>
+  <!-- Centre lens ring -->
+  <circle cx="11" cy="11" r="5"
+          stroke="var(--gold)" stroke-width="1.4" opacity="0.85"/>
+  <!-- Aperture dot — solid gold, the focal point -->
+  <circle cx="11" cy="11" r="1.8"
+          fill="var(--gold)" opacity="0.9"/>
+  <!-- Corner sprockets — 4-corner motif from logo-reel -->
+  <rect x="3" y="3"   width="2.8" height="2.8" rx="0.7" fill="var(--gold)" opacity="0.45"/>
+  <rect x="16.2" y="3"   width="2.8" height="2.8" rx="0.7" fill="var(--gold)" opacity="0.45"/>
+  <rect x="3" y="16.2" width="2.8" height="2.8" rx="0.7" fill="var(--gold)" opacity="0.45"/>
+  <rect x="16.2" y="16.2" width="2.8" height="2.8" rx="0.7" fill="var(--gold)" opacity="0.45"/>
+  <!-- Film perforations — subtle side marks -->
+  <rect x="1"    y="9.2" width="2" height="3.6" rx="0.6" fill="var(--gold)" opacity="0.2"/>
+  <rect x="19"   y="9.2" width="2" height="3.6" rx="0.6" fill="var(--gold)" opacity="0.2"/>
+</svg>`
 function init(){
   const h=new Date().getHours();
   const tw=h>=5&&h<12?"today":h>=12&&h<17?"this afternoon":h>=17&&h<22?"tonight":"right now";
@@ -2982,8 +3107,39 @@ function init(){
   let dismissed=false;
   function dismissSplash(){
     if(dismissed)return;dismissed=true;
+
+    /* ── THEME ENGINE BRIDGE — Canvas Warm-Up ──────────────────────────
+       Before fading the splash, write the idle-state gradient stops to
+       #mood-canvas directly. This bypasses the 400ms polling delay so
+       the canvas is warm and glowing the moment the splash becomes
+       transparent — creating a seamless dissolve rather than a cold reveal.
+
+       Values match MoodThemeEngine's idle phase opacities exactly:
+         idle: { stop1: .12, stop2: .07, stop3: .05 }
+       with the default gold fallback color (200,137,90).
+
+       The MoodThemeEngine polling loop will take over within its next
+       400ms tick and continue driving the canvas from here.
+    ──────────────────────────────────────────────────────────────────── */
+    const root = document.documentElement;
+    root.style.setProperty('--theme-stop1', 'rgba(200,137,90,0.12)');
+    root.style.setProperty('--theme-stop2', 'rgba(200,137,90,0.07)');
+    root.style.setProperty('--theme-stop3', 'rgba(200,137,90,0.05)');
+
+    /* ── THEME ENGINE BRIDGE — App Shell Entrance ───────────────────────
+       Trigger the #app entrance animation NOW, synchronised with the
+       splash fade. Both transitions use var(--theme-duration) so they
+       run in lockstep — splash opacity 1→0 while app opacity 0→1.
+       Class-based (not CSS animation-delay) so early-tap also works.
+    ──────────────────────────────────────────────────────────────────── */
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.classList.add('app-entering');
+
+    /* Fade out the splash using the CSS transition defined in #splash */
     const s=document.getElementById("splash");s.classList.add("fade-out");
-    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s)},1300);
+    /* Remove from DOM after transition completes — use theme-duration
+       (2.4s at idle = 2400ms) + 100ms safety buffer */
+    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s)},2500);
   }
   function runSplashSequence(){
     const rule=document.getElementById("splash-rule-top");
