@@ -6,38 +6,67 @@
   "start_url": "/moodfilm-app/",
   "scope": "/moodfilm-app/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "portrait-primary",
   "background_color": "#0D0D0F",
   "theme_color": "#0D0D0F",
   "lang": "en-IN",
-  "categories": [
-    "entertainment",
-    "lifestyle"
+  "dir": "ltr",
+  "categories": ["entertainment", "lifestyle"],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope_extensions": [
+    { "origin": "https://aaronkankipati.github.io" }
   ],
   "icons": [
+    { "src": "/moodfilm-app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/moodfilm-app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/moodfilm-app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/moodfilm-app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
     {
-      "src": "/moodfilm-app/icon-192.png",
-      "sizes": "192x192",
+      "src": "screenshots/screen1.png",
+      "sizes": "828x1792",
       "type": "image/png",
-      "purpose": "any"
+      "form_factor": "narrow",
+      "label": "Welcome screen — find movies by mood"
     },
     {
-      "src": "/moodfilm-app/icon-192.png",
-      "sizes": "192x192",
+      "src": "screenshots/screen2.png",
+      "sizes": "828x1792",
       "type": "image/png",
-      "purpose": "maskable"
+      "form_factor": "narrow",
+      "label": "Describe how you're feeling"
     },
     {
-      "src": "/moodfilm-app/icon-512.png",
-      "sizes": "512x512",
+      "src": "screenshots/screen3.png",
+      "sizes": "828x1792",
       "type": "image/png",
-      "purpose": "any"
+      "form_factor": "narrow",
+      "label": "Choose what you need from a film"
     },
     {
-      "src": "/moodfilm-app/icon-512.png",
-      "sizes": "512x512",
+      "src": "screenshots/screen4.png",
+      "sizes": "828x1792",
       "type": "image/png",
-      "purpose": "maskable"
+      "form_factor": "narrow",
+      "label": "Pick your language preference"
+    },
+    {
+      "src": "screenshots/screen5.png",
+      "sizes": "828x1792",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Your top pick with mood-match score"
+    },
+    {
+      "src": "screenshots/screen6.png",
+      "sizes": "828x1792",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "More films curated for your mood"
     }
   ],
   "shortcuts": [
@@ -46,13 +75,40 @@
       "short_name": "Find Film",
       "description": "Jump straight to mood input",
       "url": "/moodfilm-app/",
-      "icons": [
-        {
-          "src": "/moodfilm-app/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/moodfilm-app/icon-192.png", "sizes": "192x192" }]
     }
   ],
-  "prefer_related_applications": false
+  "share_target": {
+    "action": "/moodfilm-app/",
+    "method": "GET",
+    "params": {
+      "title": "mood",
+      "text": "mood",
+      "url": "url"
+    }
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+moodfilm",
+      "url": "/moodfilm-app/?mood=%s"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "note_taking": {
+    "new_note_url": "/moodfilm-app/"
+  },
+  "file_handlers": [
+    {
+      "action": "/moodfilm-app/",
+      "accept": {
+        "text/plain": [".txt"],
+        "text/csv": [".csv"]
+      }
+    }
+  ]
 }
