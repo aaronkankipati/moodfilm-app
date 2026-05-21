@@ -2566,20 +2566,12 @@ function submitMood(){
   }, 350);
 }
 
-/* ── PREFETCH (fires immediately on mood submit) ── */
+/* ── PREFETCH disabled — the new worker gates every POST through the
+   paywall, so a prefetch call would burn the free trial before the user
+   even picks a vibe. Acknowledgement text uses the local fallback instead. */
 function startPrefetch(){
-  prefetchData=null;prefetchProgress=0;
-  const bar=document.getElementById("prefetch-bar");
-  bar.style.opacity="1";bar.style.width="0%";
-  let pInt=setInterval(()=>{prefetchProgress=Math.min(prefetchProgress+Math.random()*3,82);bar.style.width=prefetchProgress+"%"},350);
-  prefetchPromise=fetch(WORKER_URL,{
-    method:"POST",headers:{"Content-Type":"application/json","X-Device-ID":DEVICE_ID},
-    body:JSON.stringify({mood,moodChips:selectedChips,prefetch:true,country:COUNTRY})
-  }).then(r=>r.json()).then(data=>{
-    prefetchData=data;clearInterval(pInt);
-    bar.style.width="100%";
-    setTimeout(()=>{bar.style.opacity="0";setTimeout(()=>bar.style.width="0%",300)},500);
-  }).catch(()=>{prefetchData=null;clearInterval(pInt);bar.style.opacity="0"});
+  prefetchData = null;
+  prefetchPromise = null;
 }
 
 /* ── STEP 2: INTENT ── */
@@ -2927,16 +2919,19 @@ function showPaywall(educationMode){
 
   // Education mode: wait for API + minimum display time, then act
   if(educationMode){
-    const apiPromise    = adApiPromise || fireFinalAPI();
-    const minShowPromise = new Promise(res => setTimeout(res, 1800)); // always show ≥1.8s
+    showToast("DEBUG: free trial firing…");
+    const apiPromise     = adApiPromise || fireFinalAPI();
+    const minShowPromise = new Promise(res => setTimeout(res, 1800));
 
     Promise.all([apiPromise, minShowPromise]).then(([data])=>{
+      showToast("DEBUG: got data — " + (data?.status || data?.error || "OK"));
       if(!data){ switchPaywallToGate(); return; }
       if(data.status === "PAYWALL_REQUIRED"){
+        showToast("DEBUG: PAYWALL_REQUIRED — switching to gate");
         switchPaywallToGate(); return;
       }
       if(data.error){
-        // API failed — show error inside the sheet, let user retry
+        showToast("DEBUG: error — " + data.error);
         const titleEl = document.querySelector("#pw-education .ad-title");
         if(titleEl) titleEl.innerHTML = "Something went <em>wrong</em>";
         const spinner = document.getElementById("pw-spinner");
@@ -2944,9 +2939,12 @@ function showPaywall(educationMode){
         setTimeout(()=>{ hideAdGate(); chatStep="awaiting_lang"; }, 1200);
         return;
       }
-      // Success — collapse and render
+      showToast("DEBUG: collapsing paywall");
       collapsePaywallAndRender(data);
-    }).catch(()=>{ hideAdGate(); chatStep="awaiting_lang"; });
+    }).catch((e)=>{
+      showToast("DEBUG: catch — " + e.message);
+      hideAdGate(); chatStep="awaiting_lang";
+    });
   }
 }
 
