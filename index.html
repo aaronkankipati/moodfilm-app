@@ -1765,6 +1765,15 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 #ad-gate.show{opacity:1;pointer-events:auto}
 #ad-sheet{background:var(--ink2);border-radius:24px 24px 0 0;border-top:1px solid rgba(200,137,90,.22);padding:22px 22px calc(22px + var(--safe-b));transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
 #ad-gate.show #ad-sheet{transform:translateY(0)}
+/* ══ PRO LOADING — Screen 3: paid users waiting for API ══ */
+#pro-loading{position:fixed;inset:0;z-index:500;background:rgba(7,7,9,.88);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(4px)}
+#pro-loading.show{opacity:1;pointer-events:auto}
+#pro-sheet{background:var(--ink2);border-radius:24px 24px 0 0;border-top:1px solid rgba(200,137,90,.22);padding:22px 22px calc(22px + var(--safe-b));transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+#pro-loading.show #pro-sheet{transform:translateY(0)}
+#pro-loading.show .mf-blob{opacity:1}
+#pro-loading.show .mood-fusion-canvas{filter:saturate(.8) blur(28px);transition:filter 1.8s ease .3s}
+.pro-spinner-arc{position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:var(--gold);border-right-color:rgba(200,137,90,.28);animation:spin .9s linear infinite}
+@keyframes proLineFade{0%{opacity:0;transform:translateY(4px)}15%,85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-3px)}}
 .ad-handle{width:36px;height:3px;background:var(--ink4);border-radius:3px;margin:0 auto 20px}
 
 /* ══ MOOD FUSION — watercolor blob overlay inside ad-sheet ══
@@ -2080,6 +2089,38 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <button class="pro-restore" onclick="restoreProPurchase()">Already subscribed? Restore</button>
     </div>
 
+  </div>
+</div>
+
+<!-- ══ PRO LOADING — Screen 3: paid users (credits or subscription) ══ -->
+<div id="pro-loading">
+  <div id="pro-sheet">
+    <div class="mood-fusion-canvas" aria-hidden="true">
+      <div class="mf-blob mf-blob-a"></div>
+      <div class="mf-blob mf-blob-b"></div>
+      <div class="mf-blob mf-blob-c"></div>
+    </div>
+    <div class="ad-handle" style="padding:8px 0;cursor:default"></div>
+    <div style="position:relative;z-index:1;text-align:center;margin-bottom:18px">
+      <div id="pro-loading-badge" style="display:none;margin-bottom:10px"><span class="pro-badge">PRO</span></div>
+      <div id="pro-spinner" style="position:relative;width:52px;height:52px;margin:0 auto 16px">
+        <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(200,137,90,.1)"></div>
+        <div class="pro-spinner-arc"></div>
+        <div id="pro-spinner-dot" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold),0 0 22px rgba(200,137,90,.35)"></div>
+      </div>
+      <h2 class="ad-title" id="pro-loading-title">Curating your films<em>…</em></h2>
+      <p id="pro-loading-line" style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:0;min-height:18px"></p>
+    </div>
+    <div style="height:2px;border-radius:2px;background:rgba(200,137,90,.1);margin-bottom:18px;overflow:hidden;position:relative;z-index:1">
+      <div id="pro-progress-fill" style="height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold-d),var(--gold));width:0%;transition:width .4s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px var(--gold)"></div>
+    </div>
+    <div style="position:relative;z-index:1;background:rgba(200,137,90,.07);border:1px solid rgba(200,137,90,.15);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div id="pro-strip-label" style="font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">Your credits</div>
+        <div id="pro-strip-count" style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold-l)">—</div>
+      </div>
+      <div id="pro-strip-badge" style="display:none"><span class="pro-badge">PRO</span></div>
+    </div>
   </div>
 </div>
 
@@ -2886,21 +2927,13 @@ function showPaywall(educationMode){
   }
   document.getElementById("ad-gate").classList.add("show");
 
-  // Education mode: wait for API + minimum display time, then act
   if(educationMode){
-    showToast("DEBUG: free trial firing…");
     const apiPromise     = adApiPromise || fireFinalAPI();
     const minShowPromise = new Promise(res => setTimeout(res, 1800));
-
     Promise.all([apiPromise, minShowPromise]).then(([data])=>{
-      showToast("DEBUG: got data — " + (data?.status || data?.error || "OK"));
       if(!data){ switchPaywallToGate(); return; }
-      if(data.status === "PAYWALL_REQUIRED"){
-        showToast("DEBUG: PAYWALL_REQUIRED — switching to gate");
-        switchPaywallToGate(); return;
-      }
+      if(data.status === "PAYWALL_REQUIRED"){ switchPaywallToGate(); return; }
       if(data.error){
-        showToast("DEBUG: error — " + data.error);
         const titleEl = document.querySelector("#pw-education .ad-title");
         if(titleEl) titleEl.innerHTML = "Something went <em>wrong</em>";
         const spinner = document.getElementById("pw-spinner");
@@ -2908,12 +2941,8 @@ function showPaywall(educationMode){
         setTimeout(()=>{ hideAdGate(); chatStep="awaiting_lang"; }, 1200);
         return;
       }
-      showToast("DEBUG: collapsing paywall");
       collapsePaywallAndRender(data);
-    }).catch((e)=>{
-      showToast("DEBUG: catch — " + e.message);
-      hideAdGate(); chatStep="awaiting_lang";
-    });
+    }).catch(()=>{ hideAdGate(); chatStep="awaiting_lang"; });
   }
 }
 
@@ -2996,45 +3025,105 @@ function dismissAdEarly(){
 
 // startAdFlow removed — no ads in this app. Access is gated server-side.
 
-/* onAdComplete — called only for paid users (sub or credits) who
-   skipped the paywall entirely. Free trial results flow through
-   collapsePaywallAndRender() instead. */
+/* onAdComplete — Screen 3: paid users (credits or subscription).
+   Shows the pro loading sheet while the API runs, then collapses
+   gracefully into results. Mirrors collapsePaywallAndRender exactly. */
+const _PRO_LINES=[
+  "Reading between the frames…",
+  "Finding your emotional frequency…",
+  "Matching mood to cinema…",
+  "Assembling your programme…",
+  "Almost there…"
+];
+let _proLineInterval=null,_proProgInterval=null;
+
+function _showProLoading(){
+  const badge=document.getElementById("pro-loading-badge");
+  const stripBadge=document.getElementById("pro-strip-badge");
+  const stripLabel=document.getElementById("pro-strip-label");
+  const stripCount=document.getElementById("pro-strip-count");
+  if(isProUser){
+    if(badge)badge.style.display="block";
+    if(stripBadge)stripBadge.style.display="block";
+    if(stripLabel)stripLabel.textContent="Monthly plan";
+    if(stripCount)stripCount.textContent=userCredits+" searches left this cycle";
+  }else{
+    if(badge)badge.style.display="none";
+    if(stripBadge)stripBadge.style.display="none";
+    if(stripLabel)stripLabel.textContent="Your credits";
+    if(stripCount)stripCount.textContent=userCredits+" credit"+(userCredits===1?"":"s")+" remaining";
+  }
+  const arc=document.querySelector(".pro-spinner-arc");
+  const dot=document.getElementById("pro-spinner-dot");
+  const title=document.getElementById("pro-loading-title");
+  const fill=document.getElementById("pro-progress-fill");
+  if(arc){arc.style.animation="spin .9s linear infinite";arc.style.border="2px solid transparent";arc.style.borderTopColor="var(--gold)";arc.style.borderRightColor="rgba(200,137,90,.28)";}
+  if(dot)dot.style.display="block";
+  if(title)title.innerHTML="Curating your films<em>…</em>";
+  if(fill)fill.style.width="0%";
+  document.getElementById("pro-loading").classList.add("show");
+  let prog=0;
+  _proProgInterval=setInterval(()=>{prog=Math.min(prog+Math.random()*5+2,88);if(fill)fill.style.width=prog+"%";},300);
+  let li=0;
+  const lineEl=document.getElementById("pro-loading-line");
+  if(lineEl){lineEl.style.animation="none";void lineEl.offsetWidth;lineEl.textContent=_PRO_LINES[0];lineEl.style.animation="proLineFade 2.2s ease forwards";}
+  _proLineInterval=setInterval(()=>{li=(li+1)%_PRO_LINES.length;if(lineEl){lineEl.style.animation="none";void lineEl.offsetWidth;lineEl.textContent=_PRO_LINES[li];lineEl.style.animation="proLineFade 2.2s ease forwards";}},2200);
+}
+
+function _collapseProAndRender(data){
+  clearInterval(_proLineInterval);clearInterval(_proProgInterval);
+  const fill=document.getElementById("pro-progress-fill");
+  const arc=document.querySelector(".pro-spinner-arc");
+  const dot=document.getElementById("pro-spinner-dot");
+  const title=document.getElementById("pro-loading-title");
+  const spinner=document.getElementById("pro-spinner");
+  if(fill)fill.style.width="100%";
+  if(arc){arc.style.animation="none";arc.style.border="2px solid rgba(200,137,90,.3)";}
+  if(dot)dot.style.display="none";
+  if(spinner&&!spinner.querySelector(".pro-tick")){
+    const tick=document.createElement("div");
+    tick.className="pro-tick";
+    tick.style.cssText="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(200,137,90,.08);border:2px solid rgba(200,137,90,.35);box-shadow:0 0 18px rgba(200,137,90,.2)";
+    tick.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    spinner.appendChild(tick);
+  }
+  if(title)title.innerHTML="Your films are <em>ready</em>";
+  setTimeout(()=>{
+    const overlay=document.getElementById("pro-loading");
+    const sheet=document.getElementById("pro-sheet");
+    if(sheet){sheet.style.transition="transform .45s cubic-bezier(.4,0,.2,1), opacity .35s ease";sheet.style.transform="translateY(100%)";sheet.style.opacity="0";}
+    setTimeout(()=>{
+      overlay.classList.remove("show");
+      if(sheet){sheet.style.transform="";sheet.style.opacity="";sheet.style.transition="";}
+      const tick=spinner?spinner.querySelector(".pro-tick"):null;if(tick)tick.remove();
+      if(data.credits_remaining!==undefined)userCredits=data.credits_remaining;
+      if(data.is_subscribed!==undefined)isProUser=data.is_subscribed;
+      chatStep="done";
+      lastRecs=data.recommendations;
+      renderResults(data.recommendations,data.moodAnalysis);
+      initialisePushNotifications();
+    },480);
+  },600);
+}
+
 async function onAdComplete(){
   chatStep="loading";
-
-  const rlWrap=document.createElement("div");
-  rlWrap.className="rl-wrap slide-up";rlWrap.id="rl-wrap";
-  rlWrap.innerHTML=`<div class="rl-bar"><div class="rl-fill" id="rl-fill"></div></div><div class="rl-text" id="rl-text">Putting your picks together...</div>`;
-  document.getElementById("chat").appendChild(rlWrap);scrollChat();
-
-  let rlProg=0;
-  const rlInt=setInterval(()=>{rlProg=Math.min(rlProg+6,95);const f=document.getElementById("rl-fill");if(f)f.style.width=rlProg+"%"},200);
-
+  _showProLoading();
   try{
     const data=await(adApiPromise||fireFinalAPI());
-    clearInterval(rlInt);
-    const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-
     if(data.status==="PAYWALL_REQUIRED"){
-      // Credits depleted mid-session (race condition) — show gate
+      clearInterval(_proLineInterval);clearInterval(_proProgInterval);
+      document.getElementById("pro-loading").classList.remove("show");
       chatStep="ad_gate";
-      if(data.credits_remaining!==undefined) userCredits=data.credits_remaining;
+      if(data.credits_remaining!==undefined)userCredits=data.credits_remaining;
       showPaywall(false);
       return;
     }
-
-    if(data.error) throw new Error(data.error);
-
-    if(data.credits_remaining!==undefined) userCredits=data.credits_remaining;
-    if(data.is_subscribed!==undefined) isProUser=data.is_subscribed;
-
-    lastRecs=data.recommendations;
-    renderResults(data.recommendations,data.moodAnalysis);
-    initialisePushNotifications();
-    chatStep="done";
+    if(data.error)throw new Error(data.error);
+    _collapseProAndRender(data);
   }catch(e){
-    clearInterval(rlInt);
-    const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
+    clearInterval(_proLineInterval);clearInterval(_proProgInterval);
+    document.getElementById("pro-loading").classList.remove("show");
     const errType=(e.message==="TIMEOUT")?"TIMEOUT":(!navigator.onLine)?"OFFLINE":"REQUEST_FAILED";
     showError(errType,function(){adApiPromise=null;chatStep="loading";onAdComplete();});
     chatStep="awaiting_lang";
