@@ -1886,9 +1886,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 #ad-gate .ad-icon,
 #ad-gate .ad-title,
 #ad-gate .ad-sub,
-#ad-gate #ad-simulated,
-#ad-gate #ad-timer-wrap,
-#ad-gate #btn-watch-ad,
 #ad-gate p{
   position:relative;
   z-index:1;
@@ -1900,73 +1897,11 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .ad-title em{font-style:italic;color:var(--gold)}
 .ad-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:22px;max-width:280px;margin-left:auto;margin-right:auto}
 
-/* The big watch ad button — premium gold */
-#btn-watch-ad{
-  width:100%;
-  background:linear-gradient(135deg,var(--gold-l),var(--gold));
-  border:none;border-radius:16px;
-  padding:16px 24px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  cursor:pointer;
-  font-family:'Lora',Georgia,serif;font-size:15px;font-weight:600;
-  color:var(--ink);
-  transition:transform .18s,box-shadow .18s;
-  box-shadow:0 4px 24px rgba(200,137,90,.3);
-  margin-bottom:12px;
-}
-#btn-watch-ad:active{transform:scale(.98)}
-
-/* Ad countdown timer ring */
-.ad-timer-wrap{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
-.ad-timer-ring{position:relative;width:52px;height:52px;flex-shrink:0}
-.ad-timer-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
-.ad-timer-ring circle{fill:none;stroke:var(--ink4);stroke-width:3}
-.ad-timer-ring .progress{stroke:var(--gold);stroke-linecap:round;stroke-dasharray:138;stroke-dashoffset:138;transition:stroke-dashoffset .9s linear}
-.ad-timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold)}
-.ad-timer-label{font-size:13px;color:var(--paper2);line-height:1.5}
-
 /* ══ PRO DIVIDER ══ */
 .pro-divider{display:flex;align-items:center;gap:10px;margin:14px 0 12px}
 .pro-divider-line{flex:1;height:1px;background:rgba(200,137,90,.15)}
 .pro-divider-text{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
 
-/* ══ PRO BUTTON ══ */
-#btn-go-pro{
-  width:100%;
-  background:transparent;
-  border:1px solid rgba(200,137,90,.35);
-  border-radius:14px;
-  padding:13px 20px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  cursor:pointer;
-  font-family:'Lora',Georgia,serif;font-size:14px;font-weight:500;
-  color:var(--gold);
-  transition:border-color .2s,background .2s;
-  margin-bottom:8px;
-  position:relative;z-index:1;
-}
-#btn-go-pro:active{background:rgba(200,137,90,.08)}
-
-/* Ad button disabled state — used limit */
-#btn-watch-ad:disabled{
-  cursor:not-allowed;
-  background:transparent;
-  border:1px solid rgba(200,137,90,.25);
-  color:rgba(200,137,90,.45);
-  box-shadow:none;
-  transform:none;
-}
-#btn-watch-ad:disabled svg{opacity:.4}
-#btn-watch-ad:disabled:active{transform:none}
-.ad-limit-msg{
-  font-size:12px;color:var(--gold);
-  text-align:center;margin-top:6px;
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;
-  position:relative;z-index:1;
-  display:none;
-}
-.ad-limit-msg.show{display:block}
 .pro-badge{
   font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
   background:linear-gradient(135deg,var(--gold-l),var(--gold));
@@ -1982,11 +1917,47 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   background:none;border:none;width:100%;
 }
 
-/* Simulated ad view (pre-Play Store) */
-#ad-simulated{display:none;background:var(--ink3);border:1px solid rgba(200,137,90,.18);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px}
-#ad-simulated.show{display:block}
-.ad-sim-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
-.ad-sim-content{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--paper2);line-height:1.5}
+/* ══ PRO BUTTON ══ */
+#btn-go-pro{
+  width:100%;
+  background:transparent;
+  border:1px solid rgba(200,137,90,.35);
+  border-radius:14px;
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  font-family:'Lora',Georgia,serif;font-size:14px;font-weight:500;
+  color:var(--gold);
+  transition:border-color .2s,background .2s;
+  margin-bottom:8px;
+  position:relative;z-index:1;
+}
+#btn-go-pro:active{background:rgba(200,137,90,.08)}
+
+/* ══ CREDITS BUTTON ══ */
+#btn-buy-credits{
+  width:100%;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold));
+  border:none;border-radius:16px;
+  padding:15px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+  font-family:'Lora',Georgia,serif;font-size:14px;font-weight:600;
+  color:var(--ink);
+  transition:transform .18s,box-shadow .18s;
+  box-shadow:0 4px 24px rgba(200,137,90,.3);
+  margin-bottom:10px;
+  position:relative;z-index:1;
+}
+#btn-buy-credits:active{transform:scale(.98)}
+
+/* ══ PRO DIVIDER ══ */
+  font-size:11px;color:var(--muted);
+  text-decoration:underline;text-underline-offset:2px;
+  cursor:pointer;margin-top:6px;
+  position:relative;z-index:1;
+  background:none;border:none;width:100%;
+}
 
 /* ══ TOAST ════════════════════════════════════════════════ */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink3);border:1px solid rgba(200,137,90,.3);border-radius:50px;padding:9px 20px;font-size:12px;color:var(--gold-l);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;z-index:700}
@@ -2053,59 +2024,92 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- ══ AD GATE ════════════════════════════════════════════ -->
 <div id="ad-gate">
   <div id="ad-sheet">
-    <!-- Mood Fusion — watercolour blobs representing chosen vibes. Pure CSS, no JS. -->
+    <!-- Mood Fusion blobs — always visible, both modes -->
     <div class="mood-fusion-canvas" aria-hidden="true">
       <div class="mf-blob mf-blob-a"></div>
       <div class="mf-blob mf-blob-b"></div>
       <div class="mf-blob mf-blob-c"></div>
     </div>
     <div class="ad-handle" style="padding:8px 0;cursor:default"></div>
-    <div class="ad-icon">🎬</div>
-    <h2 class="ad-title">Your picks are <em>ready</em></h2>
-    <p class="ad-sub" id="ad-gate-sub">Watch a short ad and your films appear the moment it ends. One free search per day.</p>
 
-    <!-- Simulated ad (shown during countdown) -->
-    <div id="ad-simulated">
-      <div class="ad-sim-label">Advertisement</div>
-      <div class="ad-sim-content">Your ad will appear here after Play Store approval</div>
-    </div>
-
-    <!-- Timer + label (shown after tap) -->
-    <div class="ad-timer-wrap" id="ad-timer-wrap" style="display:none">
-      <div class="ad-timer-ring">
-        <svg viewBox="0 0 52 52" width="52" height="52">
-          <circle cx="26" cy="26" r="22"/>
-          <circle cx="26" cy="26" r="22" class="progress" id="ad-ring-progress"/>
-        </svg>
-        <div class="ad-timer-num" id="ad-timer-num">30</div>
+    <!-- ══ MODE A: EDUCATION (free trial — API loading in background) ══ -->
+    <div id="pw-education">
+      <div style="position:relative;z-index:1;text-align:center;margin-bottom:20px">
+        <!-- Curating spinner -->
+        <div id="pw-spinner" style="margin:0 auto 14px;width:36px;height:36px;border-radius:50%;border:2px solid rgba(200,137,90,.18);border-top-color:var(--gold);animation:spin .9s linear infinite"></div>
+        <h2 class="ad-title" style="margin-bottom:6px">Curating your films<em>…</em></h2>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:0">Matching your mood to the right films.<br>Ready in just a moment.</p>
       </div>
-      <div class="ad-timer-label">Your films are being<br>curated right now</div>
+
+      <!-- Feature education cards -->
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+        <div style="background:rgba(200,137,90,.07);border:1px solid rgba(200,137,90,.15);border-radius:12px;padding:13px 15px;display:flex;align-items:flex-start;gap:12px">
+          <span style="font-size:22px;flex-shrink:0;margin-top:1px">🎭</span>
+          <div>
+            <div style="font-family:'Lora',Georgia,serif;font-size:13px;font-weight:500;color:var(--paper);margin-bottom:3px">Mood-matched picks</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Not genre. Not trending. The exact film for <em>this</em> feeling, right now.</div>
+          </div>
+        </div>
+        <div style="background:rgba(200,137,90,.07);border:1px solid rgba(200,137,90,.15);border-radius:12px;padding:13px 15px;display:flex;align-items:flex-start;gap:12px">
+          <span style="font-size:22px;flex-shrink:0;margin-top:1px">🌍</span>
+          <div>
+            <div style="font-family:'Lora',Georgia,serif;font-size:13px;font-weight:500;color:var(--paper);margin-bottom:3px">Hindi, Telugu, Tamil & more</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Every search understands language preference. Indian cinema included.</div>
+          </div>
+        </div>
+        <div style="background:rgba(200,137,90,.07);border:1px solid rgba(200,137,90,.15);border-radius:12px;padding:13px 15px;display:flex;align-items:flex-start;gap:12px">
+          <span style="font-size:22px;flex-shrink:0;margin-top:1px">📡</span>
+          <div>
+            <div style="font-family:'Lora',Georgia,serif;font-size:13px;font-weight:500;color:var(--paper);margin-bottom:3px">Where to watch, instantly</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">Netflix, Prime, Hotstar — every pick shows you exactly where it's streaming.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Soft tier preview — no hard sell, just awareness -->
+      <div style="position:relative;z-index:1;border-top:1px solid rgba(200,137,90,.12);padding-top:16px">
+        <p style="font-size:11px;text-align:center;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Keep searching after this</p>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;background:rgba(200,137,90,.06);border:1px solid rgba(200,137,90,.18);border-radius:10px;padding:11px 12px;text-align:center">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-l);font-weight:600">₹149</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4">15 credits<br>no expiry</div>
+          </div>
+          <div style="flex:1;background:rgba(200,137,90,.06);border:1px solid rgba(200,137,90,.18);border-radius:10px;padding:11px 12px;text-align:center">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-l);font-weight:600">₹349</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4">45 searches<br>per month</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Main CTA button -->
-    <button id="btn-watch-ad" onclick="startAdFlow()" aria-label="Watch a short ad to unlock film recommendations">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-      Watch a short ad, it's free
-    </button>
+    <!-- ══ MODE B: GATE (blocked — purchase required) ══ -->
+    <div id="pw-gate" style="display:none">
+      <div style="position:relative;z-index:1;text-align:center;margin-bottom:18px">
+        <div class="ad-icon" style="margin-bottom:8px">🎬</div>
+        <h2 class="ad-title" style="margin-bottom:6px">Your free session is <em>used</em></h2>
+        <p class="ad-sub">Pick a plan to keep discovering films.</p>
+      </div>
 
-    <p style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6" id="ad-hint">
-      Your picks load while the ad plays. Zero wait after it ends.
-    </p>
-    <p class="ad-limit-msg" id="ad-limit-msg">You've used your free search today. Come back tomorrow — or go Pro.</p>
+      <!-- Tier A — 15 credits -->
+      <button id="btn-buy-credits" onclick="purchaseCredits()" aria-label="Buy 15 search credits for ₹149">
+        <div style="text-align:left">
+          <div>15 Search Credits</div>
+          <div style="font-size:11px;font-weight:400;opacity:.7;margin-top:2px">No expiry · one-time purchase</div>
+        </div>
+        <div style="font-size:18px;font-weight:700">₹149</div>
+      </button>
 
-    <!-- Pro upsell -->
-    <div class="pro-divider">
-      <div class="pro-divider-line"></div>
-      <span class="pro-divider-text">or</span>
-      <div class="pro-divider-line"></div>
+      <!-- Tier B — monthly -->
+      <button id="btn-go-pro" onclick="startProPurchase()" aria-label="Subscribe for ₹349/month">
+        <div style="text-align:left">
+          <div style="display:flex;align-items:center;gap:8px"><span class="pro-badge">PRO</span> Monthly Plan</div>
+          <div style="font-size:11px;font-weight:400;color:var(--muted);margin-top:2px">45 searches / month · resets each cycle</div>
+        </div>
+        <div style="font-size:16px;font-weight:700">₹349<span style="font-size:10px;font-weight:400;opacity:.7">/mo</span></div>
+      </button>
+
+      <button class="pro-restore" onclick="restoreProPurchase()">Already subscribed? Restore</button>
     </div>
-
-    <button id="btn-go-pro" onclick="startProPurchase()" aria-label="Upgrade to Moodfilm Pro — no ads ever">
-      <span class="pro-badge">PRO</span>
-      ₹199/month — no ads, ever
-    </button>
-
-    <button class="pro-restore" onclick="restoreProPurchase()">Already subscribed? Restore</button>
 
   </div>
 </div>
@@ -2239,6 +2243,23 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 <script>
 const WORKER_URL="https://moodfilm-api.kankipati-aaron.workers.dev";
+
+// ── Persistent device ID ──────────────────────────────────────────────────────
+// Generated once on first launch, stored in localStorage.
+// Sent as X-Device-ID on every request — this is how the worker
+// identifies users without requiring a login system.
+const _DEVICE_ID_KEY = "moodfilm_device_id";
+function getDeviceId(){
+  try{
+    let id = localStorage.getItem(_DEVICE_ID_KEY);
+    if(!id){
+      id = "d_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10);
+      localStorage.setItem(_DEVICE_ID_KEY, id);
+    }
+    return id;
+  } catch { return "d_unknown"; }
+}
+const DEVICE_ID = getDeviceId();
 const COUNTRY=(()=>{try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";if(tz.includes("Kolkata")||tz.includes("Calcutta"))return"IN";return(navigator.language||"").split("-")[1]?.toUpperCase()||"IN"}catch{return"IN"}})();
 
 const LANGS=[
@@ -2258,7 +2279,7 @@ const MOOD_CHIPS=["😰 Anxious","🌙 Nostalgic","😢 Sad","✨ Excited","🤝
 const GENRE_ICONS={Drama:"🎭",Comedy:"😄",Romance:"💕",Thriller:"😰",Action:"⚡",Horror:"👻",Animation:"✨",Fantasy:"🔮","Sci-Fi":"🚀",Documentary:"📽️"};
 const STAGES=["Curating your films...","Writing your explanations...","Almost there..."];
 const FACTS=["Parasite is the first non-English film to win the Oscar for Best Picture.","The Inception hallway fight took 3 weeks on a custom rotating set.","Schindler's List was shot almost entirely in black and white, intentionally.","Interstellar's black hole led to a published Nature Physics paper.","Mad Max: Fury Road was 90% practical effects, shot over 80 days in Namibia.","The Godfather was the first film to gross $100M domestically.","Spirited Away is the only non-English animated film to win an Oscar.","Hiding the Jaws shark accidentally made the film scarier.","Jurassic Park's roar blended elephant, tiger, alligator, and penguin sounds."];
-const AD_DURATION = 30; // seconds — replace with real AdMob duration after Play Store
+// AD_DURATION removed — paywall is now backend-gated, not ad-timer-based
 
 /* ── STATE ── */
 let mood="", selectedChips=[], selectedIntent="", selectedLang="any";
@@ -2325,7 +2346,6 @@ let chatStep="idle"; // idle | awaiting_intent | awaiting_lang | ad_gate | loadi
 let prefetchData=null, prefetchPromise=null, prefetchProgress=0;
 let lastRecs=null;
 let adCountdownInterval=null, adApiPromise=null;
-let isProUser=false; // set to true after Play billing confirms subscription
 let _keyboardInited=false;
 
 /* ── CHAT HELPERS ── */
@@ -2553,7 +2573,7 @@ function startPrefetch(){
   bar.style.opacity="1";bar.style.width="0%";
   let pInt=setInterval(()=>{prefetchProgress=Math.min(prefetchProgress+Math.random()*3,82);bar.style.width=prefetchProgress+"%"},350);
   prefetchPromise=fetch(WORKER_URL,{
-    method:"POST",headers:{"Content-Type":"application/json"},
+    method:"POST",headers:{"Content-Type":"application/json","X-Device-ID":DEVICE_ID},
     body:JSON.stringify({mood,moodChips:selectedChips,prefetch:true,country:COUNTRY})
   }).then(r=>r.json()).then(data=>{
     prefetchData=data;clearInterval(pInt);
@@ -2606,171 +2626,187 @@ function selectLang(lang,row){
   row.classList.add("locked");
   appendUser(lang.label);
   advanceTracker(2);
-  // Pro users skip the ad gate entirely
-  if(isProUser){
+
+  // Paid users (sub or credits) — skip paywall, go straight to results
+  if(isProUser || userCredits > 0){
     chatStep="loading";
-    setTimeout(()=>onAdComplete(),200);
-  } else {
-    chatStep="ad_gate";
-    setTimeout(showAdGate, 400);
+    setTimeout(()=>onAdComplete(), 200);
+    return;
+  }
+
+  // Free trial OR blocked — always show paywall
+  // Free trial: education mode, API fires simultaneously in background
+  // Blocked: gate mode, API does NOT fire (server will 403 anyway)
+  chatStep="ad_gate";
+  const isFreeSession = !hasUsedFreeTrial;
+  setTimeout(()=>showPaywall(isFreeSession), 350);
+  if(isFreeSession){
+    // Fire API silently while user reads the education screen
+    adApiPromise = fireFinalAPI();
   }
 }
 
-/* ══ AD LIMIT LOGIC — 1 per 24 hours via localStorage ════
-   Key: moodfilm_last_ad — stores ISO timestamp of last ad view
-   On gate open: check if 24hrs have passed since last ad
-   If yes: ad button enabled, normal flow
-   If no: ad button disabled, show countdown, Pro is only option
-   ══════════════════════════════════════════════════════ */
-const AD_LIMIT_KEY = "moodfilm_last_ad";
+/* ══════════════════════════════════════════════════════════════
+   MOODFILM — MONETIZATION ENGINE v2
+   Backend-gated credit + subscription system.
 
-function hasUsedAdToday(){
-  try {
-    const last = localStorage.getItem(AD_LIMIT_KEY);
-    if(!last) return false;
-    const elapsed = Date.now() - parseInt(last, 10);
-    return elapsed < 24 * 60 * 60 * 1000; // 24 hours in ms
-  } catch { return false; }
+   Access tiers (checked server-side in this priority order):
+     1. Active subscription (is_subscribed = true)  → 45 credits/cycle
+     2. Consumable credits (search_credits > 0)     → depletes per search
+     3. Free trial (has_used_free_trial = false)     → exactly 1 session
+     4. BLOCKED                                      → show paywall
+
+   Play Store Product IDs (must match Play Console exactly):
+     Tier A consumable:    com.moodfilm.credits_15
+     Tier B subscription:  com.moodfilm.subscription_monthly
+   ══════════════════════════════════════════════════════════════ */
+
+const PRODUCT_CREDITS_15   = "com.moodfilm.credits_15";
+const PRODUCT_SUB_MONTHLY  = "com.moodfilm.subscription_monthly";
+
+// ── User state (hydrated from backend on load) ──────────────
+let userCredits     = 0;      // search_credits from DB
+let isProUser       = false;  // is_subscribed from DB
+let hasUsedFreeTrial= false;  // has_used_free_trial from DB
+let _userIdToken    = null;   // Firebase ID token — set after auth
+
+// ── Optimistic local mirror (avoids re-fetching after purchase) ──
+function _cacheUserState(data){
+  if(data.search_credits  !== undefined) userCredits      = data.search_credits;
+  if(data.is_subscribed   !== undefined) isProUser        = data.is_subscribed;
+  if(data.has_used_free_trial !== undefined) hasUsedFreeTrial = data.has_used_free_trial;
 }
 
-function markAdUsed(){
-  try { localStorage.setItem(AD_LIMIT_KEY, Date.now().toString()); }
-  catch {}
+/* ── refreshUserState
+   Fetches the authoritative credit + subscription state from the backend.
+   Called on boot and after any purchase. Falls back silently on error. */
+async function refreshUserState(){
+  try{
+    const res = await fetch(WORKER_URL+"/api/user/state",{
+      headers:{ "X-Device-ID": DEVICE_ID }
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    _cacheUserState(data);
+    
+  } catch(e){ console.log("[Moodfilm] Could not refresh user state:", e.message); }
 }
 
-function msUntilReset(){
-  try {
-    const last = localStorage.getItem(AD_LIMIT_KEY);
-    if(!last) return 0;
-    const elapsed = Date.now() - parseInt(last, 10);
-    return Math.max(0, 24 * 60 * 60 * 1000 - elapsed);
-  } catch { return 0; }
-}
-
-function formatTimeLeft(ms){
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  if(h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
-}
-
-function applyAdLimitState(){
-  const used = hasUsedAdToday();
-  const btn = document.getElementById("btn-watch-ad");
-  const hint = document.getElementById("ad-hint");
-  const limitMsg = document.getElementById("ad-limit-msg");
-  const sub = document.getElementById("ad-gate-sub");
-
-  if(used){
-    // Disable ad button
-    if(btn){ btn.disabled = true; btn.setAttribute("aria-label","Daily ad limit reached — come back tomorrow or go Pro"); }
-    if(hint) hint.style.display = "none";
-    if(limitMsg){
-      const left = formatTimeLeft(msUntilReset());
-      limitMsg.textContent = `Free search resets in ${left}. Come back tomorrow — or go Pro now.`;
-      limitMsg.classList.add("show");
-    }
-    if(sub) sub.textContent = "You've had your free search for today.";
-  } else {
-    // Enable ad button
-    if(btn){ btn.disabled = false; btn.setAttribute("aria-label","Watch a short ad to unlock film recommendations"); }
-    if(hint) hint.style.display = "";
-    if(limitMsg) limitMsg.classList.remove("show");
-    if(sub) sub.textContent = "Watch a short ad and your films appear the moment it ends. One free search per day.";
-  }
-}
-
-/* ══ PRO SUBSCRIPTION LOGIC ═══════════════════════════════
-   Uses Median.co's native Play Billing bridge.
-   Falls back gracefully in browser (no bridge available).
-   Product ID must match exactly what's set in Play Console.
-   ══════════════════════════════════════════════════════ */
-const PRO_PRODUCT_ID = "moodfilm_pro_monthly";
-
-// ── Digital Goods API — works natively in PWABuilder TWA (free, no Median needed)
-// Falls back gracefully in browser
-
+/* ══ Digital Goods API — TWA Play Billing bridge ══════════════
+   Available in Chrome TWA (PWABuilder / Trusted Web Activity).
+   Falls back gracefully to null in browser. */
 async function getDigitalGoodsService(){
-  // Digital Goods API — available in Chrome TWA on Android
   if("getDigitalGoodsService" in window){
-    try {
-      return await window.getDigitalGoodsService("https://play.google.com/billing");
-    } catch { return null; }
+    try{ return await window.getDigitalGoodsService("https://play.google.com/billing"); }
+    catch{ return null; }
   }
   return null;
 }
 
-// Called on every app launch — check if user is already subscribed
-async function initialisePro(){
-  try {
-    const service = await getDigitalGoodsService();
-    if(!service) return; // browser — stay free
-
-    // Check existing purchases
-    const existingPurchases = await service.listPurchases();
-    const isActive = existingPurchases.some(p =>
-      p.itemId === PRO_PRODUCT_ID &&
-      p.purchaseState === "purchased"
-    );
-    if(isActive){
-      isProUser = true;
-      updateProUI();
-    }
-  } catch(e){
-    console.log("[Pro] Could not check subscription status:", e.message);
-  }
-}
-
-// Called when user taps "₹199/month — no ads, ever"
-async function startProPurchase(){
-  try {
+/* ── purchaseCredits
+   Tier A: ₹149 → 15 credits (consumable IAP).
+   After Play confirms payment, POST the purchaseToken to our backend
+   which verifies with Google Play API, grants credits, then consumes. */
+async function purchaseCredits(){
+  try{
     const service = await getDigitalGoodsService();
     if(!service){
-      // Browser — tell user to use the app
-      showToast("Pro subscriptions are available in the Moodfilm app on Play Store.");
+      showToast("Credit packs are available in the Moodfilm app on Play Store.");
       return;
     }
 
-    // Get product details first
-    const details = await service.getDetails([PRO_PRODUCT_ID]);
-    if(!details || details.length === 0){
+    const details = await service.getDetails([PRODUCT_CREDITS_15]);
+    if(!details || !details.length){
+      showToast("Credit pack not available right now. Try again shortly.");
+      return;
+    }
+
+    const paymentRequest = new PaymentRequest(
+      [{ supportedMethods:"https://play.google.com/billing", data:{ sku: PRODUCT_CREDITS_15 } }],
+      { total:{ label:"15 Moodfilm Credits", amount:{ currency:"INR", value:"149" } } }
+    );
+
+    const response = await paymentRequest.show();
+    const purchaseToken = response.details.token;
+
+    // Tell our backend — it verifies with Google Play API, grants credits, then consumes
+    await _notifyBackendPurchase({
+      type: "consumable",
+      productId: PRODUCT_CREDITS_15,
+      purchaseToken
+    });
+
+    await response.complete("success");
+
+    // Refresh authoritative state from DB
+    await refreshUserState();
+    
+
+    // User now has credits — proceed directly to results
+    hideAdGate();
+    chatStep = "loading";
+    onAdComplete();
+    showToast("15 credits added 🎬 Enjoy!");
+
+  } catch(e){
+    if(e.name !== "AbortError") showToast("Purchase could not be completed. Please try again.");
+    console.log("[Credits] Purchase error:", e.message);
+  }
+}
+
+/* ── startProPurchase
+   Tier B: ₹349/month — auto-renewing subscription.
+   After Play confirms, backend handles RTDN webhook to set
+   is_subscribed=true and reset search_credits=45. */
+async function startProPurchase(){
+  try{
+    const service = await getDigitalGoodsService();
+    if(!service){
+      showToast("Subscriptions are available in the Moodfilm app on Play Store.");
+      return;
+    }
+
+    const details = await service.getDetails([PRODUCT_SUB_MONTHLY]);
+    if(!details || !details.length){
       showToast("Subscription not available right now. Try again shortly.");
       return;
     }
 
-    // Launch Google Play payment flow
     const paymentRequest = new PaymentRequest(
-      [{ supportedMethods: "https://play.google.com/billing",
-         data: { sku: PRO_PRODUCT_ID } }],
-      { total: { label: "Moodfilm Pro", amount: { currency: "INR", value: "199" } } }
+      [{ supportedMethods:"https://play.google.com/billing", data:{ sku: PRODUCT_SUB_MONTHLY } }],
+      { total:{ label:"Moodfilm Monthly Plan", amount:{ currency:"INR", value:"349" } } }
     );
 
     const response = await paymentRequest.show();
-    await response.complete("success");
+    const purchaseToken = response.details.token;
 
-    // Acknowledge the purchase
-    await service.acknowledge(response.details.token, "subscription");
+    // Register token with our backend so the RTDN webhook can link it to this user
+    await _notifyBackendPurchase({
+      type: "subscription",
+      productId: PRODUCT_SUB_MONTHLY,
+      purchaseToken
+    });
+
+    await response.complete("success");
+    await refreshUserState();
+    
 
     isProUser = true;
-    updateProUI();
     hideAdGate();
-    resetAdUI();
     chatStep = "loading";
     onAdComplete();
-    showToast("Welcome to Pro 🎬 No more ads, ever.");
+    showToast("Welcome to Pro 🎬 45 searches/month, no limits.");
 
   } catch(e){
-    if(e.name !== "AbortError"){
-      // AbortError = user cancelled — don't show error
-      showToast("Purchase could not be completed. Please try again.");
-    }
+    if(e.name !== "AbortError") showToast("Purchase could not be completed. Please try again.");
     console.log("[Pro] Purchase error:", e.message);
   }
 }
 
-// Called when user taps "Already subscribed? Restore"
+/* ── restoreProPurchase
+   Checks Play Store for any active subscription and syncs backend. */
 async function restoreProPurchase(){
-  try {
+  try{
     const service = await getDigitalGoodsService();
     if(!service){
       showToast("Restore is available in the Moodfilm app on Play Store.");
@@ -2778,25 +2814,45 @@ async function restoreProPurchase(){
     }
 
     const purchases = await service.listPurchases();
-    const isActive = purchases.some(p =>
-      p.itemId === PRO_PRODUCT_ID &&
-      p.purchaseState === "purchased"
+    const activeSub = purchases.find(p =>
+      p.itemId === PRODUCT_SUB_MONTHLY && p.purchaseState === "purchased"
     );
 
-    if(isActive){
+    if(activeSub){
+      await _notifyBackendPurchase({
+        type: "subscription",
+        productId: PRODUCT_SUB_MONTHLY,
+        purchaseToken: activeSub.purchaseToken
+      });
+      await refreshUserState();
+
       isProUser = true;
-      updateProUI();
       hideAdGate();
-      resetAdUI();
       chatStep = "loading";
       onAdComplete();
-      showToast("Pro restored 🎬 Welcome back.");
+      showToast("Subscription restored 🎬 Welcome back.");
     } else {
-      showToast("No active Pro subscription found.");
+      showToast("No active subscription found on this account.");
     }
   } catch(e){
     showToast("Couldn't restore. Please try again.");
   }
+}
+
+/* ── _notifyBackendPurchase
+   POSTs the purchase token to our backend immediately after Play confirms.
+   The backend links the token to this user for RTDN webhook processing. */
+async function _notifyBackendPurchase({ type, productId, purchaseToken }){
+  try{
+    await fetch(WORKER_URL+"/api/billing/register-purchase",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-Device-ID": DEVICE_ID
+      },
+      body: JSON.stringify({ type, productId, purchaseToken })
+    });
+  } catch(e){ console.log("[Billing] Backend notify failed:", e.message); }
 }
 
 // Update UI when Pro is active
@@ -2805,13 +2861,36 @@ function updateProUI(){
   if(btn) btn.style.display = "none";
 }
 
-// Reset ad UI back to initial state
+// Reset paywall UI back to initial state
 function resetAdUI(){
-  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
-  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
-  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
   clearInterval(adCountdownInterval);
-  adApiPromise=null;
+  adApiPromise = null;
+}
+
+/* ── initialisePro
+   Called on every app load. Syncs user state from backend (or Play Store
+   as fallback). Runs non-blocking — never delays app startup. */
+async function initialisePro(){
+  try{
+    // Try backend-authoritative state first (requires auth token)
+    // _userIdToken would be set here by your Firebase auth integration
+    // e.g. firebase.auth().onAuthStateChanged(user => { _userIdToken = await user.getIdToken(); refreshUserState(); })
+    // For unauthenticated / guest mode, fall back to Play billing check:
+
+    const service = await getDigitalGoodsService();
+    if(!service) return; // browser — no billing available
+
+    const existingPurchases = await service.listPurchases();
+    const activeSub = existingPurchases.find(p =>
+      p.itemId === PRODUCT_SUB_MONTHLY && p.purchaseState === "purchased"
+    );
+    if(activeSub){
+      isProUser = true;
+      updateProUI();
+    }
+  } catch(e){
+    console.log("[Pro] Could not check subscription status:", e.message);
+  }
 }
 
 /* ══ AD GATE LOGIC ════════════════════════════════════════
@@ -2822,94 +2901,151 @@ function resetAdUI(){
    - At 5 seconds in: API fires silently in background
    - At 0 seconds: ad done, wait for API if needed, show results
    ══════════════════════════════════════════════════════ */
-function showAdGate(){
-  applyAdLimitState();
+/* ══ PAYWALL — DUAL MODE ══════════════════════════════════════
+   education mode: free trial session — paywall educates while
+                   API loads silently in background. Auto-collapses
+                   gracefully when results arrive.
+   gate mode:      blocked — user must purchase to proceed.
+                   API is NOT fired. Hard stop.
+   ══════════════════════════════════════════════════════════ */
+
+function showPaywall(educationMode){
+  const edEl  = document.getElementById("pw-education");
+  const gateEl= document.getElementById("pw-gate");
+  if(educationMode){
+    if(edEl)   edEl.style.display  = "block";
+    if(gateEl) gateEl.style.display= "none";
+  } else {
+    if(edEl)   edEl.style.display  = "none";
+    if(gateEl) gateEl.style.display= "block";
+  }
   document.getElementById("ad-gate").classList.add("show");
+
+  // If education mode, watch for API resolution and auto-collapse
+  if(educationMode && adApiPromise){
+    adApiPromise.then(data=>{
+      if(data && data.status !== "PAYWALL_REQUIRED" && !data.error){
+        // Results ready — graceful collapse then render
+        collapsePaywallAndRender(data);
+      } else if(data && data.status === "PAYWALL_REQUIRED"){
+        // Shouldn't happen on free trial, but handle safely
+        switchPaywallToGate();
+      }
+    }).catch(()=>{});
+  }
 }
+
+/* Gracefully slides the paywall down and reveals results */
+function collapsePaywallAndRender(data){
+  const gate = document.getElementById("ad-gate");
+  const sheet = document.getElementById("ad-sheet");
+
+  // Swap spinner for a "Ready" confirmation before collapsing
+  const spinner = document.getElementById("pw-spinner");
+  if(spinner){
+    spinner.style.borderTopColor = "var(--gold)";
+    spinner.style.animation = "none";
+    spinner.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    spinner.style.display = "flex";
+    spinner.style.alignItems = "center";
+    spinner.style.justifyContent = "center";
+    spinner.style.borderColor = "rgba(200,137,90,.3)";
+  }
+
+  const titleEl = document.querySelector("#pw-education .ad-title");
+  if(titleEl) titleEl.innerHTML = "Your films are <em>ready</em>";
+
+  // Brief pause so the ✓ registers, then collapse
+  setTimeout(()=>{
+    // Slide sheet down
+    if(sheet) sheet.style.transition = "transform .45s cubic-bezier(.4,0,.2,1), opacity .35s ease";
+    if(sheet) sheet.style.transform  = "translateY(100%)";
+    if(sheet) sheet.style.opacity    = "0";
+
+    setTimeout(()=>{
+      gate.classList.remove("show");
+      if(sheet){ sheet.style.transform=""; sheet.style.opacity=""; sheet.style.transition=""; }
+
+      // Update local state mirrors
+      if(data.credits_remaining !== undefined) userCredits = data.credits_remaining;
+      if(data.is_subscribed !== undefined) isProUser = data.is_subscribed;
+      hasUsedFreeTrial = true; // server just flipped it
+
+      chatStep = "done";
+      lastRecs = data.recommendations;
+      renderResults(data.recommendations, data.moodAnalysis);
+      initialisePushNotifications();
+    }, 480);
+  }, 600);
+}
+
+/* Switches a visible education paywall to gate mode (edge case) */
+function switchPaywallToGate(){
+  const edEl   = document.getElementById("pw-education");
+  const gateEl = document.getElementById("pw-gate");
+  if(edEl)   edEl.style.display   = "none";
+  if(gateEl) gateEl.style.display = "block";
+  chatStep = "ad_gate";
+}
+
+function showAdGate(){ showPaywall(false); }
+
 function hideAdGate(){
-  document.getElementById("ad-gate").classList.remove("show");
+  const gate  = document.getElementById("ad-gate");
+  const sheet = document.getElementById("ad-sheet");
+  gate.classList.remove("show");
+  if(sheet){ sheet.style.transform=""; sheet.style.opacity=""; sheet.style.transition=""; }
 }
-// User dismisses ad before completion — return to language step
+
+function applyAdLimitState(){ /* state now driven by showPaywall() mode */ }
+
+// User dismisses paywall — return to language step
 function dismissAdEarly(){
-  clearInterval(adCountdownInterval);
-  adApiPromise=null;
+  adApiPromise = null;
   hideAdGate();
-  // Reset ad UI for next time
-  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
-  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
-  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
-  // Go back to language question
-  chatStep="awaiting_lang";
-  const chat=document.getElementById("chat");
-  // Remove last user bubble (language choice) and lang chips
-  const children=Array.from(chat.children);
-  // Remove everything after intent user bubble
-  let intentUserIdx=-1;
-  children.forEach((c,i)=>{if(c.classList.contains("msg-user"))intentUserIdx=i;});
-  while(chat.children.length>intentUserIdx+1)chat.lastChild.remove();
-  setTimeout(showLangQuestion,200);
+  chatStep = "awaiting_lang";
+  const chat = document.getElementById("chat");
+  const children = Array.from(chat.children);
+  let intentUserIdx = -1;
+  children.forEach((c,i)=>{ if(c.classList.contains("msg-user")) intentUserIdx=i; });
+  while(chat.children.length > intentUserIdx+1) chat.lastChild.remove();
+  setTimeout(showLangQuestion, 200);
 }
 
-function startAdFlow(){
-  // Mark this ad view in localStorage before starting
-  markAdUsed();
-  // Switch button to timer
-  const _bwa2=document.getElementById("btn-watch-ad");if(_bwa2)_bwa2.style.display="none";
-  const _atw2=document.getElementById("ad-timer-wrap");if(_atw2)_atw2.style.display="flex";
-  const _ads2=document.getElementById("ad-simulated");if(_ads2)_ads2.classList.add("show");
+// startAdFlow removed — no ads in this app. Access is gated server-side.
 
-  let secondsLeft=AD_DURATION;
-  const ring=document.getElementById("ad-ring-progress");
-  const numEl=document.getElementById("ad-timer-num");
-  const circumference=138; // 2π × 22
-  // Initialise: ring starts FULL (offset=0), counts down
-  ring.style.strokeDashoffset="0";
-  numEl.textContent=secondsLeft;
-
-  // Update ring every second
-  adCountdownInterval=setInterval(()=>{
-    secondsLeft--;
-    numEl.textContent=secondsLeft;
-    // Ring empties as time passes
-    const offset=circumference*(secondsLeft/AD_DURATION);
-    ring.style.strokeDashoffset=offset;
-
-    // At 5 seconds remaining — fire API silently (revenue locked by AdMob by now)
-    if(secondsLeft===AD_DURATION-5){
-      adApiPromise=fireFinalAPI();
-    }
-
-    if(secondsLeft<=0){
-      clearInterval(adCountdownInterval);
-      onAdComplete();
-    }
-  },1000);
-
-  // Safety: also fire API at 5s in case timer is slow
-  setTimeout(()=>{if(!adApiPromise)adApiPromise=fireFinalAPI()},5000);
-}
-
+/* onAdComplete — called only for paid users (sub or credits) who
+   skipped the paywall entirely. Free trial results flow through
+   collapsePaywallAndRender() instead. */
 async function onAdComplete(){
-  // Hide ad gate
-  hideAdGate();
   chatStep="loading";
 
-  // Show in-chat loading state
   const rlWrap=document.createElement("div");
   rlWrap.className="rl-wrap slide-up";rlWrap.id="rl-wrap";
   rlWrap.innerHTML=`<div class="rl-bar"><div class="rl-fill" id="rl-fill"></div></div><div class="rl-text" id="rl-text">Putting your picks together...</div>`;
   document.getElementById("chat").appendChild(rlWrap);scrollChat();
 
-  // Animate bar while waiting for API
   let rlProg=0;
   const rlInt=setInterval(()=>{rlProg=Math.min(rlProg+6,95);const f=document.getElementById("rl-fill");if(f)f.style.width=rlProg+"%"},200);
 
   try{
-    // Wait for API (should already be done or nearly done)
     const data=await(adApiPromise||fireFinalAPI());
     clearInterval(rlInt);
     const rl=document.getElementById("rl-wrap");if(rl)rl.remove();
-    if(data.error)throw new Error(data.error);
+
+    if(data.status==="PAYWALL_REQUIRED"){
+      // Credits depleted mid-session (race condition) — show gate
+      chatStep="ad_gate";
+      if(data.credits_remaining!==undefined) userCredits=data.credits_remaining;
+      showPaywall(false);
+      return;
+    }
+
+    if(data.error) throw new Error(data.error);
+
+    if(data.credits_remaining!==undefined) userCredits=data.credits_remaining;
+    if(data.is_subscribed!==undefined) isProUser=data.is_subscribed;
+
     lastRecs=data.recommendations;
     renderResults(data.recommendations,data.moodAnalysis);
     initialisePushNotifications();
@@ -2923,7 +3059,7 @@ async function onAdComplete(){
   }
 }
 
-/* ── FINAL API CALL — with full error handling ── */
+/* ── FINAL API CALL — routes through the secure backend paywall gate ── */
 function isOffline(){ return typeof navigator!=="undefined"&&!navigator.onLine; }
 
 async function fireFinalAPI(){
@@ -2934,13 +3070,29 @@ async function fireFinalAPI(){
     let data;
     // Race with 45s timeout
     const timeoutPromise=new Promise((_,r)=>setTimeout(()=>r(new Error("TIMEOUT")),45000));
-    if(prefetchData&&!prefetchData.error){
-      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,isPremium:isProUser})}).then(r=>r.json());
-      data=await Promise.race([fetchPromise,timeoutPromise]);
-    }else{
-      const fetchPromise=fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mood,moodChips:selectedChips,intent:selectedIntent,filmLanguage:selectedLang,country:COUNTRY,isPremium:isProUser})}).then(r=>r.json());
-      data=await Promise.race([fetchPromise,timeoutPromise]);
-    }
+
+    // Build headers — include device ID for server-side user state
+    const headers={"Content-Type":"application/json","X-Device-ID":DEVICE_ID};
+    if(_userIdToken) headers["Authorization"]="Bearer "+_userIdToken;
+
+    const fetchPromise=fetch(WORKER_URL+"/api/search/mood",{
+      method:"POST",
+      headers,
+      body:JSON.stringify({
+        mood,
+        moodChips:selectedChips,
+        intent:selectedIntent,
+        filmLanguage:selectedLang,
+        country:COUNTRY
+      })
+    }).then(async r=>{
+      const body = await r.json();
+      // Pass the status through for PAYWALL_REQUIRED handling in onAdComplete
+      if(r.status===403) return body;
+      return body;
+    });
+
+    data=await Promise.race([fetchPromise,timeoutPromise]);
     return data;
   }catch(e){
     const msg=e.message||"";
@@ -3012,9 +3164,6 @@ function restartAll(){
   clearInterval(adCountdownInterval);
   hideAdGate();
   closeCardOverlay();
-  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
-  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
-  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
   document.getElementById("mood-input").value="";
   document.getElementById("mood-input").style.height="auto";
   const gw=document.getElementById("input-glow-wrap");
@@ -3040,10 +3189,6 @@ function quickChangeLang(){
   selectedLang="any";
   closeCardOverlay();
   hideAdGate();
-  // Reset ad gate UI to clean state
-  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
-  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
-  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
 
   const chat=document.getElementById("chat");
   chat.style.padding="";
@@ -3089,10 +3234,6 @@ function changeIntent(){
   selectedLang="any";
   closeCardOverlay();
   hideAdGate();
-  // Reset ad gate UI to clean state
-  const _bwa=document.getElementById("btn-watch-ad");if(_bwa)_bwa.style.display="flex";
-  const _atw=document.getElementById("ad-timer-wrap");if(_atw)_atw.style.display="none";
-  const _ads=document.getElementById("ad-simulated");if(_ads)_ads.classList.remove("show");
 
   const chat=document.getElementById("chat");
   chat.style.padding="";
