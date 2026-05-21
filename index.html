@@ -2635,15 +2635,19 @@ function selectLang(lang,row){
   }
 
   // Free trial OR blocked — always show paywall
-  // Free trial: education mode, API fires simultaneously in background
-  // Blocked: gate mode, API does NOT fire (server will 403 anyway)
   chatStep="ad_gate";
   const isFreeSession = !hasUsedFreeTrial;
-  setTimeout(()=>showPaywall(isFreeSession), 350);
+
   if(isFreeSession){
-    // Fire API silently while user reads the education screen
+    // Fire API immediately — before the 350ms delay so promise is
+    // already in flight when showPaywall() attaches Promise.all to it
     adApiPromise = fireFinalAPI();
+    // Optimistically flip the local mirror so a rapid second search
+    // can't re-enter free trial mode before the server confirms
+    hasUsedFreeTrial = true;
   }
+
+  setTimeout(()=>showPaywall(isFreeSession), 350);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2921,17 +2925,28 @@ function showPaywall(educationMode){
   }
   document.getElementById("ad-gate").classList.add("show");
 
-  // If education mode, watch for API resolution and auto-collapse
-  if(educationMode && adApiPromise){
-    adApiPromise.then(data=>{
-      if(data && data.status !== "PAYWALL_REQUIRED" && !data.error){
-        // Results ready — graceful collapse then render
-        collapsePaywallAndRender(data);
-      } else if(data && data.status === "PAYWALL_REQUIRED"){
-        // Shouldn't happen on free trial, but handle safely
-        switchPaywallToGate();
+  // Education mode: wait for API + minimum display time, then act
+  if(educationMode){
+    const apiPromise    = adApiPromise || fireFinalAPI();
+    const minShowPromise = new Promise(res => setTimeout(res, 1800)); // always show ≥1.8s
+
+    Promise.all([apiPromise, minShowPromise]).then(([data])=>{
+      if(!data){ switchPaywallToGate(); return; }
+      if(data.status === "PAYWALL_REQUIRED"){
+        switchPaywallToGate(); return;
       }
-    }).catch(()=>{});
+      if(data.error){
+        // API failed — show error inside the sheet, let user retry
+        const titleEl = document.querySelector("#pw-education .ad-title");
+        if(titleEl) titleEl.innerHTML = "Something went <em>wrong</em>";
+        const spinner = document.getElementById("pw-spinner");
+        if(spinner) spinner.style.display = "none";
+        setTimeout(()=>{ hideAdGate(); chatStep="awaiting_lang"; }, 1200);
+        return;
+      }
+      // Success — collapse and render
+      collapsePaywallAndRender(data);
+    }).catch(()=>{ hideAdGate(); chatStep="awaiting_lang"; });
   }
 }
 
