@@ -2355,7 +2355,8 @@ function resetTracker(){
 let chatStep="idle"; // idle | awaiting_intent | awaiting_lang | ad_gate | loading | done
 let prefetchData=null, prefetchPromise=null, prefetchProgress=0;
 let lastRecs=null;
-let adCountdownInterval=null, adApiPromise=null;
+let adApiPromise=null;
+let _proLineInterval=null, _proProgInterval=null;
 let _keyboardInited=false;
 
 /* ── CHAT HELPERS ── */
@@ -2645,8 +2646,16 @@ function selectLang(lang,row){
     // already in flight when showPaywall() attaches Promise.all to it
     adApiPromise = fireFinalAPI();
     // Optimistically flip the local mirror so a rapid second search
-    // can't re-enter free trial mode before the server confirms
+    // can't re-enter free trial mode before the server confirms.
     hasUsedFreeTrial = true;
+    // ...but if the search fails, the server refunds the trial (see
+    // refundCredit in the worker). Mirror that here so the user is not
+    // locked out of their free trial by a transient network error.
+    adApiPromise.then(data=>{
+      const failed = !data || data.error ||
+        (data.status && data.status !== "OK");
+      if(failed) hasUsedFreeTrial = false;
+    }).catch(()=>{ hasUsedFreeTrial = false; });
   }
 
   setTimeout(()=>showPaywall(isFreeSession), 350);
@@ -2698,6 +2707,32 @@ async function refreshUserState(){
   } catch(e){ console.log("[Moodfilm] Could not refresh user state:", e.message); }
 }
 
+/* ── pollForEntitlement
+   Google Play purchases are confirmed asynchronously: after the user pays,
+   Google sends a server-to-server RTDN webhook to our worker, which then
+   grants the subscription/credits. That webhook can lag by a few seconds.
+   This polls /api/user/state until entitlement appears, or times out.
+
+   want = "sub"     → resolves once is_subscribed is true
+   want = "credits" → resolves once search_credits has increased
+
+   Returns true if entitlement confirmed, false if it timed out. */
+async function pollForEntitlement(want, opts){
+  const o = opts || {};
+  const maxAttempts = o.maxAttempts || 10;   // ~20s total at 2s spacing
+  const intervalMs  = o.intervalMs  || 2000;
+  const creditsBefore = (typeof o.creditsBefore === "number")
+    ? o.creditsBefore : userCredits;
+
+  for(let i=0;i<maxAttempts;i++){
+    await new Promise(r=>setTimeout(r,intervalMs));
+    await refreshUserState();
+    if(want === "sub" && isProUser) return true;
+    if(want === "credits" && userCredits > creditsBefore) return true;
+  }
+  return false; // timed out — webhook has not arrived yet
+}
+
 /* ══ Digital Goods API — TWA Play Billing bridge ══════════════
    Available in Chrome TWA (PWABuilder / Trusted Web Activity).
    Falls back gracefully to null in browser. */
@@ -2707,6 +2742,36 @@ async function getDigitalGoodsService(){
     catch{ return null; }
   }
   return null;
+}
+
+/* ── _showConfirmingPurchase / _hideConfirmingPurchase
+   Reuses the full-screen pro-loading overlay to show a calm
+   "confirming your purchase" state while we poll the backend
+   for the RTDN webhook to land. */
+function _showConfirmingPurchase(){
+  // Stop any running loading animations on the shared overlay
+  clearInterval(_proLineInterval); clearInterval(_proProgInterval);
+  const badge      = document.getElementById("pro-loading-badge");
+  const stripBadge = document.getElementById("pro-strip-badge");
+  const title      = document.getElementById("pro-loading-title");
+  const lineEl     = document.getElementById("pro-loading-line");
+  const fill       = document.getElementById("pro-progress-fill");
+  const arc        = document.querySelector(".pro-spinner-arc");
+  const dot        = document.getElementById("pro-spinner-dot");
+  if(badge)      badge.style.display      = "none";
+  if(stripBadge) stripBadge.style.display = "none";
+  if(arc){ arc.style.animation="spin .9s linear infinite"; arc.style.border="2px solid transparent"; arc.style.borderTopColor="var(--gold)"; arc.style.borderRightColor="rgba(200,137,90,.28)"; }
+  if(dot)  dot.style.display = "block";
+  if(fill) fill.style.width  = "0%";
+  if(title) title.innerHTML  = "Confirming your <em>purchase</em>";
+  if(lineEl){
+    lineEl.style.animation = "none";
+    lineEl.textContent = "This only takes a moment…";
+  }
+  document.getElementById("pro-loading").classList.add("show");
+}
+function _hideConfirmingPurchase(){
+  document.getElementById("pro-loading").classList.remove("show");
 }
 
 /* ── purchaseCredits
@@ -2735,7 +2800,11 @@ async function purchaseCredits(){
     const response = await paymentRequest.show();
     const purchaseToken = response.details.token;
 
-    // Tell our backend — it verifies with Google Play API, grants credits, then consumes
+    // Remember the credit balance before the purchase, so polling can
+    // detect when the backend has actually granted the new credits.
+    const creditsBefore = userCredits;
+
+    // Tell our backend — it links the token so the RTDN webhook can grant credits
     await _notifyBackendPurchase({
       type: "consumable",
       productId: PRODUCT_CREDITS_15,
@@ -2744,17 +2813,27 @@ async function purchaseCredits(){
 
     await response.complete("success");
 
-    // Refresh authoritative state from DB
-    await refreshUserState();
-    
-
-    // User now has credits — proceed directly to results
+    // Google confirms purchases asynchronously via the RTDN webhook.
+    // Show a calm confirming state and poll until the credits land.
     hideAdGate();
+    _showConfirmingPurchase();
+    const granted = await pollForEntitlement("credits", { creditsBefore });
+    _hideConfirmingPurchase();
+
+    if(!granted){
+      // Webhook has not arrived yet — do not strand the user.
+      showToast("Payment received. Your credits will appear shortly — please try again in a moment.");
+      chatStep = "ad_gate";
+      return;
+    }
+
+    // Credits confirmed — proceed directly to results
     chatStep = "loading";
     onAdComplete();
     showToast("15 credits added 🎬 Enjoy!");
 
   } catch(e){
+    _hideConfirmingPurchase();
     if(e.name !== "AbortError") showToast("Purchase could not be completed. Please try again.");
     console.log("[Credits] Purchase error:", e.message);
   }
@@ -2794,16 +2873,30 @@ async function startProPurchase(){
     });
 
     await response.complete("success");
-    await refreshUserState();
-    
 
-    isProUser = true;
+    // Google activates subscriptions asynchronously via the RTDN webhook.
+    // Show a calm confirming state and poll until is_subscribed flips true.
     hideAdGate();
+    _showConfirmingPurchase();
+    const granted = await pollForEntitlement("sub");
+    _hideConfirmingPurchase();
+
+    if(!granted){
+      // Webhook has not arrived yet — do not strand the user.
+      showToast("Payment received. Activating your plan — please try again in a moment.");
+      chatStep = "ad_gate";
+      return;
+    }
+
+    // Subscription confirmed by the backend
+    isProUser = true;
+    updateProUI();
     chatStep = "loading";
     onAdComplete();
     showToast("Welcome to Pro 🎬 45 searches/month, no limits.");
 
   } catch(e){
+    _hideConfirmingPurchase();
     if(e.name !== "AbortError") showToast("Purchase could not be completed. Please try again.");
     console.log("[Pro] Purchase error:", e.message);
   }
@@ -2830,9 +2923,19 @@ async function restoreProPurchase(){
         productId: PRODUCT_SUB_MONTHLY,
         purchaseToken: activeSub.purchaseToken
       });
-      await refreshUserState();
+
+      // Wait for the backend to confirm the restored subscription.
+      _showConfirmingPurchase();
+      const granted = await pollForEntitlement("sub");
+      _hideConfirmingPurchase();
+
+      if(!granted){
+        showToast("We found your subscription — syncing now. Please try again in a moment.");
+        return;
+      }
 
       isProUser = true;
+      updateProUI();
       hideAdGate();
       chatStep = "loading";
       onAdComplete();
@@ -2841,6 +2944,7 @@ async function restoreProPurchase(){
       showToast("No active subscription found on this account.");
     }
   } catch(e){
+    _hideConfirmingPurchase();
     showToast("Couldn't restore. Please try again.");
   }
 }
@@ -2867,11 +2971,6 @@ function updateProUI(){
   if(btn) btn.style.display = "none";
 }
 
-// Reset paywall UI back to initial state
-function resetAdUI(){
-  clearInterval(adCountdownInterval);
-  adApiPromise = null;
-}
 
 /* ── initialisePro
    Called on every app load. Syncs user state from backend (or Play Store
@@ -3035,7 +3134,6 @@ const _PRO_LINES=[
   "Assembling your programme…",
   "Almost there…"
 ];
-let _proLineInterval=null,_proProgInterval=null;
 
 function _showProLoading(){
   const badge=document.getElementById("pro-loading-badge");
@@ -3232,7 +3330,7 @@ function restartAll(){
   mood="";selectedChips=[];selectedIntent="";selectedLang="any";
   chatStep="idle";prefetchData=null;prefetchPromise=null;lastRecs=null;
   adApiPromise=null;
-  clearInterval(adCountdownInterval);
+  clearInterval(_proLineInterval);clearInterval(_proProgInterval);
   hideAdGate();
   closeCardOverlay();
   document.getElementById("mood-input").value="";
@@ -3253,7 +3351,7 @@ function restartAll(){
 }
 function quickChangeLang(){
   // Full clean reset of all pending state
-  clearInterval(adCountdownInterval);
+  clearInterval(_proLineInterval);clearInterval(_proProgInterval);
   adApiPromise=null;
   prefetchData=null;
   prefetchPromise=null;
@@ -3297,7 +3395,7 @@ function quickChangeLang(){
 }
 function changeIntent(){
   // Full clean reset of all pending state
-  clearInterval(adCountdownInterval);
+  clearInterval(_proLineInterval);clearInterval(_proProgInterval);
   adApiPromise=null;
   prefetchData=null;
   prefetchPromise=null;
