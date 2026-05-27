@@ -51,7 +51,7 @@
   "screenshots": [
     {
       "src": "screenshots/screen1.png",
-      "sizes": "1289x2218",
+      "sizes": "1289x2214",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Welcome screen \u2014 find movies by mood"
@@ -90,6 +90,13 @@
       "type": "image/png",
       "form_factor": "narrow",
       "label": "More films curated for your mood"
+    },
+    {
+      "src": "screenshots/wide-banner.png",
+      "sizes": "1794x876",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Moodfilm \u2014 find movies by mood"
     }
   ],
   "shortcuts": [
