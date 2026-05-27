@@ -42,7 +42,7 @@
       "purpose": "any"
     },
     {
-      "src": "/moodfilm-app/icon-512.png",
+      "src": "/moodfilm-app/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -118,34 +118,5 @@
   "launch_handler": {
     "client_mode": "focus-existing"
   },
-  "protocol_handlers": [
-    {
-      "protocol": "web+moodfilm",
-      "url": "/moodfilm-app/?mood=%s"
-    }
-  ],
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "note_taking": {
-    "new_note_url": "/moodfilm-app/"
-  },
-  "file_handlers": [
-    {
-      "action": "/moodfilm-app/",
-      "accept": {
-        "text/plain": [
-          ".txt"
-        ],
-        "text/csv": [
-          ".csv"
-        ]
-      }
-    }
-  ],
-  "scope_extensions": [
-    {
-      "origin": "https://aaronkankipati.github.io"
-    }
-  ]
+  "related_applications": []
 }
