@@ -683,6 +683,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   max-height:80px;
 }
 #composer-pills.hidden{opacity:0;max-height:0;padding:0;pointer-events:none}
+#composer-pills.kb-hidden{opacity:0;max-height:0;padding:0;pointer-events:none}
 #composer-pills-label{
   font-size:10px;
   text-transform:uppercase;
@@ -3526,23 +3527,37 @@ function initKeyboard(){
     const kbH=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
     const kbOpen=kbH>80;
     // Resize the fixed app shell to the visual-viewport height so the
-    // bottom bar lands exactly above the keyboard — no transform overshoot.
-    // The bottom bar is the last flex child, so shrinking the column height
-    // pulls it up by precisely the keyboard height and nothing more.
+    // bottom bar lands exactly above the keyboard.
     if(app){
-      if(kbOpen){
-        app.style.height = vv.height + "px";
-      }else{
-        app.style.height = "";
-      }
+      app.style.height = kbOpen ? (vv.height + "px") : "";
     }
-    // Belt-and-braces: clear any legacy transform that older builds may have set.
     const bar=document.getElementById("bottom-bar");
     if(bar)bar.style.transform="";
-    if(kbOpen)scrollChat();
+    // When the keyboard is open, collapse the "or pick a feeling" pills.
+    // They sit BELOW the input inside #composer and push the input upward
+    // out of view. Hiding them lets the input sit directly above the keyboard.
+    // They reappear automatically when the keyboard closes.
+    const pills=document.getElementById("composer-pills");
+    if(pills){
+      if(kbOpen)pills.classList.add("kb-hidden");
+      else pills.classList.remove("kb-hidden");
+    }
+    if(kbOpen){
+      // Make sure the input itself is visible above the keyboard.
+      const ta=document.getElementById("mood-input");
+      if(ta&&document.activeElement===ta){
+        requestAnimationFrame(()=>{
+          try{ta.scrollIntoView({block:"nearest",behavior:"smooth"});}catch(e){}
+        });
+      }
+      scrollChat();
+    }
   }
   window.visualViewport.addEventListener("resize",update,{passive:true});
   window.visualViewport.addEventListener("scroll",update,{passive:true});
+  // Also run when the input gains focus, in case the resize event lags.
+  const ta=document.getElementById("mood-input");
+  if(ta)ta.addEventListener("focus",()=>setTimeout(update,250),{passive:true});
 }
 
 /* ── HELPERS ── */
