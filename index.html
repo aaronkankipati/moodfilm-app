@@ -441,7 +441,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 }
 
 /* ══ APP SHELL ════════════════════════════════════════════ */
-#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--safe-t);z-index:2}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;height:100%;display:flex;flex-direction:column;padding-top:var(--safe-t);z-index:2}
 
 /* ── APP ENTRANCE — theme-engine-synced reveal ───────────────────────
    Triggered by JS: dismissSplash() adds .app-entering via classList.
@@ -3520,13 +3520,25 @@ function hideListeningState(instant){
 function initKeyboard(){
   if(!window.visualViewport||_keyboardInited)return;
   _keyboardInited=true;
+  const app=document.getElementById("app");
   function update(){
-    const kbH=Math.max(0,window.innerHeight-window.visualViewport.height);
-    const kbOpen=kbH>50;
-    // Single translateY on the whole bottom-bar — listening card, composer,
-    // tracker and quick-actions all move as one unit. Atomic, reliable.
+    const vv=window.visualViewport;
+    const kbH=Math.max(0,window.innerHeight-vv.height-vv.offsetTop);
+    const kbOpen=kbH>80;
+    // Resize the fixed app shell to the visual-viewport height so the
+    // bottom bar lands exactly above the keyboard — no transform overshoot.
+    // The bottom bar is the last flex child, so shrinking the column height
+    // pulls it up by precisely the keyboard height and nothing more.
+    if(app){
+      if(kbOpen){
+        app.style.height = vv.height + "px";
+      }else{
+        app.style.height = "";
+      }
+    }
+    // Belt-and-braces: clear any legacy transform that older builds may have set.
     const bar=document.getElementById("bottom-bar");
-    if(bar)bar.style.transform=kbOpen?`translateY(-${kbH}px)`:"translateY(0)";
+    if(bar)bar.style.transform="";
     if(kbOpen)scrollChat();
   }
   window.visualViewport.addEventListener("resize",update,{passive:true});

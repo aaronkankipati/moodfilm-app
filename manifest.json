@@ -1,15 +1,14 @@
 {
   "id": "/moodfilm-app/",
-  "name": "Moodfilm \u2014 Find Your Film by Mood",
+  "name": "Moodfilm — Find Your Film by Mood",
   "short_name": "Moodfilm",
   "description": "Describe your mood. AI picks the perfect film for this exact moment. Free, no sign-up.",
   "start_url": "/moodfilm-app/",
   "scope": "/moodfilm-app/",
   "display": "standalone",
   "display_override": [
-    "window-controls-overlay",
-    "tabbed",
-    "standalone"
+    "standalone",
+    "minimal-ui"
   ],
   "orientation": "portrait-primary",
   "background_color": "#0D0D0F",
@@ -30,16 +29,16 @@
       "purpose": "any"
     },
     {
-      "src": "/moodfilm-app/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
       "src": "/moodfilm-app/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/moodfilm-app/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/moodfilm-app/icon-maskable-512.png",
@@ -51,10 +50,10 @@
   "screenshots": [
     {
       "src": "screenshots/screen1.png",
-      "sizes": "1289x2214",
+      "sizes": "1289x2218",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Welcome screen \u2014 find movies by mood"
+      "label": "Welcome screen — find movies by mood"
     },
     {
       "src": "screenshots/screen2.png",
@@ -90,13 +89,6 @@
       "type": "image/png",
       "form_factor": "narrow",
       "label": "More films curated for your mood"
-    },
-    {
-      "src": "screenshots/wide-banner.png",
-      "sizes": "1794x876",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Moodfilm \u2014 find movies by mood"
     }
   ],
   "shortcuts": [
