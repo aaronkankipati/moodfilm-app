@@ -11,19 +11,19 @@
 <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(()=>{})</script>
 <meta property="og:title" content="Moodfilm - Find Movies by Mood">
 <meta property="og:description" content="Tell us how you feel and we find your perfect film. Free, always.">
-<meta property="og:image" content="https://aaronkankipati.github.io/moodfilm-app/og-image.png">
-<meta property="og:url" content="https://aaronkankipati.github.io/moodfilm-app/">
+<meta property="og:image" content="https://moodfilm.app/og-image.png">
+<meta property="og:url" content="https://moodfilm.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Moodfilm">
 <meta name="description" content="Describe your mood. AI picks the perfect film for this exact moment. Free, no sign-up.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Moodfilm — Find Your Film by Mood">
 <meta name="twitter:description" content="Describe your mood. AI picks the perfect film for this exact moment. Free, no sign-up.">
-<meta name="twitter:image" content="https://aaronkankipati.github.io/moodfilm-app/og-image.png">
+<meta name="twitter:image" content="https://moodfilm.app/og-image.png">
 <meta name="apple-mobile-web-app-title" content="Moodfilm">
 <meta name="application-name" content="Moodfilm">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://aaronkankipati.github.io/moodfilm-app/">
+<link rel="canonical" href="https://moodfilm.app/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=EB+Garamond:ital,wght@0,400;1,400;1,500&family=Outfit:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
@@ -3643,8 +3643,8 @@ function renderOTT(s){
   return html+'</div>';
 }
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 https://aaronkankipati.github.io/moodfilm-app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
-function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 https://aaronkankipati.github.io/moodfilm-app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 https://moodfilm.app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 https://moodfilm.app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
 /* ── INIT ── */
