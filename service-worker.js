@@ -2,17 +2,16 @@
 // Strategy: Cache-first for shell assets, network-only for API calls
 // New in v2: Background Sync, Periodic Background Sync, Push Notifications
 
-const CACHE_NAME = "moodfilm-v2";
+const CACHE_NAME = "moodfilm-v3";
 const SYNC_TAG = "moodfilm-bg-sync";
 const PERIODIC_SYNC_TAG = "moodfilm-periodic-sync";
 
 // Static assets to cache on install (the app shell)
 const SHELL_ASSETS = [
-  "/moodfilm-app/",
-  "/moodfilm-app/index.html",
-  "/moodfilm-app/manifest.json",
-  "/moodfilm-app/icon-192.png",
-  "/moodfilm-app/icon-512.png",
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap",
 ];
 
 // ── INSTALL: cache the app shell ─────────────────────────────────────────────
@@ -91,7 +90,7 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => {
           if (request.mode === "navigate") {
-            return caches.match("/moodfilm-app/index.html");
+            return caches.match("/index.html");
           }
         });
     })
@@ -158,9 +157,9 @@ self.addEventListener("push", (event) => {
   let data = {
     title: "Moodfilm",
     body: "Your daily film pick is ready 🎬",
-    icon: "/moodfilm-app/icon-192.png",
-    badge: "/moodfilm-app/icon-192.png",
-    url: "/moodfilm-app/",
+    icon: "/icon-192.png",
+    badge: "/icon-96.png",
+    url: "/",
   };
 
   if (event.data) {
@@ -186,7 +185,7 @@ self.addEventListener("push", (event) => {
 // ── NOTIFICATION CLICK ────────────────────────────────────────────────────────
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || "/moodfilm-app/";
+  const targetUrl = event.notification.data?.url || "/";
 
   event.waitUntil(
     self.clients
@@ -194,7 +193,7 @@ self.addEventListener("notificationclick", (event) => {
       .then((clients) => {
         // Focus existing tab if open
         for (const client of clients) {
-          if (client.url.includes("/moodfilm-app/") && "focus" in client) {
+          if (client.url.includes("/") && "focus" in client) {
             return client.focus();
           }
         }

@@ -2739,21 +2739,21 @@ async function pollForEntitlement(want, opts){
    Falls back gracefully to null in browser. */
 async function getDigitalGoodsService(){
   if("getDigitalGoodsService" in window){
-    console.log("[DGS] API present in window, requesting billing service...");
+    showToast("Billing: connecting...");
     try{
       const svc = await Promise.race([
         window.getDigitalGoodsService("https://play.google.com/billing"),
         new Promise((_,reject)=>setTimeout(()=>reject(new Error("DGS timeout after 10s")),10000))
       ]);
-      console.log("[DGS] service obtained:", !!svc);
+      showToast("Billing: service ready ✓");
       return svc;
     }
     catch(e){
-      console.log("[DGS] error:", e.message);
+      showToast("Billing error: " + e.message);
       return null;
     }
   }
-  console.log("[DGS] API NOT present in window");
+  showToast("Billing: API not available in this context");
   return null;
 }
 
@@ -2792,7 +2792,7 @@ function _hideConfirmingPurchase(){
    After Play confirms payment, POST the purchaseToken to our backend
    which verifies with Google Play API, grants credits, then consumes. */
 async function purchaseCredits(){
-  console.log("[Credits] purchaseCredits() called");
+  showToast("Credits: button tapped ✓");
   try{
     const service = await getDigitalGoodsService();
     if(!service){
