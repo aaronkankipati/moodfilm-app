@@ -1802,6 +1802,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   /* Each blob enters slowly and softly — no pop-in */
   transition:opacity 1.2s ease;
   will-change:transform, border-radius;
+  pointer-events:none;
 }
 #ad-gate.show .mf-blob{ opacity:1; }
 
