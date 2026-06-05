@@ -2740,21 +2740,21 @@ async function pollForEntitlement(want, opts){
    Falls back gracefully to null in browser. */
 async function getDigitalGoodsService(){
   if("getDigitalGoodsService" in window){
-    showToast("Billing: connecting...");
+    console.log("[Billing] connecting…");
     try{
       const svc = await Promise.race([
         window.getDigitalGoodsService("https://play.google.com/billing"),
         new Promise((_,reject)=>setTimeout(()=>reject(new Error("DGS timeout after 10s")),10000))
       ]);
-      showToast("Billing: service ready ✓");
+      console.log("[Billing] service ready ✓");
       return svc;
     }
     catch(e){
-      showToast("Billing error: " + e.message);
+      console.log("[Billing] error:", e.message);
       return null;
     }
   }
-  showToast("Billing: API not available in this context");
+  console.log("[Billing] Digital Goods API not available in this context");
   return null;
 }
 
@@ -2793,7 +2793,7 @@ function _hideConfirmingPurchase(){
    After Play confirms payment, POST the purchaseToken to our backend
    which verifies with Google Play API, grants credits, then consumes. */
 async function purchaseCredits(){
-  showToast("Credits: button tapped ✓");
+  console.log("[Credits] purchase tapped");
   try{
     const service = await getDigitalGoodsService();
     if(!service){
@@ -3747,10 +3747,14 @@ function init(){
     if (appEl) appEl.classList.add('app-entering');
 
     /* Fade out the splash using the CSS transition defined in #splash */
-    const s=document.getElementById("splash");s.classList.add("fade-out");
-    /* Remove from DOM after transition completes — use theme-duration
-       (2.4s at idle = 2400ms) + 100ms safety buffer */
-    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s)},900);
+    const s=document.getElementById("splash");
+    s.classList.add("fade-out");
+    /* FAILSAFE: never let the splash intercept taps, regardless of CSS state.
+       A stale/overridden .fade-out rule was leaving it on top, eating every
+       tap and making the whole app feel "dead". */
+    s.style.pointerEvents="none";
+    /* Remove from DOM after the fade completes (transition is 0.8s) */
+    setTimeout(()=>{ if(s.parentNode) s.parentNode.removeChild(s); }, 900);
   }
   function runSplashSequence(){
     const rule=document.getElementById("splash-rule-top");
