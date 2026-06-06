@@ -2795,18 +2795,9 @@ function _hideConfirmingPurchase(){
 async function purchaseCredits(){
   console.log("[Credits] purchase tapped");
   try{
-    const service = await getDigitalGoodsService();
-    if(!service){
-      showToast("Credit packs are available in the Moodfilm app on Play Store.");
-      return;
-    }
-
-    const details = await service.getDetails([PRODUCT_CREDITS_15]);
-    if(!details || !details.length){
-      showToast("Credit pack not available right now. Try again shortly.");
-      return;
-    }
-
+    // Open the Play purchase sheet FIRST, while the tap's user-activation is
+    // still valid. Slow awaits before show() (getDigitalGoodsService /
+    // getDetails) can void that activation and make show() throw.
     const paymentRequest = new PaymentRequest(
       [{ supportedMethods:"https://play.google.com/billing", data:{ sku: PRODUCT_CREDITS_15 } }],
       { total:{ label:"15 Moodfilm Credits", amount:{ currency:"INR", value:"149" } } }
@@ -2849,8 +2840,8 @@ async function purchaseCredits(){
 
   } catch(e){
     _hideConfirmingPurchase();
-    if(e.name !== "AbortError") showToast("Purchase could not be completed. Please try again.");
-    console.log("[Credits] Purchase error:", e.message);
+    if(e.name !== "AbortError") showToast("Purchase error: " + e.name + " — " + (e.message || "unknown"));
+    console.log("[Credits] Purchase error:", e.name, e.message);
   }
 }
 
@@ -2860,18 +2851,8 @@ async function purchaseCredits(){
    is_subscribed=true and reset search_credits=45. */
 async function startProPurchase(){
   try{
-    const service = await getDigitalGoodsService();
-    if(!service){
-      showToast("Subscriptions are available in the Moodfilm app on Play Store.");
-      return;
-    }
-
-    const details = await service.getDetails([PRODUCT_SUB_MONTHLY]);
-    if(!details || !details.length){
-      showToast("Subscription not available right now. Try again shortly.");
-      return;
-    }
-
+    // Open the Play purchase sheet FIRST, while the tap's user-activation is
+    // still valid (awaits before show() can void it and make show() throw).
     const paymentRequest = new PaymentRequest(
       [{ supportedMethods:"https://play.google.com/billing", data:{ sku: PRODUCT_SUB_MONTHLY } }],
       { total:{ label:"Moodfilm Monthly Plan", amount:{ currency:"INR", value:"349" } } }
@@ -2912,8 +2893,8 @@ async function startProPurchase(){
 
   } catch(e){
     _hideConfirmingPurchase();
-    if(e.name !== "AbortError") showToast("Purchase could not be completed. Please try again.");
-    console.log("[Pro] Purchase error:", e.message);
+    if(e.name !== "AbortError") showToast("Purchase error: " + e.name + " — " + (e.message || "unknown"));
+    console.log("[Pro] Purchase error:", e.name, e.message);
   }
 }
 
