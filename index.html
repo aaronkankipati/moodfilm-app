@@ -2805,35 +2805,33 @@ async function purchaseCredits(){
 
     const response = await paymentRequest.show();
     const purchaseToken = response.details.token;
-
-    // Remember the credit balance before the purchase, so polling can
-    // detect when the backend has actually granted the new credits.
     const creditsBefore = userCredits;
 
-    // Tell our backend — it links the token so the RTDN webhook can grant credits
-    await _notifyBackendPurchase({
+    // Acknowledge to Play right away.
+    await response.complete("success");
+
+    // Register with our backend — it grants the credits immediately and
+    // returns the new balance (the RTDN webhook reconciles in the background).
+    const result = await _notifyBackendPurchase({
       type: "consumable",
       productId: PRODUCT_CREDITS_15,
       purchaseToken
     });
+    if(result && typeof result.search_credits === "number") userCredits = result.search_credits;
 
-    await response.complete("success");
+    // Consume the product so Play releases it and it can be purchased again
+    // (otherwise the next buy fails with "You already own this item").
+    _consumePurchase(purchaseToken);
 
-    // Google confirms purchases asynchronously via the RTDN webhook.
-    // Show a calm confirming state and poll until the credits land.
-    hideAdGate();
-    _showConfirmingPurchase();
-    const granted = await pollForEntitlement("credits", { creditsBefore });
-    _hideConfirmingPurchase();
-
-    if(!granted){
-      // Webhook has not arrived yet — do not strand the user.
-      showToast("Payment received. Your credits will appear shortly — please try again in a moment.");
-      chatStep = "ad_gate";
-      return;
+    // Safety net only — if the grant hasn't reflected, wait briefly. We never
+    // strand the user: we proceed to curate regardless.
+    if(userCredits <= creditsBefore){
+      _showConfirmingPurchase();
+      await pollForEntitlement("credits", { creditsBefore, maxAttempts: 5 });
+      _hideConfirmingPurchase();
     }
 
-    // Credits confirmed — proceed directly to results
+    hideAdGate();
     chatStep = "loading";
     onAdComplete();
     showToast("15 credits added 🎬 Enjoy!");
@@ -2861,32 +2859,29 @@ async function startProPurchase(){
     const response = await paymentRequest.show();
     const purchaseToken = response.details.token;
 
-    // Register token with our backend so the RTDN webhook can link it to this user
-    await _notifyBackendPurchase({
+    // Acknowledge to Play right away.
+    await response.complete("success");
+
+    // Register with our backend — it activates Pro immediately and returns
+    // the new state (the RTDN webhook reconciles renewals/cancels in background).
+    const result = await _notifyBackendPurchase({
       type: "subscription",
       productId: PRODUCT_SUB_MONTHLY,
       purchaseToken
     });
+    if(result && result.is_subscribed) isProUser = true;
+    if(result && typeof result.search_credits === "number") userCredits = result.search_credits;
 
-    await response.complete("success");
-
-    // Google activates subscriptions asynchronously via the RTDN webhook.
-    // Show a calm confirming state and poll until is_subscribed flips true.
-    hideAdGate();
-    _showConfirmingPurchase();
-    const granted = await pollForEntitlement("sub");
-    _hideConfirmingPurchase();
-
-    if(!granted){
-      // Webhook has not arrived yet — do not strand the user.
-      showToast("Payment received. Activating your plan — please try again in a moment.");
-      chatStep = "ad_gate";
-      return;
+    // Safety net only — never strand the user; we proceed regardless.
+    if(!isProUser){
+      _showConfirmingPurchase();
+      if(await pollForEntitlement("sub", { maxAttempts: 5 })) isProUser = true;
+      _hideConfirmingPurchase();
     }
 
-    // Subscription confirmed by the backend
     isProUser = true;
     updateProUI();
+    hideAdGate();
     chatStep = "loading";
     onAdComplete();
     showToast("Welcome to Pro 🎬 45 searches/month, no limits.");
@@ -2950,7 +2945,7 @@ async function restoreProPurchase(){
    The backend links the token to this user for RTDN webhook processing. */
 async function _notifyBackendPurchase({ type, productId, purchaseToken }){
   try{
-    await fetch(WORKER_URL+"/api/billing/register-purchase",{
+    const res = await fetch(WORKER_URL+"/api/billing/register-purchase",{
       method:"POST",
       headers:{
         "Content-Type":"application/json",
@@ -2958,7 +2953,21 @@ async function _notifyBackendPurchase({ type, productId, purchaseToken }){
       },
       body: JSON.stringify({ type, productId, purchaseToken })
     });
-  } catch(e){ console.log("[Billing] Backend notify failed:", e.message); }
+    return await res.json();
+  } catch(e){ console.log("[Billing] Backend notify failed:", e.message); return null; }
+}
+
+/* ── _consumePurchase
+   Consumes a one-time (consumable) purchase so Play releases it and it can be
+   bought again. Fire-and-forget — must never block or break the buy flow. */
+async function _consumePurchase(purchaseToken){
+  try{
+    const service = await getDigitalGoodsService();
+    if(service && typeof service.consume === "function"){
+      await service.consume(purchaseToken);
+      console.log("[Credits] consumed token");
+    }
+  }catch(e){ console.log("[Credits] consume failed:", e.message); }
 }
 
 // Update UI when Pro is active
@@ -2988,6 +2997,15 @@ async function initialisePro(){
     if(activeSub){
       isProUser = true;
       updateProUI();
+    }
+
+    // Clear any leftover, unconsumed credits purchase so the user isn't blocked
+    // by "You already own this item" on their next credit purchase.
+    const ownedCredits = existingPurchases.filter(p =>
+      p.itemId === PRODUCT_CREDITS_15 && p.purchaseState === "purchased"
+    );
+    for(const p of ownedCredits){
+      if(p.purchaseToken) _consumePurchase(p.purchaseToken);
     }
   } catch(e){
     console.log("[Pro] Could not check subscription status:", e.message);
