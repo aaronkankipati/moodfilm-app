@@ -3142,11 +3142,11 @@ function dismissAdEarly(){
    Shows the pro loading sheet while the API runs, then collapses
    gracefully into results. Mirrors collapsePaywallAndRender exactly. */
 const _PRO_LINES=[
-  "Reading between the frames…",
-  "Finding your emotional frequency…",
-  "Matching mood to cinema…",
-  "Assembling your programme…",
-  "Almost there…"
+  "Reading how you feel…",
+  "Searching 700,000+ films…",
+  "Matching tone, pace and feeling…",
+  "Because your mood deserves the best…",
+  "Curating your six…"
 ];
 
 function _showProLoading(){
@@ -3211,6 +3211,7 @@ function _collapseProAndRender(data){
       if(data.credits_remaining!==undefined)userCredits=data.credits_remaining;
       if(data.is_subscribed!==undefined)isProUser=data.is_subscribed;
       chatStep="done";
+      _searchFailCount=0;
       lastRecs=data.recommendations;
       renderResults(data.recommendations,data.moodAnalysis);
       initialisePushNotifications();
@@ -3286,7 +3287,10 @@ async function fireFinalAPI(){
 }
 
 /* ── ERROR DISPLAY — never leaves user stuck ── */
+let _searchFailCount=0;
 function showError(type, retryFn){
+  _searchFailCount++;
+  const stuck = _searchFailCount >= 3;
   const messages={
     OFFLINE:        {icon:"📡", title:"You're offline", sub:"Check your connection and try again."},
     TIMEOUT:        {icon:"⏱", title:"That took too long", sub:"The AI is busy. Try again in a moment."},
@@ -3294,36 +3298,36 @@ function showError(type, retryFn){
     REQUEST_FAILED: {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
     DEFAULT:        {icon:"⚡", title:"Something went wrong", sub:"Give it another try."},
   };
-  const m=messages[type]||messages.DEFAULT;
+  let m = messages[type] || messages.DEFAULT;
+  // After a few failures, escalate the message and offer an explicit
+  // Start-over CHOICE. We never auto-wipe the user's mood/inputs.
+  if(stuck){
+    m = {icon:"🎬", title:"Still having trouble",
+         sub:"We can't reach our film engine right now. Try once more, or start fresh — either way nothing's lost."};
+  }
   const w=document.createElement("div");
   w.className="msg-app slide-up";
-  // Use a data attribute for retry count — avoids closure/serialisation issues
-  w.dataset.retryCount="0";
   w.innerHTML=`<div class="msg-avatar"></div>
     <div class="bubble-app error-bubble">
       <div class="error-icon">${m.icon}</div>
       <div class="error-title">${m.title}</div>
       <div class="error-sub">${m.sub}</div>
       <button class="error-retry" id="err-retry-btn" aria-label="Retry loading film recommendations">Try again</button>
+      ${stuck ? `<button class="error-retry" id="err-startover-btn" style="margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,.18)" aria-label="Start over">Start over</button>` : ``}
     </div>`;
-  // Wire retry button — no inline string serialisation
   const chat=document.getElementById("chat");
   chat.appendChild(w);
-  const btn=w.querySelector("#err-retry-btn");
-  btn.id=""; // clear id to avoid duplicates
-  btn.onclick=function(){
-    const count=parseInt(w.dataset.retryCount||"0");
+  const retry=w.querySelector("#err-retry-btn"); if(retry)retry.id="";
+  const over =w.querySelector("#err-startover-btn"); if(over)over.id="";
+  // Try again: re-run the same search, preserving the user's inputs. Never restart.
+  if(retry)retry.onclick=function(){
     w.remove();
-    if(count===0){
-      // First retry — clean re-attempt of the API
-      w.dataset.retryCount="1";
-      adApiPromise=null;
-      try{ retryFn(); }catch(e){ restartAll(); }
-    } else {
-      // Second retry — user is stuck, hard reset to main page
-      restartAll();
-    }
+    adApiPromise=null;
+    chatStep="loading";
+    try{ retryFn(); }catch(e){ showError("REQUEST_FAILED", retryFn); }
   };
+  // Start over: only when the USER chooses it.
+  if(over)over.onclick=function(){ w.remove(); _searchFailCount=0; restartAll(); };
   scrollChat();
 }
 
