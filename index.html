@@ -2671,6 +2671,8 @@ function selectLang(lang,row){
 
 const PRODUCT_CREDITS_15   = "com.moodfilm.credits_15";
 const PRODUCT_SUB_MONTHLY  = "com.moodfilm.subscription_monthly";
+// Link shared with friends. Play Store listing — drives installs, not web.
+const SHARE_URL = "https://play.google.com/store/apps/details?id=com.moodfilm.app";
 
 // ── User state (hydrated from backend on load) ──────────────
 let userCredits     = 0;      // search_credits from DB
@@ -2973,6 +2975,11 @@ function updateProUI(){
    as fallback). Runs non-blocking — never delays app startup. */
 async function initialisePro(){
   try{
+    // Load the user's real account state (credits, Pro, free-trial-used) from
+    // the backend FIRST — so a returning paid user is recognised on their very
+    // first search instead of seeing the free-trial education screen.
+    await refreshUserState();
+
     // Try backend-authoritative state first (requires auth token)
     // _userIdToken would be set here by your Firebase auth integration
     // e.g. firebase.auth().onAuthStateChanged(user => { _userIdToken = await user.getIdToken(); refreshUserState(); })
@@ -3651,8 +3658,8 @@ function renderOTT(s){
   return html+'</div>';
 }
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 https://moodfilm.app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
-function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 https://moodfilm.app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 ${SHARE_URL}`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 ${SHARE_URL}`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
 /* ── INIT ── */
