@@ -2695,11 +2695,11 @@ async function refreshUserState(){
     const res = await fetch(WORKER_URL+"/api/user/state",{
       headers:{ "X-Device-ID": DEVICE_ID }
     });
-    if(!res.ok) return;
+    if(!res.ok) return false;
     const data = await res.json();
     _cacheUserState(data);
-    
-  } catch(e){ console.log("[Moodfilm] Could not refresh user state:", e.message); }
+    return true;
+  } catch(e){ console.log("[Moodfilm] Could not refresh user state:", e.message); return false; }
 }
 
 /* ── pollForEntitlement
@@ -2978,23 +2978,29 @@ async function initialisePro(){
     // Load the user's real account state (credits, Pro, free-trial-used) from
     // the backend FIRST — so a returning paid user is recognised on their very
     // first search instead of seeing the free-trial education screen.
-    await refreshUserState();
-
-    // Try backend-authoritative state first (requires auth token)
-    // _userIdToken would be set here by your Firebase auth integration
-    // e.g. firebase.auth().onAuthStateChanged(user => { _userIdToken = await user.getIdToken(); refreshUserState(); })
-    // For unauthenticated / guest mode, fall back to Play billing check:
+    // Backend is the source of truth for Pro status (is_subscribed), kept current
+    // by register-purchase + Google Play RTDN webhooks. stateLoaded tells us
+    // whether the backend actually answered.
+    const stateLoaded = await refreshUserState();
+    updateProUI(); // reflect the authoritative state in the UI
 
     const service = await getDigitalGoodsService();
     if(!service) return; // browser — no billing available
 
     const existingPurchases = await service.listPurchases();
-    const activeSub = existingPurchases.find(p =>
-      p.itemId === PRODUCT_SUB_MONTHLY && p.purchaseState === "purchased"
-    );
-    if(activeSub){
-      isProUser = true;
-      updateProUI();
+
+    // Subscription status comes from the BACKEND ONLY. We do NOT let
+    // listPurchases() switch Pro on when the backend says otherwise: right after
+    // a sub is cancelled/expired, Play's on-device cache can still report it as
+    // "purchased", which would wrongly resurrect Pro on reopen.
+    // The single exception is when the backend was unreachable (stateLoaded
+    // false) — only then do we fall back to Play's cache so a genuine subscriber
+    // isn't stranded offline. This self-corrects on the next successful refresh.
+    if(!stateLoaded){
+      const activeSub = existingPurchases.find(p =>
+        p.itemId === PRODUCT_SUB_MONTHLY && p.purchaseState === "purchased"
+      );
+      if(activeSub){ isProUser = true; updateProUI(); }
     }
 
     // Clear any leftover, unconsumed credits purchase so the user isn't blocked
