@@ -2,7 +2,7 @@
 // Strategy: Cache-first for shell assets, network-only for API calls
 // New in v2: Background Sync, Periodic Background Sync, Push Notifications
 
-const CACHE_NAME = "moodfilm-v4";
+const CACHE_NAME = "moodfilm-v5";
 const SYNC_TAG = "moodfilm-bg-sync";
 const PERIODIC_SYNC_TAG = "moodfilm-periodic-sync";
 

@@ -3042,6 +3042,7 @@ function showPaywall(educationMode){
   } else {
     if(edEl)   edEl.style.display  = "none";
     if(gateEl) gateEl.style.display= "block";
+    updateProUI(); // re-assert subscribe-button visibility for current Pro state
   }
   document.getElementById("ad-gate").classList.add("show");
 
@@ -3114,6 +3115,7 @@ function switchPaywallToGate(){
   const gateEl = document.getElementById("pw-gate");
   if(edEl)   edEl.style.display   = "none";
   if(gateEl) gateEl.style.display = "block";
+  updateProUI(); // re-assert subscribe-button visibility for current Pro state
   chatStep = "ad_gate";
 }
 
