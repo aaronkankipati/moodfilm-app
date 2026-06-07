@@ -2963,10 +2963,11 @@ async function _consumePurchase(purchaseToken){
   }catch(e){ console.log("[Credits] consume failed:", e.message); }
 }
 
-// Update UI when Pro is active
+// Reflect Pro state in the paywall: hide the subscribe button only when the
+// user is actually Pro; show it (the default flex layout) otherwise.
 function updateProUI(){
   const btn = document.getElementById("btn-go-pro");
-  if(btn) btn.style.display = "none";
+  if(btn) btn.style.display = isProUser ? "none" : "flex";
 }
 
 
