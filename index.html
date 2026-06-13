@@ -2117,15 +2117,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
            not during the user's first magic moment. -->
       <div style="position:relative;z-index:1;border-top:1px solid rgba(200,137,90,.12);padding-top:16px">
         <p style="font-size:12.5px;text-align:center;color:var(--muted);line-height:1.6;margin:0">Your first search is on us — no card, no sign-up.</p>
-          <div style="flex:1;background:rgba(200,137,90,.06);border:1px solid rgba(200,137,90,.18);border-radius:10px;padding:11px 12px;text-align:center">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-l);font-weight:600">₹149</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4">15 credits<br>no expiry</div>
-          </div>
-          <div style="flex:1;background:rgba(200,137,90,.06);border:1px solid rgba(200,137,90,.18);border-radius:10px;padding:11px 12px;text-align:center">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-l);font-weight:600">₹349</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4">45 searches<br>per month</div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -3033,7 +3024,7 @@ async function _consumePurchase(purchaseToken){
 // user is actually Pro; show it (the default flex layout) otherwise.
 function updateProUI(){
   const btn = document.getElementById("btn-go-pro");
-  if(btn) btn.style.display = "none";
+  if(btn) btn.style.display = isProUser ? "none" : "flex";
 }
 
 
@@ -3285,7 +3276,6 @@ function _collapseProAndRender(data){
       if(data.credits_remaining!==undefined)userCredits=data.credits_remaining;
       if(data.is_subscribed!==undefined)isProUser=data.is_subscribed;
       chatStep="done";
-      _searchFailCount=0;
       lastRecs=data.recommendations;
       renderResults(data.recommendations,data.moodAnalysis);
       // Reset scroll so Top Pick heading is fully visible, not under the topbar
