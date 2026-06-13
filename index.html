@@ -2084,8 +2084,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <div style="position:relative;z-index:1;text-align:center;margin-bottom:20px">
         <!-- Curating spinner -->
         <div id="pw-spinner" style="margin:0 auto 14px;width:36px;height:36px;border-radius:50%;border:2px solid rgba(200,137,90,.18);border-top-color:var(--gold);animation:spin .9s linear infinite"></div>
-        <h2 class="ad-title" style="margin-bottom:6px">Curating your films<em>…</em></h2>
-        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:0">Matching your mood to the right films.<br>Ready in just a moment.</p>
+        <h2 class="ad-title" style="margin-bottom:6px">Finding films for how you feel<em>…</em></h2>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:0">We're taking your mood to heart.<br>This is worth a moment.</p>
       </div>
 
       <!-- Feature education cards -->
@@ -2168,7 +2168,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
         <div class="pro-spinner-arc"></div>
         <div id="pro-spinner-dot" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold),0 0 22px rgba(200,137,90,.35)"></div>
       </div>
-      <h2 class="ad-title" id="pro-loading-title">Curating your films<em>…</em></h2>
+      <h2 class="ad-title" id="pro-loading-title">Finding films for how you feel<em>…</em></h2>
       <p id="pro-loading-line" style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:0;min-height:18px"></p>
     </div>
     <div style="height:2px;border-radius:2px;background:rgba(200,137,90,.1);margin-bottom:18px;overflow:hidden;position:relative;z-index:1">
@@ -3204,14 +3204,14 @@ function dismissAdEarly(){
    Shows the pro loading sheet while the API runs, then collapses
    gracefully into results. Mirrors collapsePaywallAndRender exactly. */
 const _PRO_LINES=[
-  "Reading how you feel…",
-  "Searching 700,000+ films…",
-  "Matching tone, pace and feeling…",
-  "Because your mood deserves the best…",
-  "Curating your six…",
-  "Matching mood to cinema…",
-  "Assembling your programme…",
-  "Almost there…"
+  "Sitting with how you feel…",
+  "Taking your mood seriously…",
+  "Looking through 700,000+ films for you…",
+  "Finding the ones that truly fit…",
+  "Matching feeling, not just genre…",
+  "You deserve the right film tonight…",
+  "Choosing your six with care…",
+  "Almost ready for you…"
 ];
 
 function _showProLoading(){
@@ -3236,7 +3236,7 @@ function _showProLoading(){
   const fill=document.getElementById("pro-progress-fill");
   if(arc){arc.style.animation="spin .9s linear infinite";arc.style.border="2px solid transparent";arc.style.borderTopColor="var(--gold)";arc.style.borderRightColor="rgba(200,137,90,.28)";}
   if(dot)dot.style.display="block";
-  if(title)title.innerHTML="Curating your films<em>…</em>";
+  if(title)title.innerHTML="Finding films for how you feel<em>…</em>";
   if(fill)fill.style.width="0%";
   document.getElementById("pro-loading").classList.add("show");
   let prog=0;
