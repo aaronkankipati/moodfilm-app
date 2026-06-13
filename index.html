@@ -2100,7 +2100,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
         <div style="background:rgba(200,137,90,.07);border:1px solid rgba(200,137,90,.15);border-radius:12px;padding:13px 15px;display:flex;align-items:flex-start;gap:12px">
           <span style="font-size:22px;flex-shrink:0;margin-top:1px">🌍</span>
           <div>
-            <div style="font-family:'Lora',Georgia,serif;font-size:13px;font-weight:500;color:var(--paper);margin-bottom:3px">Hindi, Telugu, Tamil & more</div>
+            <div style="font-family:'Lora',Georgia,serif;font-size:13px;font-weight:500;color:var(--paper);margin-bottom:3px">English, Hindi, Telugu, Tamil &amp; more</div>
             <div style="font-size:12px;color:var(--muted);line-height:1.5">Every search understands language preference. Indian cinema included.</div>
           </div>
         </div>
@@ -2113,10 +2113,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
         </div>
       </div>
 
-      <!-- Soft tier preview — no hard sell, just awareness -->
+      <!-- First-search reassurance — pricing is introduced later, at the gate,
+           not during the user's first magic moment. -->
       <div style="position:relative;z-index:1;border-top:1px solid rgba(200,137,90,.12);padding-top:16px">
-        <p style="font-size:11px;text-align:center;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Keep searching after this</p>
-        <div style="display:flex;gap:8px">
+        <p style="font-size:12.5px;text-align:center;color:var(--muted);line-height:1.6;margin:0">Your first search is on us — no card, no sign-up.</p>
           <div style="flex:1;background:rgba(200,137,90,.06);border:1px solid rgba(200,137,90,.18);border-radius:10px;padding:11px 12px;text-align:center">
             <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-l);font-weight:600">₹149</div>
             <div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4">15 credits<br>no expiry</div>
@@ -2761,11 +2761,11 @@ async function refreshUserState(){
     const res = await fetch(WORKER_URL+"/api/user/state",{
       headers:{ "X-Device-ID": DEVICE_ID }
     });
-    if(!res.ok) return;
+    if(!res.ok) return false;
     const data = await res.json();
     _cacheUserState(data);
-    
-  } catch(e){ console.log("[Moodfilm] Could not refresh user state:", e.message); }
+    return true;
+  } catch(e){ console.log("[Moodfilm] Could not refresh user state:", e.message); return false; }
 }
 
 /* ── pollForEntitlement
@@ -3029,7 +3029,8 @@ async function _consumePurchase(purchaseToken){
   }catch(e){ console.log("[Credits] consume failed:", e.message); }
 }
 
-// Update UI when Pro is active
+// Reflect Pro state in the paywall: hide the subscribe button only when the
+// user is actually Pro; show it (the default flex layout) otherwise.
 function updateProUI(){
   const btn = document.getElementById("btn-go-pro");
   if(btn) btn.style.display = "none";
@@ -3041,21 +3042,32 @@ function updateProUI(){
    as fallback). Runs non-blocking — never delays app startup. */
 async function initialisePro(){
   try{
-    // Try backend-authoritative state first (requires auth token)
-    // _userIdToken would be set here by your Firebase auth integration
-    // e.g. firebase.auth().onAuthStateChanged(user => { _userIdToken = await user.getIdToken(); refreshUserState(); })
-    // For unauthenticated / guest mode, fall back to Play billing check:
+    // Load the user's real account state (credits, Pro, free-trial-used) from
+    // the backend FIRST — so a returning paid user is recognised on their very
+    // first search instead of seeing the free-trial education screen.
+    // Backend is the source of truth for Pro status (is_subscribed), kept current
+    // by register-purchase + Google Play RTDN webhooks. stateLoaded tells us
+    // whether the backend actually answered.
+    const stateLoaded = await refreshUserState();
+    updateProUI(); // reflect the authoritative state in the UI
 
     const service = await getDigitalGoodsService();
     if(!service) return; // browser — no billing available
 
     const existingPurchases = await service.listPurchases();
-    const activeSub = existingPurchases.find(p =>
-      p.itemId === PRODUCT_SUB_MONTHLY && p.purchaseState === "purchased"
-    );
-    if(activeSub){
-      isProUser = true;
-      updateProUI();
+
+    // Subscription status comes from the BACKEND ONLY. We do NOT let
+    // listPurchases() switch Pro on when the backend says otherwise: right after
+    // a sub is cancelled/expired, Play's on-device cache can still report it as
+    // "purchased", which would wrongly resurrect Pro on reopen.
+    // The single exception is when the backend was unreachable (stateLoaded
+    // false) — only then do we fall back to Play's cache so a genuine subscriber
+    // isn't stranded offline. This self-corrects on the next successful refresh.
+    if(!stateLoaded){
+      const activeSub = existingPurchases.find(p =>
+        p.itemId === PRODUCT_SUB_MONTHLY && p.purchaseState === "purchased"
+      );
+      if(activeSub){ isProUser = true; updateProUI(); }
     }
 
     // Clear any leftover, unconsumed credits purchase so the user isn't blocked
@@ -3201,8 +3213,11 @@ function dismissAdEarly(){
    Shows the pro loading sheet while the API runs, then collapses
    gracefully into results. Mirrors collapsePaywallAndRender exactly. */
 const _PRO_LINES=[
-  "Reading between the frames…",
-  "Finding your emotional frequency…",
+  "Reading how you feel…",
+  "Searching 700,000+ films…",
+  "Matching tone, pace and feeling…",
+  "Because your mood deserves the best…",
+  "Curating your six…",
   "Matching mood to cinema…",
   "Assembling your programme…",
   "Almost there…"
@@ -3270,8 +3285,12 @@ function _collapseProAndRender(data){
       if(data.credits_remaining!==undefined)userCredits=data.credits_remaining;
       if(data.is_subscribed!==undefined)isProUser=data.is_subscribed;
       chatStep="done";
+      _searchFailCount=0;
       lastRecs=data.recommendations;
       renderResults(data.recommendations,data.moodAnalysis);
+      // Reset scroll so Top Pick heading is fully visible, not under the topbar
+      const _chat=document.getElementById('chat');
+      if(_chat) _chat.scrollTop=0;
       initialisePushNotifications();
     },480);
   },600);
@@ -3715,8 +3734,8 @@ function renderOTT(s){
   return html+'</div>';
 }
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
-function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 https://moodfilm.app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
-function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 https://moodfilm.app/`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 ${SHARE_URL}`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
+function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 ${SHARE_URL}`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
 /* ── INIT ── */
@@ -4470,5 +4489,4 @@ initialisePro();
 
 </script>
 </body>
-</html>
 </html>
