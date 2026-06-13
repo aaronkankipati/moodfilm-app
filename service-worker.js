@@ -2,7 +2,7 @@
 // Strategy: Cache-first for shell assets, network-only for API calls
 // New in v2: Background Sync, Periodic Background Sync, Push Notifications
 
-const CACHE_NAME = "moodfilm-v4"; // bumped for branding asset rollout
+const CACHE_NAME = "moodfilm-v5";
 const SYNC_TAG = "moodfilm-bg-sync";
 const PERIODIC_SYNC_TAG = "moodfilm-periodic-sync";
 
@@ -66,7 +66,32 @@ self.addEventListener("fetch", (event) => {
   // 4. Skip non-http(s) schemes
   if (!url.protocol.startsWith("http")) return;
 
-  // 5. For everything else (app shell, fonts, icons): cache-first
+  // 5. HTML / navigations: NETWORK-FIRST so code updates always reach the
+  //    device. A cache-first shell here was serving a stale index.html,
+  //    which made redeployed fixes (e.g. paywall buttons) never load.
+  const isHTML =
+    request.mode === "navigate" ||
+    request.destination === "document" ||
+    url.pathname === "/" ||
+    url.pathname.endsWith("/index.html");
+
+  if (isHTML) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type !== "error") {
+            const toCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, toCache));
+          }
+          return response;
+        })
+        // Offline fallback only — never the primary path
+        .catch(() => caches.match(request).then((c) => c || caches.match("/index.html")))
+    );
+    return;
+  }
+
+  // 6. Everything else (fonts, icons, static assets): cache-first
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
