@@ -1311,18 +1311,26 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   align-items: center;
   justify-content: center;
 }
-/* Genre badge — bottom of poster */
+/* Genre badge — copper pill, bottom-left of poster. Bold and legible against
+   busy poster art (was a faint 8px full-width grey label that got lost). */
 .film-genre-badge {
   position: absolute;
-  bottom: 0;
-  left: 0; right: 0;
-  padding: 18px 8px 8px;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-  font-size: 8px;
+  bottom: 10px;
+  left: 10px;
+  padding: 5px 11px;
+  background: linear-gradient(135deg, rgba(224,112,48,0.96), rgba(176,80,32,0.96));
+  border: 1px solid rgba(248,200,144,0.55);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.14em;
+  color: #fff;
   text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.25);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* Vertical gold divider */
@@ -1511,7 +1519,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .action-chip:active{background:rgba(200,137,90,.16)}
 .action-chip.gold{color:var(--gold-l);border-color:rgba(200,137,90,.45);background:rgba(200,137,90,.13)}
 /* Mood summary */
-.results-lead{padding:2px 0 8px}
+.results-lead{padding:12px 0 8px;scroll-margin-top:16px}
 .results-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.22em;color:var(--gold);margin-bottom:6px;display:block}
 .mood-summary-text{font-family:'EB Garamond',serif;font-size:17px;font-style:italic;color:rgba(237,232,226,.78);line-height:1.55;margin-bottom:10px}
 .mood-tags{display:flex;flex-wrap:wrap;gap:5px}
@@ -3214,7 +3222,12 @@ const _PRO_LINES=[
   "Almost ready for you…"
 ];
 
-function _showProLoading(){
+// Applies Pro vs credits state to the loading sheet badge + credit strip.
+// Pulled out so it can be re-run the moment authoritative is_subscribed arrives
+// (the boot refreshUserState() is non-blocking, so a fast returning subscriber
+// can start a search before isProUser is populated — re-applying on response
+// guarantees the PRO badge shows for real subscribers regardless of that race).
+function _applyProBadge(){
   const badge=document.getElementById("pro-loading-badge");
   const stripBadge=document.getElementById("pro-strip-badge");
   const stripLabel=document.getElementById("pro-strip-label");
@@ -3229,6 +3242,15 @@ function _showProLoading(){
     if(stripBadge)stripBadge.style.display="none";
     if(stripLabel)stripLabel.textContent="Your credits";
     if(stripCount)stripCount.textContent=userCredits+" credit"+(userCredits===1?"":"s")+" remaining";
+  }
+}
+
+function _showProLoading(){
+  _applyProBadge();
+  // If boot state-fetch finishes around now, re-apply so a returning subscriber's
+  // PRO badge appears as soon as their status is confirmed (no full reload needed).
+  if(window._proInitPromise&&window._proInitPromise.then){
+    window._proInitPromise.then(()=>_applyProBadge());
   }
   const arc=document.querySelector(".pro-spinner-arc");
   const dot=document.getElementById("pro-spinner-dot");
@@ -3275,12 +3297,16 @@ function _collapseProAndRender(data){
       const tick=spinner?spinner.querySelector(".pro-tick"):null;if(tick)tick.remove();
       if(data.credits_remaining!==undefined)userCredits=data.credits_remaining;
       if(data.is_subscribed!==undefined)isProUser=data.is_subscribed;
+      _applyProBadge(); // refresh badge now that authoritative Pro state is known
       chatStep="done";
       lastRecs=data.recommendations;
       renderResults(data.recommendations,data.moodAnalysis);
-      // Reset scroll so Top Pick heading is fully visible, not under the topbar
+      // Reset scroll so the "Your Picks" heading sits fully below the topbar.
+      // rAF ensures this runs AFTER the results DOM has laid out, so the
+      // position is correct regardless of render timing (fixes the header
+      // occasionally parking slightly under the bar).
       const _chat=document.getElementById('chat');
-      if(_chat) _chat.scrollTop=0;
+      if(_chat) requestAnimationFrame(()=>{ _chat.scrollTop=0; });
       initialisePushNotifications();
     },480);
   },600);
@@ -4474,8 +4500,10 @@ function _urlB64ToUint8(base64String) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Initialise Pro status on every load
-initialisePro();
+// Initialise Pro status on every load. Capture the promise so the loading
+// screen can reflect authoritative Pro state if it has already resolved by the
+// time the user searches (the common case — users pause on the home screen).
+window._proInitPromise = initialisePro();
 
 </script>
 </body>
