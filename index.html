@@ -1311,26 +1311,26 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   align-items: center;
   justify-content: center;
 }
-/* Genre badge — copper pill, bottom-left of poster. Bold and legible against
-   busy poster art (was a faint 8px full-width grey label that got lost). */
+/* Genre badge — centered at poster bottom. Matches the elegant muted-copper
+   of the hero share button (var(--gold)→var(--gold-d) with dark text) rather
+   than a loud saturated orange. Refined, legible, on-brand. */
 .film-genre-badge {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  padding: 5px 11px;
-  background: linear-gradient(135deg, rgba(224,112,48,0.96), rgba(176,80,32,0.96));
-  border: 1px solid rgba(248,200,144,0.55);
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 14px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-d));
   border-radius: 999px;
-  font-size: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 9.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #fff;
+  letter-spacing: 0.16em;
+  color: #1a1206;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.25);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.45);
 }
 
 /* Vertical gold divider */
