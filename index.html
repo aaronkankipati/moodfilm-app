@@ -2801,51 +2801,11 @@ function selectLang(lang,row){
     }).catch(()=>{ hasUsedFreeTrial = false; });
   }
 
-  // ── RATING PROMPT → PAYWALL SEQUENCE ──────────────────────────────────
-  // Correct trigger: SECOND search attempt, not the first.
-  //
-  // Why: on isFreeSession the rating was firing at t=350ms — before results
-  // even rendered (API takes 18-27s). Asking "did we find the right film?"
-  // before showing a single film is wrong and kills conversion.
-  //
-  // The right moment: the user's SECOND search. They've seen the curated list,
-  // felt the quality, and are coming back for more. Peak satisfaction, natural
-  // gate before payment. Rating sheet slides up over the paywall gate.
-  //
-  // 1st search (isFreeSession): results → education paywall. No rating.
-  // 2nd search (!isFreeSession): gate paywall → rating overlay → user decides.
-  // After rating/skip: paywall gate stays visible underneath. No extra dismiss.
-  // One-shot: `mf_rated` in localStorage, never shown again.
-
-  if(isFreeSession){
-    // First search — show results then education paywall. Rating comes later.
-    setTimeout(()=>showPaywall(true), 350);
-  } else {
-    // Second+ search — user has seen picks. Show rating over the gate.
-    const alreadyRated = localStorage.getItem('mf_rated');
-    if(alreadyRated){
-      setTimeout(()=>showPaywall(false), 350);
-    } else {
-      setTimeout(()=>{
-        showPaywall(false); // gate appears first
-        setTimeout(async ()=>{
-          // Try native Play In-App Review (TWA only, silent no-op in browser)
-          let nativeShown = false;
-          try{
-            if(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage){
-              chrome.runtime.sendMessage({type:'REQUEST_REVIEW'});
-              nativeShown = true;
-            }
-          } catch(e){}
-          if(nativeShown){
-            localStorage.setItem('mf_rated','1');
-          } else {
-            _showRatingPrompt(null); // paywall gate already visible underneath
-          }
-        }, 600); // gate animates in, then rating slides over it
-      }, 350);
-    }
-  }
+  // ── PAYWALL TRIGGER ──────────────────────────────────────────────────────
+  // Simple: first search shows education paywall, all subsequent show the gate.
+  // Rating is scheduled from _collapseProAndRender AFTER results are visible —
+  // not here, where the API hasn't even responded yet.
+  setTimeout(()=>showPaywall(isFreeSession), 350);
 }
 
 // ── RATING PROMPT ENGINE ──────────────────────────────────────────────────
@@ -3499,6 +3459,28 @@ function _collapseProAndRender(data){
       const _chat=document.getElementById('chat');
       if(_chat) requestAnimationFrame(()=>{ _chat.scrollTop=0; });
       initialisePushNotifications();
+
+      // ── RATING PROMPT ─────────────────────────────────────────────────────
+      // Fires from here — the ONLY place we know results are visible on screen.
+      // 4s delay so the user can scroll the picks and feel the quality first.
+      // One-shot: mf_rated localStorage flag; never shown again after rate/skip.
+      if(!localStorage.getItem('mf_rated')){
+        setTimeout(async ()=>{
+          // Try Google Play native In-App Review (TWA only, no-op in browser)
+          let nativeShown = false;
+          try{
+            if(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage){
+              chrome.runtime.sendMessage({type:'REQUEST_REVIEW'});
+              nativeShown = true;
+            }
+          } catch(e){}
+          if(nativeShown){
+            localStorage.setItem('mf_rated','1');
+          } else {
+            _showRatingPrompt(null);
+          }
+        }, 4000);
+      }
     },480);
   },600);
 }
