@@ -2802,44 +2802,49 @@ function selectLang(lang,row){
   }
 
   // ── RATING PROMPT → PAYWALL SEQUENCE ──────────────────────────────────
-  // Strategy: show the rating prompt at peak delight (2.5s after results
-  // appear), give the user time to interact, then flow into the paywall.
-  // One-shot: localStorage flag `mf_rated` prevents repeat shows.
-  // Native TWA: try Play in-app review first (zero friction, real review);
-  // fall back to our elegant modal for browser / if native is unavailable.
+  // Correct trigger: SECOND search attempt, not the first.
+  //
+  // Why: on isFreeSession the rating was firing at t=350ms — before results
+  // even rendered (API takes 18-27s). Asking "did we find the right film?"
+  // before showing a single film is wrong and kills conversion.
+  //
+  // The right moment: the user's SECOND search. They've seen the curated list,
+  // felt the quality, and are coming back for more. Peak satisfaction, natural
+  // gate before payment. Rating sheet slides up over the paywall gate.
+  //
+  // 1st search (isFreeSession): results → education paywall. No rating.
+  // 2nd search (!isFreeSession): gate paywall → rating overlay → user decides.
+  // After rating/skip: paywall gate stays visible underneath. No extra dismiss.
+  // One-shot: `mf_rated` in localStorage, never shown again.
+
   if(isFreeSession){
+    // First search — show results then education paywall. Rating comes later.
+    setTimeout(()=>showPaywall(true), 350);
+  } else {
+    // Second+ search — user has seen picks. Show rating over the gate.
     const alreadyRated = localStorage.getItem('mf_rated');
     if(alreadyRated){
-      // User already rated or skipped — go straight to paywall
-      setTimeout(()=>showPaywall(true), 350);
+      setTimeout(()=>showPaywall(false), 350);
     } else {
-      // Peak delight moment: delay 2.5s so user reads the top pick first
-      setTimeout(async ()=>{
-        // Try Google Play In-App Review API (TWA only, no-ops silently in browser)
-        let nativeShown = false;
-        try{
-          if(window.digitalGoods || (window.getDigitalGoodsService)){
-            // Check if we're in a TWA context with chrome.runtime available
+      setTimeout(()=>{
+        showPaywall(false); // gate appears first
+        setTimeout(async ()=>{
+          // Try native Play In-App Review (TWA only, silent no-op in browser)
+          let nativeShown = false;
+          try{
             if(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage){
-              // Post message to TWA shell to trigger LaunchReviewFlow
               chrome.runtime.sendMessage({type:'REQUEST_REVIEW'});
               nativeShown = true;
             }
+          } catch(e){}
+          if(nativeShown){
+            localStorage.setItem('mf_rated','1');
+          } else {
+            _showRatingPrompt(null); // paywall gate already visible underneath
           }
-        } catch(e){ /* silently ignore — not in TWA context */ }
-
-        if(nativeShown){
-          // Native review shown — mark as rated and proceed to paywall after delay
-          localStorage.setItem('mf_rated','1');
-          setTimeout(()=>showPaywall(true), 2500);
-        } else {
-          // Show our elegant modal
-          _showRatingPrompt(()=>showPaywall(true));
-        }
-      }, 2500);
+        }, 600); // gate animates in, then rating slides over it
+      }, 350);
     }
-  } else {
-    setTimeout(()=>showPaywall(false), 350);
   }
 }
 
