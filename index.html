@@ -1612,71 +1612,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .error-retry{background:linear-gradient(135deg,var(--gold),var(--gold-d));border:none;border-radius:10px;color:var(--ink);font-family:'Lora',Georgia,serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;touch-action:manipulation}
 .error-retry:active{opacity:.85}
 
-/* ── RATING PROMPT ────────────────────────────────────────────────────────
-   Appears at peak delight (2.5s after free-trial results), before paywall.
-   Copper pill buttons match the share CTA; dark overlay matches ad-gate. */
-#rating-prompt{
-  position:fixed;inset:0;z-index:490;
-  background:rgba(7,7,9,.72);
-  display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .3s ease;
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-}
-#rating-prompt.show{opacity:1;pointer-events:auto}
-#rating-sheet{
-  width:100%;max-width:480px;
-  background:linear-gradient(160deg,#181210,#120e0c);
-  border:1px solid rgba(200,137,90,.18);
-  border-bottom:none;
-  border-radius:22px 22px 0 0;
-  padding:28px 26px 38px;
-  transform:translateY(100%);
-  transition:transform .38s cubic-bezier(.22,.61,.36,1);
-}
-#rating-prompt.show #rating-sheet{transform:translateY(0)}
-.rating-handle{
-  width:36px;height:4px;border-radius:2px;
-  background:rgba(200,137,90,.3);
-  margin:0 auto 24px;
-}
-.rating-stars{
-  display:flex;justify-content:center;gap:10px;
-  margin-bottom:20px;
-}
-.rating-star{
-  font-size:32px;line-height:1;cursor:pointer;
-  color:rgba(200,137,90,.25);
-  transition:color .15s ease,transform .15s ease;
-}
-.rating-star.lit{color:var(--gold)}
-.rating-star:hover{transform:scale(1.15)}
-.rating-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px;font-weight:400;
-  color:var(--paper);
-  text-align:center;margin-bottom:8px;line-height:1.3;
-}
-.rating-sub{
-  font-size:12px;color:var(--muted);
-  text-align:center;line-height:1.6;margin-bottom:24px;
-}
-.rating-btn-primary{
-  width:100%;padding:14px;margin-bottom:10px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-d));
-  border:none;border-radius:12px;
-  font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
-  color:#060606;letter-spacing:.02em;cursor:pointer;
-  transition:opacity .15s;
-}
-.rating-btn-primary:active{opacity:.85}
-.rating-btn-skip{
-  width:100%;padding:11px;
-  background:none;border:none;
-  font-family:'Outfit',sans-serif;font-size:12px;
-  color:var(--muted);cursor:pointer;letter-spacing:.02em;
-}
-
 /* ══ EXPANDED CARD OVERLAY ══════════════════════════════
    Slides up from bottom when user taps a film card.
    Full screen — large poster, full explanation, all details.
@@ -2142,24 +2077,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 </div>
 
 <!-- ══ AD GATE ════════════════════════════════════════════ -->
-<!-- ══ RATING PROMPT — shown at peak delight after free trial results ══ -->
-<div id="rating-prompt" role="dialog" aria-modal="true" aria-label="Rate Moodfilm">
-  <div id="rating-sheet">
-    <div class="rating-handle"></div>
-    <div class="rating-stars" id="rating-stars">
-      <span class="rating-star" data-v="1">★</span>
-      <span class="rating-star" data-v="2">★</span>
-      <span class="rating-star" data-v="3">★</span>
-      <span class="rating-star" data-v="4">★</span>
-      <span class="rating-star" data-v="5">★</span>
-    </div>
-    <p class="rating-title">Did we find the right film?</p>
-    <p class="rating-sub">Your honest rating helps us match more people<br>to their perfect film.</p>
-    <button class="rating-btn-primary" id="rating-btn-rate">★&nbsp; Rate on Play Store</button>
-    <button class="rating-btn-skip" id="rating-btn-skip">Not now</button>
-  </div>
-</div>
-
 <div id="ad-gate">
   <div id="ad-sheet">
     <!-- Mood Fusion blobs — always visible, both modes -->
@@ -2801,75 +2718,7 @@ function selectLang(lang,row){
     }).catch(()=>{ hasUsedFreeTrial = false; });
   }
 
-  // ── PAYWALL TRIGGER ──────────────────────────────────────────────────────
-  // Simple: first search shows education paywall, all subsequent show the gate.
-  // Rating is scheduled from _collapseProAndRender AFTER results are visible —
-  // not here, where the API hasn't even responded yet.
   setTimeout(()=>showPaywall(isFreeSession), 350);
-}
-
-// ── RATING PROMPT ENGINE ──────────────────────────────────────────────────
-// Displays the rating modal, wires star interactions, handles rate/skip.
-// onDismiss callback fires when the user rates OR skips — always leads to paywall.
-function _showRatingPrompt(onDismiss){
-  const prompt  = document.getElementById('rating-prompt');
-  const stars   = document.querySelectorAll('.rating-star');
-  const rateBtn = document.getElementById('rating-btn-rate');
-  const skipBtn = document.getElementById('rating-btn-skip');
-  if(!prompt) return onDismiss && onDismiss();
-
-  let selected = 0;
-
-  // Star hover/select interaction
-  stars.forEach(s=>{
-    s.addEventListener('mouseover', ()=>{
-      const v = +s.dataset.v;
-      stars.forEach(x=>x.classList.toggle('lit', +x.dataset.v <= v));
-    });
-    s.addEventListener('mouseleave', ()=>{
-      stars.forEach(x=>x.classList.toggle('lit', +x.dataset.v <= selected));
-    });
-    s.addEventListener('click', ()=>{
-      selected = +s.dataset.v;
-      stars.forEach(x=>x.classList.toggle('lit', +x.dataset.v <= selected));
-      // 4-5 stars → send to Play Store; 1-3 → just record and dismiss
-      if(selected >= 4){
-        rateBtn.textContent = '★  Open Play Store';
-      } else {
-        rateBtn.textContent = 'Send feedback';
-      }
-    });
-  });
-
-  function _dismiss(rated){
-    localStorage.setItem('mf_rated', rated ? '1' : 'skipped');
-    prompt.classList.remove('show');
-    setTimeout(()=>{ if(onDismiss) onDismiss(); }, 400);
-  }
-
-  rateBtn.onclick = ()=>{
-    _dismiss(true);
-    // Open Play Store listing — works in browser + TWA
-    const storeUrl = 'market://details?id=com.moodfilm.app';
-    const webUrl   = 'https://play.google.com/store/apps/details?id=com.moodfilm.app';
-    try{ window.open(storeUrl,'_blank'); }
-    catch(e){ window.open(webUrl,'_blank'); }
-  };
-
-  skipBtn.onclick = ()=>_dismiss(false);
-
-  // Tap backdrop to dismiss
-  prompt.addEventListener('click', e=>{
-    if(e.target === prompt) _dismiss(false);
-  }, {once:true});
-
-  // Show with a small frame delay so CSS transition fires
-  requestAnimationFrame(()=>requestAnimationFrame(()=>prompt.classList.add('show')));
-
-  // Auto-dismiss after 12s if user ignores it — never block forever
-  setTimeout(()=>{
-    if(prompt.classList.contains('show')) _dismiss(false);
-  }, 12000);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -3459,28 +3308,6 @@ function _collapseProAndRender(data){
       const _chat=document.getElementById('chat');
       if(_chat) requestAnimationFrame(()=>{ _chat.scrollTop=0; });
       initialisePushNotifications();
-
-      // ── RATING PROMPT ─────────────────────────────────────────────────────
-      // Fires from here — the ONLY place we know results are visible on screen.
-      // 4s delay so the user can scroll the picks and feel the quality first.
-      // One-shot: mf_rated localStorage flag; never shown again after rate/skip.
-      if(!localStorage.getItem('mf_rated')){
-        setTimeout(async ()=>{
-          // Try Google Play native In-App Review (TWA only, no-op in browser)
-          let nativeShown = false;
-          try{
-            if(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage){
-              chrome.runtime.sendMessage({type:'REQUEST_REVIEW'});
-              nativeShown = true;
-            }
-          } catch(e){}
-          if(nativeShown){
-            localStorage.setItem('mf_rated','1');
-          } else {
-            _showRatingPrompt(null);
-          }
-        }, 4000);
-      }
     },480);
   },600);
 }
@@ -3841,6 +3668,7 @@ function initKeyboard(){
 }
 
 /* ── HELPERS ── */
+/* ── CARD OVERLAY ── */
 let _overlayRec=null;
 function openCardOverlay(rec){
   _overlayRec=rec;
