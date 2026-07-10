@@ -3750,6 +3750,7 @@ function renderOTT(s){
   return html+'</div>';
 }
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+const SHARE_URL="https://play.google.com/store/apps/details?id=com.moodfilm.app";
 function shareFilm(title){const text=`Moodfilm just paired my vibe with "${title}" 🎬\nSkip the endless scrolling 👉 ${SHARE_URL}`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function shareAll(){if(!lastRecs)return;const top=lastRecs.find(r=>r.isTopPick)||lastRecs[0];const text=`Moodfilm just paired my vibe with "${top?.title||"some great films"}" 🎬\nSkip the endless scrolling 👉 ${SHARE_URL}`;if(navigator.share)navigator.share({title:"Moodfilm",text}).catch(()=>{});else navigator.clipboard.writeText(text).then(()=>showToast("Copied!")).catch(()=>showToast("Copied!"))}
 function esc(s){if(s==null)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
